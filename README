@@ -1,0 +1,15 @@
+
+Configuration
+=============
+
+Set the SYSTEMC_PREFIX variable in the CMakeLists.txt file.
+
+Build
+=====
+
+Just type:
+
+* make
+* make run  # to generate waveform files.
+* make view # to open the waveform files with gtkwave.
+
