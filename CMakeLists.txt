@@ -11,7 +11,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
 #find_package(SystemC REQUIRED)
 #find_package(SimSoc REQUIRED)
 
-add_definitions(-std=gnu++0x)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
 
 file(GLOB THIRD_PARTY_INC_DIRS "3rd_party/*/include")
 
