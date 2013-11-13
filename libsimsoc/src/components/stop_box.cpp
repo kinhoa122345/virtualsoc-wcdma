@@ -3,8 +3,9 @@
 // LGPL license version 3
 //
 
-#include "stop_box.hpp"
-#include "libsimsoc/display.hpp"
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/components/stop_box.hpp>
+
 
 using namespace std;
 using namespace sc_core;

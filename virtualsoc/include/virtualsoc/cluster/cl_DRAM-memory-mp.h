@@ -4,10 +4,11 @@
 #define SC_INCLUDE_DYNAMIC_PROCESSES
 
 #include <systemc.h>
-#include "core_signal.h"
-#include "ext_mem.h"
 
 #include <DRAMSim2/MemorySystem.h>
+
+#include "virtualsoc/core/core_signal.h"
+#include "virtualsoc/core/ext_mem.h"
 
 
 void power_callback_mp(double a, double b, double c, double d);
@@ -18,19 +19,19 @@ SC_MODULE(DRAM_mem_mp)
 {
   sc_in<bool>                  clock;
   sc_in<bool>                  reset;
-  
+
   sc_in<bool>                  *request;
   sc_out<bool>                 *ready;
   sc_inout<PINOUT>             *pinout;
-  
+
   Mem_class *target_mem;
-  
+
   //DRAMSim Memory Controller
   MemorySystem *mem;
   //Callback functions (hooks for MPARM)
   Callback_t *read_cb;
   Callback_t *write_cb;
-  
+
   private:
   // System ID
   unsigned char ID;

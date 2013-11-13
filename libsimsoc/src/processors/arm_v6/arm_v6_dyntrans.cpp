@@ -3,17 +3,17 @@
 // LGPL license version 3
 //
 
-#include "arm_v6_dyntrans.hpp"
+#include <cstring>
+#include "libsimsoc/processors/arm_v6/arm_v6_dyntrans.hpp"
 #include <libsimsoc/processors/llvm_gen_parameters.hpp>
 
 #ifdef SIMSOC_HAVE_LLVM
-#include "arm_v6_llvm_server.hpp"
-#include "arm_v6_llvm_generator.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_llvm_server.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_llvm_generator.hpp"
 #include <llvm/Function.h>
 #endif
 
-#include "arm_v6_printers.hpp"
-#include <cstring>
+#include "libsimsoc/processors/arm_v6/arm_v6_printers.hpp"
 
 #ifndef SLV6_LDR_M2_ImmOff_NC_ID
 #define SLV6_LDR_M2_ImmOff_NC_ID ((uint16_t)~0)

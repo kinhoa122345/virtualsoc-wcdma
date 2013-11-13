@@ -3,13 +3,13 @@
 // LGPL license version 3
 //
 
-#include "dce_factory.hpp"
 #include <libsimsoc/context.hpp>
-#include "dce_xterm.hpp"
-#include "dce_xterm_pthread.hpp"
-#include "dce_host_uart.hpp"
-#include "dce_host_uart_pthread.hpp"
-#include "dce_stub.hpp"
+#include <libsimsoc/components/dce_factory.hpp>
+#include <libsimsoc/components/dce_xterm.hpp>
+#include <libsimsoc/components/dce_xterm_pthread.hpp>
+#include <libsimsoc/components/dce_host_uart.hpp>
+#include <libsimsoc/components/dce_host_uart_pthread.hpp>
+#include <libsimsoc/components/dce_stub.hpp>
 
 using namespace sc_core;
 

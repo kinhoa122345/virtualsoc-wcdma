@@ -16,9 +16,10 @@
  * is discovered at end of elaboration.
  */
 
-#include "display.hpp"
-#include "serial_flash.hpp"
-#include "st_smi.hpp"
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/components/serial_flash.hpp>
+#include <libsimsoc/components/st_smi.hpp>
+
 
 using namespace std;
 using namespace sc_core;

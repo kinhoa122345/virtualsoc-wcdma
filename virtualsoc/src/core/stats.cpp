@@ -1,10 +1,13 @@
-#include "stats.h"
-#include "power.h"
-#include "config.h"
-#include "globals.h"
-#include "address.h"
+#include "virtualsoc/core/stats.h"
+
 #include <time.h>
 #include <math.h>
+
+#include "virtualsoc/core/config.h"
+#include "virtualsoc/core/globals.h"
+#include "virtualsoc/core/power.h"
+#include "virtualsoc/core/address.h"
+
 
 Statistics *statobject;
 
@@ -22,34 +25,34 @@ Statistics::Statistics()
   prev_di = new bool [N_CORES];
   prev_time = new float [N_CORES];
   w_cycles = new uint32_t [N_CORES];
-  
+
   master_c = new ACCESS_COUNTERS[N_MASTERS];
   master_ocp_c = new OCP_COUNTERS[N_MASTERS];
   master_s = new MASTER_STATUS[N_MASTERS];
   master_ocp_s = new OCP_STATUS[N_MASTERS];
   core_ct = new CORE_CYCLE_TYPE[N_CORES];
   core_c = new CORE_COUNTERS[N_CORES];
-  
+
   start_time_crit = new double [N_CORES];
   start_sim_time_crit = new time_t [N_CORES];
 
   status = new CORE_STATUS [N_CORES];
-   
+
   resetValues();
   readytoterm = 0;
 
   for (uint i = 0; i < N_CORES; i ++)
   {
-  
+
     status[i] = READY_TO_MEASURE;
     status_global = READY_TO_MEASURE;
-    
+
     if (AUTOSTARTMEASURING)
       startMeasuring(i);
 
   }
 
-    
+
   fstat = fopen(STATSFILENAME.c_str(), "w");
   res_file = fopen("stats_light.txt", "w");
   if (!fstat || !res_file)
@@ -101,7 +104,7 @@ void Statistics::dumpEverything()
    printInterconnectionResults();
 
    for (uint i=0; i<N_TILE; i++) //### bortolotti
-   	printXbarResults(i);
+    printXbarResults(i);
    fprintf(fstat, "\n\n---------------------------------------------------------------------------------\n\n\n");
 
    if (USING_OCP)
@@ -118,7 +121,7 @@ void Statistics::dumpEverything()
 //      break;
 //     default:
 //      break;
-	   printSWARMCoreResults(i);
+     printSWARMCoreResults(i);
  //   }
 
     fprintf(fstat, "\n\n---------------------------------------------------------------------------------\n\n\n");
@@ -138,7 +141,7 @@ void Statistics::dumpEverything()
      fprintf(fstat, "\n\n---------------------------------------------------------------------------------\n\n\n");
 //   }
 
-  // To dump the remaining power trace 
+  // To dump the remaining power trace
 
 //  if (POWERSTATS)
 
@@ -149,7 +152,7 @@ void Statistics::dumpEverything()
 //     double tc[N_CORES];
 //     for (uint i = 0; i < N_CORES; i++)
 //       tc[i] = core_c[i].total_time_crit;
-// 
+//
 //     fprintf(fstat, "==============================================================================\n");
 //     fprintf(fstat, "----------------\nPower estimation\n----------------\n");
 //     fprintf(fstat, "\n  Energy spent:\n");
@@ -165,7 +168,7 @@ void Statistics::dumpEverything()
 //     fprintf(fstat, "==============================================================================\n");
 // #endif
 //   }
-//   
+//
 //   #if defined N_TGEN && defined LXBUILD
 //     printTgenResults();
 //   #endif
@@ -176,7 +179,7 @@ void Statistics::dumpEverything()
 // dump - Dumps statistics collected by one processor.
 void Statistics::dump(uint ID)
 {
-	printSWARMCoreResults(ID);
+  printSWARMCoreResults(ID);
 //  switch (CURRENT_ISS)
 //    {
 //     case SWARM: printSWARMCoreResults(ID);
@@ -188,7 +191,7 @@ void Statistics::dump(uint ID)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// dump_light - Dumps restricted statistics collected by one processor and by 
+// dump_light - Dumps restricted statistics collected by one processor and by
 //              the global objects.
 void Statistics::dump_light(uint ID)
 {
@@ -436,7 +439,7 @@ void Statistics::resetValues()
     master_c[i].min_comptime_r  = 100000;
     master_c[i].min_comptime_w  = 100000;
     memset(&master_s[i], 0, sizeof(MASTER_STATUS));
-    
+
     memset(&master_ocp_c[i], 0, sizeof(OCP_COUNTERS));
     // Non-zero initializations
     master_ocp_c[i].min_cmdacctime      = 100000;
@@ -460,24 +463,24 @@ void Statistics::resetValues()
   }
 
   global_total_time_crit = 0.0;
-  
+
   for (uint i = 0; i < N_MEMORIES; i ++) {
     mem_access_r[i] = 0;
     mem_access_w[i] = 0;
   }
-  
+
   for (uint i = 0; i < N_CORES; i ++)
   {
       memset(&core_c[i], 0, sizeof(CORE_COUNTERS));
-        
-      
+
+
       core_ct[i] = NONE;
 
       prev_addr[i] = 0xFFFFFFFF;
       //prev_mode[i] = P_NORMAL;
       prev_di[i] = false;   // instruction (see core.h)
       prev_time[i] = 0.0;
-      
+
       w_cycles[i] = 0;
   }
 
@@ -493,14 +496,14 @@ void Statistics::resetValues()
 void Statistics::inspectMemoryAccess(uint32_t addr, bool reading, double energy, uint ID)
 {
   if(ID>(N_MEMORIES-1)) {
-	  cout << "ERROR: invalid ID value (ID="<<ID<<") whereas maximum number of memories is "<<N_MEMORIES<<endl;
-	  exit(-1);
+    cout << "ERROR: invalid ID value (ID="<<ID<<") whereas maximum number of memories is "<<N_MEMORIES<<endl;
+    exit(-1);
   }
   if(reading)
     mem_access_r[ID]++;
   else
     mem_access_w[ID]++;
-  
+
   return;
 }
 
@@ -522,7 +525,7 @@ void Statistics::inspectMemoryAccess(uint32_t addr, bool reading, double energy,
     //printf("Error in the inspectDMA: %d\n",ID);
     //exit(1);
   //}
-   
+
   //if (status_global == IS_MEASURING)
     //power_object->dmas[ID] += energy;
 //}
@@ -761,15 +764,15 @@ void Statistics::inspectSWARMAccess(uint32_t addr, PPROC mode, bool hit, bool di
   short int slave;
   uint8_t rangeid;
   bool stall = false, is_ext_read = false, is_ext_write = false;
-  
+
   //if (sc_simulation_time() - prev_time[ID] != 5.0 && sc_simulation_time() > 20.0)
   //{
   //  printf("Fatal error: stats call by ID %u at %10.1f, previous at %10.1f (expected period %3.1f)\n", ID, sc_simulation_time(), prev_time[ID], 5.0);
   //  exit(1);
   //}
-  
+
   prev_time[ID] = sc_simulation_time();
- 
+
   // Check to see if the ARM pipeline is stalled. Info is irrelevant for cores
   // blocked waiting for the bus to respond
   if (mode != P_BLOCKED && addr == prev_addr[ID] && mode == prev_mode[ID] && di == prev_di[ID] && mode == P_NORMAL)
@@ -796,14 +799,14 @@ void Statistics::inspectSWARMAccess(uint32_t addr, PPROC mode, bool hit, bool di
     else
       power_object->cores[ID] += ARMEnergy(ID, RUNNING, M_DIVIDER[ID]);
   }
-  
+
   // for a core blocked waiting for the bus there is nothing else to do
   if (mode == P_BLOCKED)
   {
     w_cycles[ID] ++;
     return;
   }
-  
+
   // for a core in IDLE state there is nothing else to do
   if (mode == P_IDLE)
   {
@@ -896,7 +899,7 @@ void Statistics::inspectSWARMAccess(uint32_t addr, PPROC mode, bool hit, bool di
   if (status[ID] == IS_MEASURING && !stall)
   {
     core_c[ID].counter++;
-    
+
     switch (mode)
     {
       case P_NORMAL:
@@ -908,7 +911,7 @@ void Statistics::inspectSWARMAccess(uint32_t addr, PPROC mode, bool hit, bool di
         else if (addresser->PhysicalInIScratchSpace(ID, addresser->Logical2Physical(addr, ID)))
           core_ct[ID] = ISCRATCH_R;
         else if (addresser->PhysicalInQueueSpace(ID, addresser->Logical2Physical(addr, ID)))
-          core_ct[ID] = QUEUE_R;  
+          core_ct[ID] = QUEUE_R;
         else if (!addresser->LogicalIsCacheable(addr))
         {
           // MapPhysicalToSlave may return -1 to specify DMA or scratchpad accesses.
@@ -971,9 +974,9 @@ void Statistics::inspectSWARMAccess(uint32_t addr, PPROC mode, bool hit, bool di
           else if (addresser->IsSmartmem(slave))
             core_ct[ID] = PREPARING_SMARTMEM_R;
           else if (addresser->IsFFT(slave))
-            core_ct[ID] = PREPARING_FFT_R; 
+            core_ct[ID] = PREPARING_FFT_R;
           else if (addresser->IsFreq(slave))
-            core_ct[ID] = PREPARING_FREQ_R; 
+            core_ct[ID] = PREPARING_FREQ_R;
           else if (addresser->PhysicalInDMASpace(addresser->Logical2Physical(addr, ID)))
             core_ct[ID] = PREPARING_DMA_R;
           else
@@ -1002,7 +1005,7 @@ void Statistics::inspectSWARMAccess(uint32_t addr, PPROC mode, bool hit, bool di
         else if (addresser->PhysicalInSimSupportSpace(addr))
           core_ct[ID] = INTERNAL_W;
         else if (addresser->LogicalIsCacheable(addr))
-	{
+  {
             if (hit)
             {
              if (di)
@@ -1063,7 +1066,7 @@ void Statistics::inspectSWARMAccess(uint32_t addr, PPROC mode, bool hit, bool di
       ASSERT(0); // It must not happen
       break;
     } //switch (mode)
-    
+
 
     switch(core_ct[ID])
     {
@@ -1242,7 +1245,7 @@ void Statistics::inspectSWARMAccess(uint32_t addr, PPROC mode, bool hit, bool di
       core_c[ID].scratchrrange[rangeid]++;
     if (SPCHECK && (core_c[ID].scratchrangenumber > 0) && (core_ct[ID] == SCRATCH_W))
       core_c[ID].scratchwrange[rangeid]++;
-    
+
     // If in SPCHECK mode, traces are only interesting if referring to private/scratch space
     //if (ACCTRACE && status[ID] == IS_MEASURING/* && !di*/)
       //if (
@@ -1293,10 +1296,10 @@ void Statistics::startMeasuring(uint ID)
   {
     status[ID] = IS_MEASURING;
     core_measuring++;
-    
+
     start_sim_time_crit[ID] = time(NULL);
     start_time_crit[ID] = sc_simulation_time();
-    
+
     for (uint k=0; k<ID; k++)
       printf(" ");
     printf("Processor %hu starts measuring\n", (uint)ID);
@@ -1307,7 +1310,7 @@ void Statistics::startMeasuring(uint ID)
   }
   else
   {
-      /* A core can continue to run after the "swi stop". If we are measuring the 
+      /* A core can continue to run after the "swi stop". If we are measuring the
          OS calls, they can invoke "swi start" */
     if (status[ID] == READY_TO_SHUTDOWN) return; /* simply ignore it */
     printf("Fatal error: Processor %hu sent an unexpected \"Start measure\" signal\n", (uint)ID);
@@ -1322,16 +1325,16 @@ void Statistics::startMeasuring(uint ID)
 void Statistics::stopMeasuring(uint ID)
 {
   if (status_global == IS_MEASURING)
-    global_total_time_crit += 
+    global_total_time_crit +=
       sc_simulation_time() - global_start_time_crit;
-  
+
   status_global = READY_TO_MEASURE; // The first stop swi stops the measures for global objects
 
   if (status[ID] == IS_MEASURING)
   {
     status[ID] = READY_TO_MEASURE;
     core_measuring --;
-    
+
     core_c[ID].total_sim_time_crit += time(NULL) - start_sim_time_crit[ID];
     core_c[ID].total_time_crit += sc_simulation_time() - start_time_crit[ID];
 
@@ -1353,14 +1356,14 @@ void Statistics::stopMeasuring(uint ID)
 //        will have called this function, the simulation will be terminated.
 void Statistics::quit(uint ID)
 {
-    /* If this core is measuring, continue to measure, but remember that it 
+    /* If this core is measuring, continue to measure, but remember that it
        finished */
   if ( (status[ID] == READY_TO_MEASURE) || (status[ID] == IS_MEASURING) )
   {
     if (status[ID] == READY_TO_MEASURE)
       status[ID] = READY_TO_SHUTDOWN;
     readytoterm++;
-  
+
     for (uint k=0; k<ID; k++)
       cout << " ";
     cout << "Processor " << dec << ID << " shuts down @ " << sc_time_stamp() << endl;
@@ -1368,8 +1371,8 @@ void Statistics::quit(uint ID)
     if (readytoterm == N_CORES)
     {
       cout << "\n\n#----------------------------------------------------\n";
-	  cout << "#-------------- SIM STOP @ " << sc_time_stamp() << " ------------------\n";
-	  cout << "#----------------------------------------------------\n";
+    cout << "#-------------- SIM STOP @ " << sc_time_stamp() << " ------------------\n";
+    cout << "#----------------------------------------------------\n";
 
       dumpEverything();
 
@@ -1399,10 +1402,10 @@ void Statistics::beginsAccess(uint8_t min, bool reading, uint8_t burst, uint ID)
 {
   uint transl_ID = (ID < N_CORES ? ID : ID - N_CORES);
   uint32_t wait_time;
-  
+
   master_s[ID].start_access = sc_simulation_time();
   wait_time = (uint32_t)(master_s[ID].start_access - master_s[ID].request_access);
-  
+
   master_s[ID].is_accessing = true;
   master_s[ID].data_on_bus = burst;
 
@@ -1474,18 +1477,18 @@ void Statistics::beginsAccess(uint8_t min, bool reading, uint8_t burst, uint ID)
     }
   }
 };
-    
-    
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // endsAccess - Marks the time when a bus master completed a bus access.
 void Statistics::endsAccess(bool reading, uint8_t burst, uint ID)
 {
   uint transl_ID = (ID < N_CORES ? ID : ID - N_CORES);
   uint32_t comp_time;
-  
+
   master_s[ID].finish_access = sc_simulation_time();
   comp_time = (uint32_t)(master_s[ID].finish_access - master_s[ID].request_access);
-  
+
   if (status[transl_ID] == IS_MEASURING)
   {
     master_c[ID].tot_comptime += comp_time;
@@ -1561,7 +1564,7 @@ void Statistics::printTimeResults()
 {
   total_time = difftime(time(NULL), start_time);
   uint64_t cycles = (uint64_t)(sc_simulation_time() / CLOCKPERIOD);
-  
+
   fprintf(fstat, "Simulation executed: %s", asctime(localtime(&start_time)));
   fprintf(fstat, "Elapsed time - overall simulation: %lu:%02u minutes\n", (unsigned long int)floor(total_time / 60),
             (unsigned int)(fmod(total_time, 60)) );
@@ -1579,17 +1582,17 @@ void Statistics::printTimeResults()
 // printInterconnectionResults - Dumps some information about interconnection usage.
 void Statistics::printXbarResults(uint ID)
 {
-	fprintf(fstat, "\n\n---------------------------------------------------------------------------------\n\n\n");
-	fprintf(fstat, "-----------------\n");
-	fprintf(fstat, "XBAR %d\n", ID);
-	fprintf(fstat, "-----------------\n");
+  fprintf(fstat, "\n\n---------------------------------------------------------------------------------\n\n\n");
+  fprintf(fstat, "-----------------\n");
+  fprintf(fstat, "XBAR %d\n", ID);
+  fprintf(fstat, "-----------------\n");
 }
 
 void Statistics::printInterconnectionResults()
 {
   double avg_time = 0.0;
   unsigned short int i;
-  
+
   ACCESS_COUNTERS total_results;
   memset(&total_results, 0, sizeof(ACCESS_COUNTERS));
   // Non-zero initializations
@@ -1607,11 +1610,11 @@ void Statistics::printInterconnectionResults()
   total_results.min_comptime_bw = 100000;
   total_results.min_comptime_r  = 100000;
   total_results.min_comptime_w  = 100000;
-  
+
   for (i = 0; i < N_CORES; i ++)
     avg_time += core_c[i].total_time_crit;
   avg_time /= N_CORES;
-    
+
   fprintf(fstat, "-----------------------\n");
   fprintf(fstat, "Interconnect statistics\n");
   fprintf(fstat, "-----------------------\n");
@@ -1793,7 +1796,7 @@ void Statistics::printOCPLatencyResults()
 {
   double avg_time = 0.0;
   unsigned short int i;
-  
+
   OCP_COUNTERS total_results;
   memset(&total_results, 0, sizeof(OCP_COUNTERS));
   // Non-zero initializations
@@ -1818,7 +1821,7 @@ void Statistics::printOCPLatencyResults()
   for (i = 0; i < N_CORES; i ++)
     avg_time += core_c[i].total_time_crit;
   avg_time /= N_CORES;
-  
+
   for (i = 0; i < N_MASTERS; i ++)
   {
     if (master_ocp_c[i].accesses)
@@ -1935,7 +1938,7 @@ void Statistics::printOCPLatencyResults()
         total_results.max_comptime_bwnp       = master_ocp_c[i].max_comptime_bwnp;
     }
   }
-  
+
   fprintf(fstat, "--------------------------\n");
   fprintf(fstat, "OCP performance statistics\n");
   fprintf(fstat, "--------------------------\n");
@@ -2378,9 +2381,9 @@ void Statistics::printSmartmem(uint ID)
 //   fprintf(fstat, "\n------------------------------\n");
 //   fprintf(fstat, "Smart Memory %d DMA Controller\n", ID - N_CORES - (DMA*N_CORES));
 //   fprintf(fstat, "------------------------------\n");
-// 
+//
 //   printMasterResults(ID);
-// 
+//
 //   fprintf(fstat, "\n--------------\n");
 //   fprintf(fstat, "Smart Memory %d\n", ID - N_CORES - (DMA*N_CORES));
 //   fprintf(fstat, "--------------\n");

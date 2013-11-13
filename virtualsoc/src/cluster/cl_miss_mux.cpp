@@ -1,4 +1,4 @@
-#include "cl_miss_mux.h"
+#include "virtualsoc/cluster/cl_miss_mux.h"
 
 #define MISS_LOW_ID_HI_PRI
 
@@ -18,12 +18,12 @@ void cl_miss_mux::arbiter() {
   // CUSTOM DELAY
   for (id = 0; id < (int)delay; id++)
     wait();
-  
+
   go_fsm.write(false);
-    
+
   for(id = 0; id < (int)num_caches; id++)
     req_table[id] = (req[id] && !served[id]) ? true : false;
-    
+
 
   switch(miss_mux_sched) {
         case 0 : 	//////////////////
@@ -42,7 +42,7 @@ void cl_miss_mux::arbiter() {
                             served[id].write(true);
                         }
                     break;
-                    
+
         case 1 : 	//////////////////
                     //ROUND ROBIN
                     //////////////////
@@ -60,11 +60,11 @@ void cl_miss_mux::arbiter() {
                         }
                     }
                     break;
-                    
+
         case 2 :	//////////////////
-                    //2 Levels : 
+                    //2 Levels :
                     //////////////////
-                    
+
                     //higher priority for CORE 0
                     if(req_table[0] && !busy_fsm)
                     {
@@ -89,11 +89,11 @@ void cl_miss_mux::arbiter() {
                         }
                     }
                     break;
-                    
+
         default :   printf("[%s] error in scheduling value!\n", name());
                     exit(1);
                     break;
-                    
+
     }
 }
 
@@ -123,7 +123,7 @@ void cl_miss_mux::fsm()
   cs = IDLE;
 
   while(true)
-  { 
+  {
     switch(cs) {
 
       case IDLE :
@@ -142,10 +142,10 @@ void cl_miss_mux::fsm()
                   cs = READ;
                 else
                   cs = WRITE;
-                break;				
+                break;
 
       case READ :
-                
+
                 for (burst_ctr = 0; burst_ctr < burst; burst_ctr++)
                 {
                       // modificato dopo aver settato mem_in_ws, mem_bb_w > 0
@@ -156,7 +156,7 @@ void cl_miss_mux::fsm()
 #endif
                       wait(ready_muxL3.posedge_event());
                       pinout = pinout_muxL3.read();
-                
+
                       pinout_miss_cache[idc_fsm].write( pinout );
                       ready_miss_cache[idc_fsm].write(true);
 
@@ -188,13 +188,13 @@ void cl_miss_mux::fsm()
                 {
                     wait(ready_muxL3.posedge_event());
                     ready_miss_cache[idc_fsm].write(true);
-    
+
                     wait( ready_muxL3.negedge_event() );
                     request_muxL3.write( false );
                     ready_miss_cache[idc_fsm].write( false);
 
                     // ### [Wed Apr 7 16:11:28]
-                    // per evitare problemi quando il core tiene sempre alto 
+                    // per evitare problemi quando il core tiene sempre alto
                     // request e fa piu scritture consecutive
                     //wait(clock.posedge_event());
                     __DELTA_L1;

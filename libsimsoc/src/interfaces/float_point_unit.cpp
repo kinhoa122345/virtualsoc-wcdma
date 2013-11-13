@@ -1,4 +1,4 @@
-#include "float_point_unit.hpp"
+#include <libsimsoc/interfaces/float_point_unit.hpp>
 
 namespace simsoc{
   static const fp_range_t double_prec =

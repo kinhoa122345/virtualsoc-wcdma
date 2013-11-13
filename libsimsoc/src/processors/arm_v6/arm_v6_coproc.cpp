@@ -3,9 +3,10 @@
 // LGPL license version 3
 //
 
-#include "arm_v6_coproc.hpp"
-#include "arm_v6_processor.hpp"
 #include <cassert>
+
+#include "libsimsoc/processors/arm_v6/arm_v6_coproc.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_processor.hpp"
 
 using namespace sc_core;
 

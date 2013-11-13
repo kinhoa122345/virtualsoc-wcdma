@@ -3,10 +3,10 @@
 // LGPL license version 3
 //
 
-#include "primecell_vic_pl190.hpp"
-#include "libsimsoc/processors/arm/arm_processor.hpp"
-#include "libsimsoc/interfaces/yield.hpp"
-#include "libsimsoc/display.hpp"
+#include <libsimsoc/components/primecell_vic_pl190.hpp>
+#include <libsimsoc/processors/arm/arm_processor.hpp>
+#include <libsimsoc/interfaces/yield.hpp>
+#include <libsimsoc/display.hpp>
 
 using namespace std;
 using namespace sc_core;
@@ -380,7 +380,7 @@ void PrimeCell_PL190_VIC::write_word(uint32_t addr, uint32_t d) {
     break;
 
   case ITCR:
-	  break;
+    break;
 
   default:
     if (VECT_ADDR <= addr && addr <= LAST_VECT_ADDR) {

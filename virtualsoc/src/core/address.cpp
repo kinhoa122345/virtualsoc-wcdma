@@ -1,4 +1,4 @@
-#include "address.h"
+#include "virtualsoc/core/address.h"
 
 Addresser *addresser;
 
@@ -14,7 +14,7 @@ Addresser::Addresser()
 // IsInTcdmSpace - Returns true if address belongs to the TCDM Space
 bool Addresser::IsInTcdmSpace(uint32_t address, uint16_t tile_id)
 {
-  return ((address >= (uint32_t)(tile_id*TILE_SPACING + CL_TCDM_BASE)) && 
+  return ((address >= (uint32_t)(tile_id*TILE_SPACING + CL_TCDM_BASE)) &&
          (address < (uint32_t)(tile_id*TILE_SPACING + CL_TCDM_BASE + CL_TCDM_SIZE))) ? true : false;
 }
 
@@ -22,23 +22,23 @@ bool Addresser::IsInTcdmSpace(uint32_t address, uint16_t tile_id)
 // IsInTaSSpace - Returns true if address belongs to the TCDM test & set space
 bool Addresser::IsInTaSSpace(uint32_t address, uint16_t tile_id)
 {
-  return ((address >= (uint32_t)(tile_id*TILE_SPACING + CL_TCDM_BASE + CL_TCDM_SIZE - CL_TCDM_TAS_SIZE)) && 
+  return ((address >= (uint32_t)(tile_id*TILE_SPACING + CL_TCDM_BASE + CL_TCDM_SIZE - CL_TCDM_TAS_SIZE)) &&
          (address < (uint32_t)(tile_id*TILE_SPACING + CL_TCDM_BASE + CL_TCDM_SIZE))) ? true : false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// IsInL3Space - Returns true if 
+// IsInL3Space - Returns true if
 bool Addresser::IsInSemSpace(uint32_t address, uint16_t tile_id)
 {
-  return ((address >= (uint32_t)(tile_id*TILE_SPACING + CL_SEM_BASE)) && 
+  return ((address >= (uint32_t)(tile_id*TILE_SPACING + CL_SEM_BASE)) &&
          (address < (uint32_t)(tile_id*TILE_SPACING + CL_SEM_BASE + CL_SEM_SIZE))) ? true : false;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// IsInL3Space - Returns true if 
+// IsInL3Space - Returns true if
 bool Addresser::IsInL3Space(uint32_t address, uint16_t tile_id)
 {
-  return ((address >= (uint32_t)(tile_id*TILE_SPACING + CL_L3_BASE)) && 
+  return ((address >= (uint32_t)(tile_id*TILE_SPACING + CL_L3_BASE)) &&
          (address < (uint32_t)(tile_id*TILE_SPACING + CL_L3_BASE + CL_L3_SIZE))) ? true : false;
 }
 
@@ -54,7 +54,7 @@ bool Addresser::IsInHWSSpace(uint32_t address, uint16_t tile_id)
 // IsOffCluster - Returns true if
 bool Addresser::IsOffCluster(uint32_t address, uint16_t tile_id)
 {
-  return (!((address >= (uint32_t)(tile_id*TILE_SPACING)) && 
+  return (!((address >= (uint32_t)(tile_id*TILE_SPACING)) &&
          (address < (uint32_t)((tile_id+1)*TILE_SPACING)))) ? true : false;
 }
 
@@ -62,7 +62,7 @@ bool Addresser::IsOffCluster(uint32_t address, uint16_t tile_id)
 // IsInDmaSpace - Returns true if
 bool Addresser::IsInDmaSpace(uint32_t address, uint16_t tile_id)
 {
-  return (address >= (uint32_t)(tile_id*TILE_SPACING + CL_DMA_BASE) && 
+  return (address >= (uint32_t)(tile_id*TILE_SPACING + CL_DMA_BASE) &&
          (address <= (uint32_t)(tile_id*TILE_SPACING + CL_DMA_BASE + CL_DMA_SIZE))) ? true : false;;
 }
 

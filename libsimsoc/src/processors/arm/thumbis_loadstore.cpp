@@ -3,11 +3,11 @@
 // LGPL license version 3
 //
 
-#include "thumbis_loadstore.hpp"
+#include "libsimsoc/display.hpp"
+#include "libsimsoc/bitwise_operator.hpp"
+#include "libsimsoc/processors/arm/thumbis_loadstore.hpp"
 #include "libsimsoc/processors/arm/arm_cpu.hpp"
 #include "libsimsoc/processors/arm/arm_processor.hpp"
-#include "libsimsoc/bitwise_operator.hpp"
-#include "libsimsoc/display.hpp"
 #include "libsimsoc/processors/arm/arm_thumb_pi.hpp"
 
 using namespace std;

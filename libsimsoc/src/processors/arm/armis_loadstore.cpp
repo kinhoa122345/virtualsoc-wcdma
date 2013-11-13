@@ -3,8 +3,8 @@
 // LGPL license version 3
 //
 
-#include "armis_loadstore.hpp"
 #include "libsimsoc/display.hpp"
+#include "libsimsoc/processors/arm/armis_loadstore.hpp"
 
 using namespace std;
 

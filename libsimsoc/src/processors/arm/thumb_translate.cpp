@@ -3,15 +3,15 @@
 // LGPL license version 3
 //
 
-#include "thumb_translate.hpp"
-#include "thumbis_arithmetic.hpp"
-#include "thumbis_control.hpp"
-#include "thumbis_loadstore.hpp"
-#include "arm_thumb_pi.hpp"
-#include "arm_processor.hpp"
-#include <libsimsoc/translation_page.hpp>
-#include <libsimsoc/display.hpp>
 #include <cassert>
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/translation_page.hpp>
+#include "libsimsoc/processors/arm/thumb_translate.hpp"
+#include "libsimsoc/processors/arm/thumbis_arithmetic.hpp"
+#include "libsimsoc/processors/arm/thumbis_control.hpp"
+#include "libsimsoc/processors/arm/thumbis_loadstore.hpp"
+#include "libsimsoc/processors/arm/arm_thumb_pi.hpp"
+#include "libsimsoc/processors/arm/arm_processor.hpp"
 
 namespace simsoc {
 

@@ -3,9 +3,10 @@
 // LGPL license version 3
 //
 
-#include "arm_condition.hpp"
 #include <cassert>
+
 #include "libsimsoc/display.hpp"
+#include "libsimsoc/processors/arm/arm_condition.hpp"
 
 using namespace std;
 

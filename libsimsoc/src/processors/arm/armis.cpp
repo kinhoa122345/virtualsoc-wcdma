@@ -3,11 +3,12 @@
 // LGPL license version 3
 //
 
-#include "armis.hpp"
 #include <cassert>
+
+#include "libsimsoc/display.hpp"
+#include "libsimsoc/processors/arm/armis.hpp"
 #include "libsimsoc/processors/arm/armpi.hpp"
 #include "libsimsoc/processors/arm/arm_processor.hpp"
-#include "libsimsoc/display.hpp"
 
 using namespace std;
 

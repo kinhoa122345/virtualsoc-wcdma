@@ -3,8 +3,9 @@
 // LGPL license version 3
 //
 
-#include "nand_flash.hpp"
-#include "display.hpp"
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/components/nand_flash.hpp>
+
 
 using namespace std;
 using namespace sc_core;

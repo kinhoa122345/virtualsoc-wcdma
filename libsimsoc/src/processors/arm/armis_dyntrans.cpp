@@ -3,11 +3,12 @@
 // LGPL license version 3
 //
 
-#include "armis_dyntrans.hpp"
-#include "arm_processor.hpp"
-#include "arm_translate.hpp"
-#include "thumb_translate.hpp"
 #include <cassert>
+
+#include "libsimsoc/processors/arm/armis_dyntrans.hpp"
+#include "libsimsoc/processors/arm/arm_processor.hpp"
+#include "libsimsoc/processors/arm/arm_translate.hpp"
+#include "libsimsoc/processors/arm/thumb_translate.hpp"
 
 namespace simsoc {
 

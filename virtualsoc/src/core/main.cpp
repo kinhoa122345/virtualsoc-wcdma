@@ -2,17 +2,18 @@
 
 #include <systemc.h>
 #include <unistd.h>
-#include "stats.h"
-#include "sim_support.h"
-#include "address.h"
-#include "parser.h"
-#include "globals.h"
-#include "power.h"
-#include "config.h"
+
+#include "virtualsoc/core/config.h"
+#include "virtualsoc/core/stats.h"
+#include "virtualsoc/core/sim_support.h"
+#include "virtualsoc/core/address.h"
+#include "virtualsoc/core/parser.h"
+#include "virtualsoc/core/globals.h"
+#include "virtualsoc/core/power.h"
 
 #ifdef CLUSTERBUILD
-  #include "cl_platform_prv.h"
-  #include "cl_platform_shr.h"
+  #include "virtualsoc/cluster/cl_platform_prv.h"
+  #include "virtualsoc/cluster/cl_platform_shr.h"
 #endif
 #ifdef NOC2BUILD
   #include "noc_2x2_platform.h"
@@ -63,24 +64,25 @@ int sc_main(int argc, char *argv[])
 
   // Command line option parsing
   parseArgs(argc, argv, environ, &new_argc, &new_argv, &new_envp);
-  
+
   // SimSoc Armv6 init
   simsoc_init(1,argv);
 
-  // System management of addresses and translations. 
+  // System management of addresses and translations.
   addresser = new Addresser();
-  
+
   // Signal tracing
-  if (VCD) {
+  if (VCD)
+  {
     tf = sc_create_vcd_trace_file("waves");
-    ((vcd_trace_file*)tf)->sc_set_vcd_time_unit(-10); // 10^-10 s = 100 ps (notice: has to be smaller than the default time unit)
+    ((vcd_trace_file*)tf)->set_time_unit(100, SC_PS); // 10^-10 s = 100 ps (notice: has to be smaller than the default time unit)
   }
 
   // Hardware platform instantiation
   switch (CURRENT_ARCH)
   {
 #ifdef CLUSTERBUILD
-    case SINGLE_CLUSTER: 
+    case SINGLE_CLUSTER:
                     if(CL_ICACHE_PRIV)
                       cl_ic_p = new cl_platform_prv("cl_platform", tf, VCD, new_argc, new_argv, new_envp);
                     else
@@ -104,9 +106,9 @@ int sc_main(int argc, char *argv[])
   }
 
   // Statistics collection. Please leave the instantiation below that of the cores
-  statobject = new Statistics(); 
+  statobject = new Statistics();
   cout<<"statobject @ is 0x"<<hex<<statobject<<dec<<endl;
-  
+
   // Statistics synchronizer with clock
   //synchronizer sync("sync");
   //sync.clock(ClockGen_1);
@@ -122,13 +124,13 @@ int sc_main(int argc, char *argv[])
     switch (CURRENT_ARCH)
     {
 #ifdef NOC2BUILD
-      case NOC2: break;    
+      case NOC2: break;
 #endif
 #ifdef NOC3BUILD
-      case NOC3: break;    
+      case NOC3: break;
 #endif
 #ifdef NOC4BUILD
-      case NOC4: break;    
+      case NOC4: break;
 #endif
 #ifdef CLUSTERBUILD
       case SINGLE_CLUSTER: break;
@@ -137,21 +139,21 @@ int sc_main(int argc, char *argv[])
                exit(1);
     }
   }
-  
- 
+
+
   // Simulation starts now
   cout << "\n\n#---------------------------------------------------------\n";
   cout << "#------------------ START SIMULATION ---------------------\n";
   cout << "#---------------------------------------------------------\n\n";
-  
-  // let's go!
-  sc_start(NSIMCYCLES, SC_NS);
 
-  
-  
+  // let's go!
+  sc_start(static_cast<int>(NSIMCYCLES), SC_NS);
+
+
+
   switch (CURRENT_ARCH) {
 #ifdef CLUSTERBUILD
-    case SINGLE_CLUSTER: 
+    case SINGLE_CLUSTER:
       if(CL_ICACHE_PRIV)
         cl_ic_p->~cl_platform_prv();
       else
@@ -183,7 +185,7 @@ int sc_main(int argc, char *argv[])
       break;
 #endif
 #ifdef NOC4BUILD
-    case NOC4:          
+    case NOC4:
       noc4_ic->~noc_4x4_platform();
       if(STATS) {
         cout << "\nERROR: Statistics for Multi-cluster architecture is not supported yet" << endl;

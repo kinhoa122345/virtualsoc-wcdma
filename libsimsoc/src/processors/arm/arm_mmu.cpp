@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "arm_mmu.hpp"
+#include "libsimsoc/processors/arm/arm_mmu.hpp"
 #include "libsimsoc/display.hpp"
 #include "libsimsoc/processors/arm/arm_processor.hpp"
 #include "libsimsoc/processors/arm/arm_systemcontrol_coproc.hpp"

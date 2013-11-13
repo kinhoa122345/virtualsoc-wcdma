@@ -3,8 +3,10 @@
 // LGPL license version 3
 //
 
-#include "st_smi.hpp"
-#include "display.hpp"
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/components/st_smi.hpp>
+
+
 using namespace std;
 using namespace sc_core;
 

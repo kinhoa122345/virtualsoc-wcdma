@@ -4,11 +4,11 @@
 //
 
 #ifdef HAVE_CONFIG_H
-# include "libsimsoc/config.h"
+# include <libsimsoc/config.h>
 #endif
 
-#include "libsimsoc/components/memory.hpp"
-#include "libsimsoc/processors/processor.hpp"
+#include <libsimsoc/components/memory.hpp>
+#include <libsimsoc/processors/processor.hpp>
 
 #include <fcntl.h>
 #include <errno.h>

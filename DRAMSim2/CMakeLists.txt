@@ -22,4 +22,5 @@ endif()
 set(FLAGS "${FLAGS}-DLOG_OUTPUT -fPIC")
 set_target_properties(${CURRENT_TARGET} PROPERTIES COMPILE_FLAGS ${FLAGS})
 
+add_subdirectory(utils)
 

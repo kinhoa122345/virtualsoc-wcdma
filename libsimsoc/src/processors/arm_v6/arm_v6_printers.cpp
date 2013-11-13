@@ -3,15 +3,16 @@
 // LGPL license version 3
 //
 
-#include "arm_v6_printers.hpp"
-#include "simlight/slv6_math.h"
+#include "libsimsoc/processors/arm_v6/arm_v6_printers.hpp"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_math.h"
+
 
 namespace simsoc {
 
   void slv6_print_cond(std::ostream &os, SLv6_Condition cond) {
     os <<condition2string(cond);
   }
-  
+
   void slv6_print_mode(std::ostream &os, SLv6_Mode mode) {
     os <<mode2string(mode);
   }
@@ -58,12 +59,12 @@ namespace simsoc {
           else os <<"BLX\tPC+#" <<std::hex <<offset;
         } else
           abort();
-      } else 
+      } else
         slv6_print_instr(os,const_cast<SLv6_Instruction*>(&instr),bincode);
     } else {
       os <<slv6_instruction_names[instr.args.g0.id];
     }
     return os;
   }
-  
+
 } // namespace simsoc

@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "arm_loadstore.hpp"
+#include "libsimsoc/processors/arm/arm_loadstore.hpp"
 
 namespace simsoc {
 

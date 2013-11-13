@@ -1,5 +1,7 @@
-#include "cache_RPU.h"
+#include "virtualsoc/core/cache_RPU.h"
+
 #include <cstdlib>
+
 
 //This function usage to return a boolean that indicates a hit or a miss
 // If the address has a valid record then it is a hit, otherwise
@@ -14,7 +16,7 @@ int RPU::check_exist(uint32_t addr)
   {
 
     record_check=storing->read_cache(index_val);
-    
+
     if((tag_val==record_check->Ch_Tag) && (record_check->Ch_Valid==1))
       return 1;
     else
@@ -53,7 +55,7 @@ uint32_t RPU::read_data(uint32_t addr,int i=0)
   uint32_t tag_val=address->get_tag(addr);
   uint32_t off_val=(address->get_offset(addr))>>2;
   Cache_record *record_check;
-  
+
   if(Ch_assoc_num==0 || Ch_assoc_num>1)
   {
     //cout << "RPU read_data Ch_assoc_num != 1" << endl;
@@ -83,7 +85,7 @@ uint32_t RPU::read_data(uint32_t addr,int i=0)
 }
 
 ////////////////////////////////////////////////
-// This function is used to set the writing methodology 
+// This function is used to set the writing methodology
 // 0 is for write through
 // 1 is for write back
 void RPU::set_writing_method(uint32_t type)
@@ -93,14 +95,14 @@ void RPU::set_writing_method(uint32_t type)
 /////////////////////////////////////////////////
 // The updating function
 // This function is used along with check function
-// If a word is requested to be written in the cache from 
+// If a word is requested to be written in the cache from
 // L1 cache or the processor, and exists in L2 chache.
 int RPU::update_data(uint32_t addr,uint32_t data)
 {
   uint32_t index_val=address->get_index(addr);
   uint32_t tag_val=address->get_tag(addr);
   uint32_t off_val=(address->get_offset(addr))>>2;
-  
+
   if(Ch_assoc_num==0)//Direct
   {
     storing->write_cache(index_val,data,off_val);
@@ -109,7 +111,7 @@ int RPU::update_data(uint32_t addr,uint32_t data)
   }
   else if(Ch_assoc_num==1)
   {
-    
+
     if(Ch_replace_type==2)//LRU
     {
       for(unsigned int k=0;k<Ch_size/(Ch_line);k++)
@@ -132,7 +134,7 @@ int RPU::update_data(uint32_t addr,uint32_t data)
     }
     storing->write_cache(index_val,data,off_val,temp);
     storing->set_dirty(index_val,data,temp);
-    dirty_locations[temp][index_val]=addr;		
+    dirty_locations[temp][index_val]=addr;
   }
   return 0; //FIXME dummy value to avoid compiler warnings
 }
@@ -179,7 +181,7 @@ int RPU::write_data(uint32_t addr,uint32_t data,int loc)
     else if(Ch_replace_type==2)
     {
       for(unsigned int l=0;l<Ch_assoc_num;l++)
-        Ch_info[l][index_val]++;		
+        Ch_info[l][index_val]++;
       Ch_info[loc1][index_val]=0;
     }
     storing->write_tag(index_val,tag_val,loc1);
@@ -237,7 +239,7 @@ int RPU::where_to(uint32_t indx)
         {
           if(Ch_info[0][temp]<Ch_info[0][i])
             temp=i;
-          
+
         }
         //cout<<"The replaced block will be block number"<<temp<<endl;
       }
@@ -305,7 +307,7 @@ int RPU::where_to(uint32_t indx)
 //         {
 //           if( (Ch_info[0][temp]<Ch_info[0][i]) && task_status[i]==1)
 //             temp=i;
-//           
+//
 //         }
 //         //cout<<"The replaced block will be block number"<<temp<<endl;
 //       }

@@ -3,8 +3,9 @@
 // LGPL license version 3
 //
 
-#include "arm_coproc.hpp"
+#include "libsimsoc/processors/arm/arm_coproc.hpp"
 #include "libsimsoc/processors/arm/arm_processor.hpp"
+
 
 using namespace sc_core;
 

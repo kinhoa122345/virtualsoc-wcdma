@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "arm_cpu.hpp"
+#include "libsimsoc/processors/arm/arm_cpu.hpp"
 #include "libsimsoc/processors/arm/arm_processor.hpp"
 
 using namespace std;

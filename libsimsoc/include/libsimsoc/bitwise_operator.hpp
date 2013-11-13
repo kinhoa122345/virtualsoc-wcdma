@@ -6,7 +6,7 @@
 #ifndef BITWISE_OPERATOR_HPP
 #define BITWISE_OPERATOR_HPP
 
-#include "simsoc-config.h"
+#include <libsimsoc/simsoc-config.h>
 #include <inttypes.h>
 #include <vector>
 
@@ -53,8 +53,8 @@ namespace simsoc {
 
   // ------------------------------------------------------------------
 #ifndef SIMSOC_HAVE_FLS
-  inline size_t fls(uint32_t x) {
-    size_t result = 0;
+  inline std::size_t fls(uint32_t x) {
+    std::size_t result = 0;
     if (x&0xffff0000) {
       result += 16;
       x>>=16;
@@ -93,12 +93,12 @@ namespace simsoc {
 
   // ------------------------------------------------------------------
   template < class ctype >
-  inline ctype full(size_t count) {
+  inline ctype full(std::size_t count) {
     return ((ctype) 1 << count) - ((ctype) 1);
   }
 
   template < class ctype >
-  inline ctype bit(ctype value, size_t position) {
+  inline ctype bit(ctype value, std::size_t position) {
     return (value >> position) & 0x1;
   }
 
@@ -110,34 +110,34 @@ namespace simsoc {
   }
 
   template < class ctype >
-  inline ctype topbits(ctype value, size_t size) {
+  inline ctype topbits(ctype value, std::size_t size) {
     return (value >> size) << size;
   }
 
   template < class ctype >
-  inline ctype is_set(ctype value, size_t position) {
+  inline ctype is_set(ctype value, std::size_t position) {
     return value & (((ctype) 1) << position);
   }
 
   template < class ctype >
-  inline void set_bit(ctype &value, size_t position) {
+  inline void set_bit(ctype &value, std::size_t position) {
     value |= ((ctype) 1 << position);
   }
 
   template < class ctype >
-  inline void unset_bit(ctype &value, size_t position) {
+  inline void unset_bit(ctype &value, std::size_t position) {
     value &= ~((ctype) 1 << position);
   }
 
   // ------------------------------------------------------------------
-  template < class T, size_t To, size_t From = To >
+  template < class T, std::size_t To, std::size_t From = To >
   class bits_t {
   public:
     typedef T ctype_t;
 
-    static const size_t from  = From;
-    static const size_t to    = To;
-    static const size_t nbits = 1 + (to - from);
+    static const std::size_t from  = From;
+    static const std::size_t to    = To;
+    static const std::size_t nbits = 1 + (to - from);
 
     static const ctype_t mask0 = (((ctype_t) 1) << nbits) - 1;
     static const ctype_t mask  = (mask0 << from);

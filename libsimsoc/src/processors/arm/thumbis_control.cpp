@@ -3,10 +3,10 @@
 // LGPL license version 3
 //
 
-#include "thumbis_control.hpp"
+#include "libsimsoc/display.hpp"
+#include "libsimsoc/processors/arm/thumbis_control.hpp"
 #include "libsimsoc/processors/arm/arm_cpu.hpp"
 #include "libsimsoc/processors/arm/arm_processor.hpp"
-#include "libsimsoc/display.hpp"
 #include "libsimsoc/processors/arm/arm_thumb_pi.hpp"
 
 using namespace std;

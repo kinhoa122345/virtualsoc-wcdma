@@ -3,7 +3,8 @@
 // LGPL license version 3
 //
 
-#include "arm_dpi.hpp"
+#include "libsimsoc/processors/arm/arm_dpi.hpp"
+
 
 using namespace std;
 

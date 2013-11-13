@@ -6,16 +6,21 @@
 #ifndef MEMORY_HPP
 #define MEMORY_HPP
 
-#include "libsimsoc/interfaces/dmi.hpp"
-#include "libsimsoc/translation_table.hpp"
-#include "libsimsoc/module.hpp"
-#include <tlm.h>
-#include <tlm_utils/simple_target_socket.h>
+#include <csignal>
 #include <list>
 #include <set>
-#include <signal.h>
 #include <map>
 #include <algorithm>
+
+#include <sysc/kernel/sc_spawn.h>
+#include <sysc/kernel/sc_spawn_options.h>
+#include <sysc/kernel/sc_boost.h>
+#include <tlm_utils/simple_target_socket.h>
+
+#include <libsimsoc/interfaces/dmi.hpp>
+#include <libsimsoc/interfaces/tlm.hpp>
+#include <libsimsoc/translation_table.hpp>
+#include <libsimsoc/module.hpp>
 
 namespace simsoc {
 

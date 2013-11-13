@@ -3,9 +3,9 @@
 // LGPL license version 3
 //
 
-#include "irqc.hpp"
+#include <libsimsoc/components/irqc.hpp>
 #ifndef PARALLEL
-#include "libsimsoc/interfaces/yield.hpp"
+#include <libsimsoc/interfaces/yield.hpp>
 #endif
 
 using namespace sc_core;

@@ -3,6 +3,9 @@
 // LGPL license version 3
 //
 
+
+#ifdef SIMSOC_HAVE_LLVM
+
 // compiled with llvm-g++, and included after simlight/slv6_iss_expanded.hot.c
 
 namespace simsoc {
@@ -26,7 +29,7 @@ namespace simsoc {
     if (!ConditionPassed(&proc->cpsr,cond)) return;
     set_reg(proc,d,data);
   }
-  
+
   extern "C" void slv6_X_set_reg_nc(SLv6_Processor *proc,
                                     const uint8_t d,
                                     const uint32_t data) {
@@ -34,3 +37,5 @@ namespace simsoc {
   }
 
 }
+
+#endif // SIMSOC_HAVE_LLVM

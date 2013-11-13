@@ -3,9 +3,13 @@
 // LGPL license version 3
 //
 
-#include "libsimsoc/components/ti_am1x_uart.hpp"
-#include "libsimsoc/display.hpp"
-#include "libsimsoc/interfaces/yield.hpp"
+#include <sysc/kernel/sc_spawn.h>
+#include <sysc/kernel/sc_spawn_options.h>
+#include <sysc/kernel/sc_boost.h>
+
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/components/ti_am1x_uart.hpp>
+#include <libsimsoc/interfaces/yield.hpp>
 
 #include <stdexcept>
 

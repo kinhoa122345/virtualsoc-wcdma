@@ -3,8 +3,13 @@
 // LGPL license version 3
 //
 
-#include "rtc.hpp"
-#include "libsimsoc/display.hpp"
+#include <sysc/kernel/sc_spawn.h>
+#include <sysc/kernel/sc_spawn_options.h>
+#include <sysc/kernel/sc_boost.h>
+
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/components/rtc.hpp>
+
 
 using namespace std;
 using namespace sc_core;

@@ -3,18 +3,19 @@
 // LGPL license version 3
 //
 
-#include "arm_processor.hpp"
-#include "arm_debugger.hpp"
-#include "arm_decode.hpp"
-#include "thumb_decode.hpp"
-#include "arm_translation_page.hpp"
-#include "armis.hpp"
-#include "armis_dyntrans.hpp"
-#include <libsimsoc/display.hpp>
 #include <arpa/inet.h>
 #include <errno.h>
 #include <iomanip>
 #include <sys/mman.h>
+
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/processors/arm/arm_processor.hpp>
+#include "libsimsoc/processors/arm/arm_debugger.hpp"
+#include "libsimsoc/processors/arm/arm_decode.hpp"
+#include "libsimsoc/processors/arm/arm_translation_page.hpp"
+#include "libsimsoc/processors/arm/armis.hpp"
+#include "libsimsoc/processors/arm/armis_dyntrans.hpp"
+#include "libsimsoc/processors/arm/thumb_decode.hpp"
 
 using namespace std;
 using namespace sc_core;

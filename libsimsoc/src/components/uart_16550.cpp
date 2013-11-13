@@ -3,10 +3,10 @@
 // LGPL license version 3
 //
 
-#include "uart_16550.hpp"
-#include "libsimsoc/display.hpp"
+#include <libsimsoc/components/uart_16550.hpp>
+#include <libsimsoc/display.hpp>
 #ifndef PARALLEL
-#include "libsimsoc/interfaces/yield.hpp"
+#include <libsimsoc/interfaces/yield.hpp>
 #endif
 
 using namespace std;

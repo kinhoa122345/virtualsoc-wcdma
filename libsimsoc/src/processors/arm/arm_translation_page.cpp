@@ -3,13 +3,14 @@
 // LGPL license version 3
 //
 
-#include "arm_translation_page.hpp"
-#include "arm_decode.hpp"
-#include "arm_translate.hpp"
-#include "thumb_decode.hpp"
-#include "thumb_translate.hpp"
-#include <libsimsoc/display.hpp>
 #include <cstring>
+
+#include <libsimsoc/display.hpp>
+#include "libsimsoc/processors/arm/arm_translation_page.hpp"
+#include "libsimsoc/processors/arm/arm_decode.hpp"
+#include "libsimsoc/processors/arm/arm_translate.hpp"
+#include "libsimsoc/processors/arm/thumb_decode.hpp"
+#include "libsimsoc/processors/arm/thumb_translate.hpp"
 
 using namespace std;
 

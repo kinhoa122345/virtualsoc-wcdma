@@ -4,19 +4,20 @@
 #define SC_INCLUDE_DYNAMIC_PROCESSES
 
 #include <systemc.h>
-#include "globals.h"
-#include "core_signal.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include "virtualsoc/core/globals.h"
+#include "virtualsoc/core/core_signal.h"
 
 SC_MODULE(cl_NI_mux) {
 
 public:
 
     sc_in<bool>                 clock;
-    
+
     sc_in<bool>                 *request_from_core;
     sc_out<bool>                *ready_to_core;
     sc_inout<PINOUT>            *pinout_core;
@@ -25,10 +26,10 @@ public:
     sc_in<bool>                 ready_from_L3;
     sc_inout<PINOUT>            pinout_L3;
 
-    
+
     // segnali per attivare le 2 fsm e per riattivare il polling
     sc_signal<bool> go_fsm, *served;
-    
+
     enum ctrl_state { IDLE=0, READ=1, WRITE=2, CACHED_LINE=3};
     ctrl_state cs;
 
@@ -39,13 +40,13 @@ public:
     // idc_fsm  : id del core che deve servire la fsm        settati da arbiter()
     // busy    : 0/1 se la fsm sta gia' servendo un core      settati da arbiter() e fsm()
 
-    ////////////////////////////////////// 
-    // prototipi  
+    //////////////////////////////////////
+    // prototipi
     void req_polling(int index);
     void arbiter();
     void fsm();
-    
-    ////////////////////////////////////// 
+
+    //////////////////////////////////////
     //miss filter stuff
     ICACHE_LINE *miss_buffer; //actual line buffer
     bool IsInstrAccess(unsigned int id);
@@ -54,21 +55,21 @@ public:
     bool is_buff_empty; //FIXME needed only for the first access at addr 0x0
     unsigned int curr_buff_line; //current buffer line to fill
     unsigned int *buff_line_hit; //number of hit for each line
-    
+
 private:
     unsigned char ID;
-    unsigned int n_mst; 
+    unsigned int n_mst;
     unsigned char delay, L3_mux_sched;
     bool miss_filter; //if true enables miss filter mode (default false)
     unsigned int miss_buff_depth; //depth = how many cache lines (default 4)
-    
+
 public:
 
-    ////////////////////////////////////// 
-    // constructor 
-    ////////////////////////////////////// 
+    //////////////////////////////////////
+    // constructor
+    //////////////////////////////////////
     SC_HAS_PROCESS(cl_NI_mux);
-    cl_NI_mux(sc_module_name nm, 
+    cl_NI_mux(sc_module_name nm,
             unsigned char ID,
             unsigned int n_mst,
             unsigned char delay,
@@ -85,7 +86,7 @@ public:
             miss_filter(miss_filter),
             miss_buff_depth(miss_buff_depth)
     {
-    
+
     char buffer[100];
     unsigned char i;
 
@@ -100,7 +101,7 @@ public:
 
     //////////////////////////////////////////////////
     //static and dynamic process creation
-    SC_METHOD(arbiter);  
+    SC_METHOD(arbiter);
         sensitive << clock.pos();
     SC_THREAD(fsm);
         sensitive << clock.pos();
@@ -112,7 +113,7 @@ public:
 
     //init
     for(i=0; i<(int)n_mst; i++)
-    {    
+    {
         served[i].write(false);
         req[i] = 0;
     }
@@ -121,18 +122,18 @@ public:
     idc_fsm = 0;
     cs = IDLE;
     next_to_serve = 0;
-    
+
     //////////////////////////////////////////////////
     //miss filter stuff
     if(miss_filter)
       cout << name() << " created with MISS FILTER - depth " << miss_buff_depth << endl;
-    
+
     miss_buffer = new ICACHE_LINE[miss_buff_depth];
-    is_buff_empty = true; 
+    is_buff_empty = true;
     is_curr_acc_inst = false;
     curr_buff_line = 0;
     buff_line_hit = new unsigned int[miss_buff_depth];
-    
+
     //////////////////////////////////////////////////
     // TRACING
     if (tracing)
@@ -153,10 +154,10 @@ public:
         sc_trace(tf, idc_fsm, buffer);
 
         sprintf(buffer, "muxL3_next_to_serve");
-        sc_trace(tf, next_to_serve, buffer);  
+        sc_trace(tf, next_to_serve, buffer);
 
         sprintf(buffer, "muxL3_cs");
-        sc_trace(tf, (char)cs, buffer);  
+        sc_trace(tf, (char)cs, buffer);
 
         sprintf(buffer, "muxL3_curr_line");
         sc_trace(tf, curr_buff_line, buffer);
@@ -171,15 +172,15 @@ public:
     } //costruttore
 
     ~cl_NI_mux() {
-		delete [] request_from_core;
-		delete [] ready_to_core;
-		delete [] pinout_core;
+    delete [] request_from_core;
+    delete [] ready_to_core;
+    delete [] pinout_core;
 
-		delete [] req;
-		delete [] served;
-		delete [] miss_buffer;
-		delete [] buff_line_hit;
+    delete [] req;
+    delete [] served;
+    delete [] miss_buffer;
+    delete [] buff_line_hit;
     }
-}; 
+};
 
 #endif

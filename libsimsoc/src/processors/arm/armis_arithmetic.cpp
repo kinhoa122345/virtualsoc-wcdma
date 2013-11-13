@@ -3,8 +3,9 @@
 // LGPL license version 3
 //
 
-#include "armis_arithmetic.hpp"
 #include "libsimsoc/bitwise_operator.hpp"
+#include "libsimsoc/processors/arm/armis_arithmetic.hpp"
+
 
 namespace simsoc {
 
@@ -84,11 +85,11 @@ std::ostream& ARM_mul::display(std::ostream& os) const {
 
 void ARM_smlal::compute(uint32_t & RdHi, uint32_t & RdLo, uint32_t Rm, uint32_t Rs) {
 //  TODO("SMLAL instruction");
-	int64_t r =(int64_t)(int32_t)RdHi;
-	r = r<<32;
-	r = (int64_t)(int32_t)Rm * (int64_t)(int32_t)Rs + r + (int64_t)(int32_t)RdLo;
-	RdLo = r;
-	RdHi = r>>32;
+  int64_t r =(int64_t)(int32_t)RdHi;
+  r = r<<32;
+  r = (int64_t)(int32_t)Rm * (int64_t)(int32_t)Rs + r + (int64_t)(int32_t)RdLo;
+  RdLo = r;
+  RdHi = r>>32;
 }
 
 void ARM_smull::compute(uint32_t & RdHi, uint32_t & RdLo, uint32_t Rm, uint32_t Rs) {
@@ -99,11 +100,11 @@ void ARM_smull::compute(uint32_t & RdHi, uint32_t & RdLo, uint32_t Rm, uint32_t 
 
 void ARM_umlal::compute(uint32_t & RdHi, uint32_t & RdLo, uint32_t Rm, uint32_t Rs) {
 //  TODO("UMLAL instruction");
-	uint64_t r = RdHi;
-	r = r<<32;
-	r = (uint64_t) Rm * (uint64_t) Rs + r + RdLo;
-	RdHi = (uint32_t)(r >> 32);
-	RdLo = (uint32_t) r;
+  uint64_t r = RdHi;
+  r = r<<32;
+  r = (uint64_t) Rm * (uint64_t) Rs + r + RdLo;
+  RdHi = (uint32_t)(r >> 32);
+  RdLo = (uint32_t) r;
 }
 
 void ARM_umull::compute(uint32_t & RdHi, uint32_t & RdLo, uint32_t Rm, uint32_t Rs) {

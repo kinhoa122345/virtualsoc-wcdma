@@ -1,4 +1,4 @@
-#include "core_signal.h"
+#include "virtualsoc/core/core_signal.h"
 
 // System clock
 sc_clock ClockGen_1("ClockGen_1", CLOCKPERIOD, SC_NS, 0.5, 0, SC_NS, true);

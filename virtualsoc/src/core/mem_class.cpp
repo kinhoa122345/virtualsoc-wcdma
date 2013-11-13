@@ -1,5 +1,5 @@
-#include "mem_class.h"
-#include "address.h"
+#include "virtualsoc/core/mem_class.h"
+
 #include <stdlib.h>
 #include <fcntl.h>
 #ifdef WIN32
@@ -9,6 +9,8 @@
 #endif
 #include <iostream>
 #include <sys/stat.h>
+
+#include "virtualsoc/core/address.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // hexstringtonumber - Translates a string representing a hex into a number.
@@ -47,17 +49,17 @@ int Mem_class::load_tcdm_init_data(char * image_filename, int i, unsigned int st
   int res;
 
   fstat(fd, &s);
-    
+
   if(s.st_size <= start_addr) // no tcdm initialized data in binary
   {
     cerr << "WARNING: trying to copy initialized data in TCDM but there's no data (skipping...)" << endl;
     return EXIT_FAILURE;
   }
-    
+
   lseek(fd, start_addr + offset + i*CL_WORD, SEEK_SET);
   //FIXME more error checking
   res = read(fd, myMemory + get_local_bank_addr(offset + i*CL_WORD,log2(N_CL_BANKS)+2),CL_WORD);
-                            
+
   close(fd);
 
   return EXIT_SUCCESS;
@@ -135,37 +137,37 @@ int Mem_class::load_srec_program(char * srec_filename)
   while(fgets(str,4096,fd) != NULL)
     {
       if(str[0] != 'S')
-	{
-	  fprintf(stderr, "Error: Not a SRec line\n");
-	  continue;
-	}
+  {
+    fprintf(stderr, "Error: Not a SRec line\n");
+    continue;
+  }
       switch(str[1])
-	{
-	case '2':
-	  CountBytes = hexstringtonumber(str,2,2);
-	  Address = hexstringtonumber(str,4,6);
-	  if(MinAddress > Address) MinAddress = Address;
-	  if(MaxAddress < Address) MaxAddress = Address;
-	  for(iCur = 10; iCur < (CountBytes-4)*2+10; iCur+=2)
-	    {
-	      iValue = hexstringtonumber(str,iCur,2);
-	      myMemory[Address++] = iValue;
-	      //printf("Just read: %x is %x\n", pMemory[Address-1], iValue);
-	    }
-	  break;
-	case '3':
-	  CountBytes = hexstringtonumber(str,2,2);
-	  Address = hexstringtonumber(str,4,8);
-	  for(iCur = 12; iCur < (CountBytes-5)*2+12; iCur+=2)
-	    {
-	      iValue = hexstringtonumber(str,iCur,2);
-	      myMemory[Address++] = iValue;
-	      //printf("Just read: %x is %x\n", pMemory[Address-1], iValue);
-	    }
-	  break;
-	case '7':
-	  break;
-	}
+  {
+  case '2':
+    CountBytes = hexstringtonumber(str,2,2);
+    Address = hexstringtonumber(str,4,6);
+    if(MinAddress > Address) MinAddress = Address;
+    if(MaxAddress < Address) MaxAddress = Address;
+    for(iCur = 10; iCur < (CountBytes-4)*2+10; iCur+=2)
+      {
+        iValue = hexstringtonumber(str,iCur,2);
+        myMemory[Address++] = iValue;
+        //printf("Just read: %x is %x\n", pMemory[Address-1], iValue);
+      }
+    break;
+  case '3':
+    CountBytes = hexstringtonumber(str,2,2);
+    Address = hexstringtonumber(str,4,8);
+    for(iCur = 12; iCur < (CountBytes-5)*2+12; iCur+=2)
+      {
+        iValue = hexstringtonumber(str,iCur,2);
+        myMemory[Address++] = iValue;
+        //printf("Just read: %x is %x\n", pMemory[Address-1], iValue);
+      }
+    break;
+  case '7':
+    break;
+  }
     }
   fclose(fd);
   printf("Uploaded Program SRec %s between addresses[hex]: %lx to %lx\n", srec_filename, MinAddress, MaxAddress);

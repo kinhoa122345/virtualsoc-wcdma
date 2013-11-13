@@ -3,13 +3,14 @@
 // LGPL license version 3
 //
 
-#include "arm_thumb_pi.hpp"
-#include <assert.h>
-#include "libsimsoc/processors/arm/armis.hpp"
-#include "libsimsoc/bitwise_operator.hpp"
-#include "libsimsoc/processors/arm/arm_processor.hpp"
-#include "libsimsoc/display.hpp"
-#include "libsimsoc/processors/arm/arm_shift.hpp"
+#include <cassert>
+
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/bitwise_operator.hpp>
+#include <libsimsoc/processors/arm/arm_thumb_pi.hpp>
+#include <libsimsoc/processors/arm/armis.hpp>
+#include <libsimsoc/processors/arm/arm_processor.hpp>
+#include <libsimsoc/processors/arm/arm_shift.hpp>
 
 using namespace std;
 

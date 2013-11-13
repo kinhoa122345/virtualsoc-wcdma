@@ -1,6 +1,6 @@
-#include "cache_module.h"
+#include "virtualsoc/core/cache_module.h"
 
-//used with double clocking 
+//used with double clocking
 //cache clocked at a frequency 2x than core and higher level memory
 //done in order in order to have HIT latency = 1 (main) clock cycle
 #define DOUBLECLOCK
@@ -8,7 +8,7 @@
 /////////////////////////////////////////////////////////////////
 void cache_module::start_cacti()
 {
-  
+
 }
 /////////////////////////////////////////////////////////////////
 void cache_module::reset_cache()
@@ -55,14 +55,14 @@ void cache_module::request_cache()
     wait();
     if(request_from_CPU.read()==true)
     {
-      handle_request(); 
+      handle_request();
     }
   }
 }
 //////////////////////////////////////////////////////////////
 void cache_module::read_from_mem(uint32_t missed_addr,uint32_t id, uint32_t missed_burst, int miss_loc)
 {
-  
+
   PINOUT pinout;
   pinout.address=missed_addr;
   pinout.bw      = 0; // 32-bit word
@@ -75,7 +75,7 @@ void cache_module::read_from_mem(uint32_t missed_addr,uint32_t id, uint32_t miss
   pinout.id=id;
   pinout_ft_MEM.write(pinout);
   request_to_MEM.write(true);
-  
+
   for(unsigned int i=0;i<missed_burst;i++)
   {
     do
@@ -93,19 +93,19 @@ void cache_module::read_from_mem(uint32_t missed_addr,uint32_t id, uint32_t miss
         trace_status = (int) status ;
 
     pinout=pinout_ft_MEM.read();
-    
+
     if(CL_CACHE_METRICS[ID])
     {
       miss_cost++;
       miss_cost_temp++;
     }
-    
+
 #ifdef DOUBLECLOCK
     wait();
 #endif
-         
+
     target_rpu->write_data(missed_addr - TID*TILE_SPACING,pinout.data,miss_loc);
-    
+
     missed_addr+=4;
 
         status = CACHE_ST_IDLE ;
@@ -122,8 +122,8 @@ void cache_module::read_from_mem(uint32_t missed_addr,uint32_t id, uint32_t miss
     }
     miss_cost_temp = 0;
   }
-    
-  
+
+
 }
 //////////////////////////////////////////////////////////////////////////////////////////////
 void cache_module::handle_request()
@@ -132,13 +132,13 @@ void cache_module::handle_request()
   PINOUT temp_pinout;
   unsigned int temp_brst;
   temp_pinout= pinout_ft_CPU.read();
-  
+
   bool exist = false;
-  
+
   addr=temp_pinout.address - TID*TILE_SPACING;
   //enj=(num_read+num_write)*power*1E9;
   temp_brst=temp_pinout.burst;
-  
+
   if(temp_pinout.benable==0)
     return;
 
@@ -151,11 +151,11 @@ void cache_module::handle_request()
     }
     else
     {
-      
+
       int ind=target_rpu->check_exist(addr);
-        
+
       if(ind!=-1)
-      { 
+      {
         if(CL_CACHE_METRICS[ID])
           num_hits++;
         hit.write(true);
@@ -164,7 +164,7 @@ void cache_module::handle_request()
 
         status = CACHE_ST_READ ;
         trace_status = (int) status ;
-                
+
         for(unsigned int j=0;j<temp_brst;j++)
         {
           num_read++;
@@ -194,7 +194,7 @@ void cache_module::handle_request()
       {
         int loc;
         //uint32_t old_addr;
-        
+
         if(assoc_num!=0)
           loc=target_rpu->where_to(target_rpu->address->get_index(addr));
         else
@@ -204,7 +204,7 @@ void cache_module::handle_request()
         {
           num_miss++;
 //          cout << name() << " MISS! " << hex << addr << " @ " << sc_time_stamp() << endl;
-          
+
           //cerco l'indirizzo nella tabella: se c'è incremento il contatore di miss relativo ad addr
           for(int i=0; i< num_miss; i++)
             if(miss_addr_tbl[i][0] == (int)addr)
@@ -213,23 +213,23 @@ void cache_module::handle_request()
               exist = true;
               if(miss_addr_tbl[i][1] > 1)
                 cap_miss++;
-                              
+
               break;
             }
-          //se non c'è aggiungo addr alla tabella e incremento il suo contatore          
+          //se non c'è aggiungo addr alla tabella e incremento il suo contatore
           if(!exist)
           {
             miss_addr_tbl[tbl_index][0] = addr;
             miss_addr_tbl[tbl_index][1]++;
             if(miss_addr_tbl[tbl_index][1] == 1)
               cold_miss++;
- 
+
             tbl_index++;
           }
         }
         hit.write(false);
 //        cout << name() << " MISS! " << hex << addr << " @ " << sc_time_stamp() << endl;
-                
+
         read_from_mem(((addr+TID*TILE_SPACING)&0xFFFFFFF0),temp_pinout.id,4,loc);
         num_write+=4;
         ind =target_rpu->check_exist(addr);
@@ -246,11 +246,11 @@ void cache_module::handle_request()
 
           pinout_ft_CPU.write(temp_pinout);
           ready_to_CPU.write(true);
-          wait();   
+          wait();
 
           addr+=4;
         }
-        ready_to_CPU.write(false);     
+        ready_to_CPU.write(false);
       }
       status = CACHE_ST_IDLE ;
       trace_status = (int) status ;

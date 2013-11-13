@@ -3,19 +3,21 @@
 // LGPL license version 3
 //
 
-#include "dce_host_uart.hpp"
-#include "libsimsoc/interfaces/yield.hpp"
-#include "libsimsoc/display.hpp"
-#include <termios.h>
-#include <errno.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
 #include <sys/types.h>
-#include <time.h>
+#include <termios.h>
+#include <unistd.h>
 #include <fcntl.h>
+
+#include <cerrno>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
+
+#include <libsimsoc/components/dce_host_uart.hpp>
+#include <libsimsoc/interfaces/yield.hpp>
+#include <libsimsoc/display.hpp>
 using namespace std;
 using namespace sc_core;
 

@@ -4,19 +4,20 @@
 #define SC_INCLUDE_DYNAMIC_PROCESSES
 
 #include <systemc.h>
-#include "globals.h"
-#include "core_signal.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include "virtualsoc/core/globals.h"
+#include "virtualsoc/core/core_signal.h"
 
 SC_MODULE(cl_L3_mux_NM) {
 
 public:
 
     sc_in<bool>                 clock;
-    
+
     sc_in<bool>                 *request_from_core;
     sc_out<bool>                *ready_to_core;
     sc_inout<PINOUT>            *pinout_core;
@@ -25,10 +26,10 @@ public:
     sc_in<bool>                 *ready_from_L3;
     sc_inout<PINOUT>            *pinout_L3;
 
-    
+
     // segnali per attivare le 2 fsm e per riattivare il polling
     sc_signal<bool> *go_fsm, *served;
-    
+
     enum ctrl_state { IDLE=0, READ=1, WRITE=2/*, CACHED_LINE=3*/};
 
     ctrl_state *cs;
@@ -45,21 +46,21 @@ public:
     void fsm(int index);
 
     int GetMyPortId(unsigned int id); //id-based port binding for static mapping
-   
+
 private:
     unsigned char ID;
-    unsigned int n_mst; 
-    unsigned int n_slv; 
+    unsigned int n_mst;
+    unsigned int n_slv;
     unsigned char delay, L3_mux_sched;
     bool static_mapping; //if true enables static mapping between initiators and targets
-    
+
 public:
 
-    ////////////////////////////////////// 
-    // constructor 
-    ////////////////////////////////////// 
+    //////////////////////////////////////
+    // constructor
+    //////////////////////////////////////
     SC_HAS_PROCESS(cl_L3_mux_NM);
-    cl_L3_mux_NM(sc_module_name nm, 
+    cl_L3_mux_NM(sc_module_name nm,
             unsigned char ID,
             unsigned int n_mst,
             unsigned int n_slv,
@@ -80,7 +81,7 @@ public:
             miss_filter(miss_filter),
             miss_buff_depth(miss_buff_depth)*/
     {
-    
+
     char buffer[100];
     unsigned char i;
 
@@ -98,10 +99,10 @@ public:
     served              = new sc_signal<bool>   [n_mst];
     done                = new bool              [n_mst];
     go_fsm              = new sc_signal<bool>   [n_slv];
-    cs                  = new ctrl_state        [n_slv];       
+    cs                  = new ctrl_state        [n_slv];
     next_to_serve       = new unsigned char     [n_slv];
     current             = new int               [n_slv];
-    busy_fsm            = new bool              [n_slv];       
+    busy_fsm            = new bool              [n_slv];
     idc_fsm             = new unsigned char     [n_slv];
 
     req_table           = new bool              [n_slv*n_mst];
@@ -112,7 +113,7 @@ public:
 
     //////////////////////////////////////////////////
     //static and dynamic process creation
-    SC_METHOD(arbiter);  
+    SC_METHOD(arbiter);
         sensitive << clock.pos();
 
     for (int index = 0; index < (int)n_mst; index++)
@@ -129,7 +130,7 @@ public:
     //////////////////////////////////////////////////
     //init
     for(i=0; i<(int)n_mst; i++)
-    {    
+    {
       served[i].write(false);
       done[i] = false;
       req[i] = 0;
@@ -186,10 +187,10 @@ public:
 //        sc_trace(tf, idc_fsm, buffer);
 
 //        sprintf(buffer, "muxL3_next_to_serve");
-//        sc_trace(tf, next_to_serve, buffer);  
+//        sc_trace(tf, next_to_serve, buffer);
 
 //        sprintf(buffer, "muxL3_cs");
-//        sc_trace(tf, (char)cs, buffer);  
+//        sc_trace(tf, (char)cs, buffer);
 
 //        sprintf(buffer, "muxL3_curr_line");
 //        sc_trace(tf, curr_buff_line, buffer);
@@ -206,26 +207,26 @@ public:
 
     ~cl_L3_mux_NM()
     {
-		delete [] request_from_core;
-		delete [] ready_to_core;
-		delete [] pinout_core;
+    delete [] request_from_core;
+    delete [] ready_to_core;
+    delete [] pinout_core;
 
-		delete [] request_to_L3;
-		delete [] ready_from_L3;
-		delete [] pinout_L3;
+    delete [] request_to_L3;
+    delete [] ready_from_L3;
+    delete [] pinout_L3;
 
-		delete [] req;
-		delete [] served;
-		delete [] done;
-		delete [] go_fsm;
-		delete [] cs;
-		delete [] next_to_serve;
-		delete [] current;
-		delete [] busy_fsm;
-		delete [] idc_fsm;
+    delete [] req;
+    delete [] served;
+    delete [] done;
+    delete [] go_fsm;
+    delete [] cs;
+    delete [] next_to_serve;
+    delete [] current;
+    delete [] busy_fsm;
+    delete [] idc_fsm;
 
-		delete [] req_table;
+    delete [] req_table;
     }
-}; 
+};
 
 #endif //__L3_MUX_NM_H__

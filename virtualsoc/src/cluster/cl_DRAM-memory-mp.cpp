@@ -1,4 +1,4 @@
-#include "cl_DRAM-memory-mp.h"
+#include "virtualsoc/cluster/cl_DRAM-memory-mp.h"
 
 
 /* callback functors */
@@ -29,7 +29,7 @@ void power_callback_mp(double a, double b, double c, double d)
 void DRAM_mem_mp::dram_update()
 {
   int i = 0;
-  
+
   while (true)
   {
     //stepping DRAMSim at every cycle
@@ -40,17 +40,17 @@ void DRAM_mem_mp::dram_update()
       i = 0;
     }
     else
-      i++; 
-    
+      i++;
+
     wait();
   }
-  
+
 }
 
 void DRAM_mem_mp::stats()
 {
   int i;
-  cout << "\n#==========#" << endl; 
+  cout << "\n#==========#" << endl;
   cout << "#=== L3 ===#" << endl;
   cout << "#==========#\n" << endl;
   cout << "PORT\tWacc\tRacc\tTOT"<<endl;
@@ -67,20 +67,20 @@ void DRAM_mem_mp::working(int idx)
   bool wr;
   PINOUT mast_pinout;
   unsigned long int data;
-  
-  
+
+
   ready[idx].write(false);
-  
+
   while (true)
   {
-    
+
     must_wait[idx] = true;
     __DELTA_L1;
-    
+
     if(!request[idx].read())
       wait(request[idx].posedge_event());
 
-    
+
     if(CL_GLB_STATS)
       L3_acc_cnt++;
 
@@ -100,48 +100,48 @@ void DRAM_mem_mp::working(int idx)
         ID, sc_simulation_time());
         exit(1);
     }
-    
+
     burst = (int)mast_pinout.burst;
     wr = mast_pinout.rw;
     //addr = addresser->Logical2Physical(mast_pinout.address, global_ID);
     addr = mast_pinout.address;
-    
+
     //////////////////////////////////
     // Wait for MEM_IN_WS cycles if != 0
     for(i = 0; i < (int)mem_in_ws; i++)
       wait(clock.posedge_event());
-    
-    
+
+
     // ------------------------------ READ ACCESS ------------------------------
     if (!wr)
     {
       for (i = 0; i < burst; i ++)
       {
-        
+
         data = this->Read(addr, bw, idx);
-        
+
         do
         {
           wait(clock.posedge_event());
           ready[idx].write(false);
         } while (must_wait[idx] == true);
-        
+
         //fflush(stdout);
-       
-        // Wait cycles between burst beat 
+
+        // Wait cycles between burst beat
         for(j=0; j<(int)mem_bb_ws && i!=0; j++)
           wait(clock.posedge_event());
-        
+
         prev_addr = addr;
         // Increment the address for the next beat
         addr += size;
-        
+
         mast_pinout.data = data;
         pinout[idx].write(mast_pinout);
         ready[idx].write(true);
-        
+
       } // end for
-      
+
       wait(clock.posedge_event());
       ready[idx].write(false);
     }
@@ -151,26 +151,26 @@ void DRAM_mem_mp::working(int idx)
       for (i = 0; i < burst; i ++)
       {
         data = mast_pinout.data;
-        
+
         this->Write(addr, data, bw, idx);
-        
+
         do
         {
           wait(clock.posedge_event());
           data = mast_pinout.data;
           ready[idx].write(false);
         } while (must_wait[idx] == true);
-        
+
         ///////////////////////////////////////
-        // Wait cycles between burst beat 
+        // Wait cycles between burst beat
         for(j=0; j<(int)mem_bb_ws && i!=0; j++)
           wait(clock.posedge_event());
-        
+
         // Increment the address for the next beat
         prev_addr = addr;
         addr += size;
         ready[idx].write(true);
-      } 
+      }
       wait(clock.posedge_event());
       ready[idx].write(false);
     }

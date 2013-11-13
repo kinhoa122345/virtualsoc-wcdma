@@ -8,13 +8,15 @@
 #ifndef PROCESSOR_HPP
 #define PROCESSOR_HPP
 
-#include "processor_base.hpp"
-#include "libsimsoc/interfaces/dmi.hpp"
-#include "libsimsoc/translation_page.hpp"
-#include <tlm_h/tlm_sockets/tlm_initiator_socket.h>
-#include <tlm_h/tlm_sockets/tlm_target_socket.h>
+#include <cstdio>
 
-#include <stdio.h>
+#include <tlm_core/tlm_2/tlm_sockets/tlm_initiator_socket.h>
+#include <tlm_core/tlm_2/tlm_sockets/tlm_target_socket.h>
+
+#include <libsimsoc/processors/processor_base.hpp>
+#include <libsimsoc/interfaces/dmi.hpp>
+#include <libsimsoc/translation_page.hpp>
+
 using namespace std;
 
 namespace simsoc {
@@ -35,7 +37,7 @@ protected:
 
 public:
   static ParameterInt simulation_mode;
-  
+
   SimulationMode mode;
   size_t dt3_threshold;
   const int iquantum;

@@ -3,8 +3,10 @@
 // LGPL license version 3
 //
 
-#include "watchdog.hpp"
-#include "libsimsoc/display.hpp"
+#include <libsimsoc/components/watchdog.hpp>
+#include <libsimsoc/display.hpp>
+
+
 using namespace std;
 using namespace sc_core;
 

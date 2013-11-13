@@ -3,8 +3,9 @@
 // LGPL license version 3
 //
 
-#include "arm_systemcontrol_coproc.hpp"
 #include <cassert>
+
+#include "libsimsoc/processors/arm/arm_systemcontrol_coproc.hpp"
 #include "libsimsoc/processors/arm/arm_mmu.hpp"
 
 using namespace std;

@@ -3,16 +3,16 @@
 // LGPL license version 3
 //
 
-#include "armis_visitor.hpp"
-#include "armis.hpp"
-#include "armis_arithmetic.hpp"
-#include "armis_control.hpp"
-#include "armis_coproc.hpp"
-#include "armis_edsp.hpp"
-#include "armis_loadstore.hpp"
-#include "thumbis_arithmetic.hpp"
-#include "thumbis_control.hpp"
-#include "thumbis_loadstore.hpp"
+#include "libsimsoc/processors/arm/armis_visitor.hpp"
+#include "libsimsoc/processors/arm/armis.hpp"
+#include "libsimsoc/processors/arm/armis_arithmetic.hpp"
+#include "libsimsoc/processors/arm/armis_control.hpp"
+#include "libsimsoc/processors/arm/armis_coproc.hpp"
+#include "libsimsoc/processors/arm/armis_edsp.hpp"
+#include "libsimsoc/processors/arm/armis_loadstore.hpp"
+#include "libsimsoc/processors/arm/thumbis_arithmetic.hpp"
+#include "libsimsoc/processors/arm/thumbis_control.hpp"
+#include "libsimsoc/processors/arm/thumbis_loadstore.hpp"
 
 namespace simsoc {
 

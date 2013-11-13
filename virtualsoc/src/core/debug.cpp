@@ -1,2 +1,2 @@
-#include "debug.h"
+#include "virtualsoc/core/debug.h"
 

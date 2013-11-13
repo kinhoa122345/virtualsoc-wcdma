@@ -3,8 +3,8 @@
 // LGPL license version 3
 //
 
-#include "arm_shift.hpp"
-#include "libsimsoc/display.hpp"
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/processors/arm/arm_shift.hpp>
 #include "libsimsoc/processors/arm/arm_cpu.hpp"
 
 using namespace std;

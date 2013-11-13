@@ -1,6 +1,4 @@
-#include <systemc.h>
-#include "globals.h"
-#include "config.h"
+#include <systemc>
 #include <stdio.h>
 #include <stdlib.h>
 #include <getopt.h>
@@ -8,7 +6,11 @@
 #include <sstream>
 #include <iomanip>
 #include <string>
-#include "debug.h"
+
+#include "virtualsoc/core/globals.h"
+#include "virtualsoc/core/config.h"
+#include "virtualsoc/core/debug.h"
+
 
 using namespace std;
 
@@ -20,7 +22,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
   // If the Makefile provided default values at compile time, use them.
   // Otherwise, use built-in defaults. Every option will then be
   // configurable at runtime via command line
-  
+
 #ifdef MAKEFILE_DEFAULT_CURRENT_ISS
   CURRENT_ISS = MAKEFILE_DEFAULT_CURRENT_ISS;
 #else
@@ -32,7 +34,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
 #else
   CURRENT_ARCH = BUILTIN_DEFAULT_CURRENT_ARCH;
 #endif
-  
+
 #ifdef MAKEFILE_DEFAULT_N_CORES
   N_CORES = MAKEFILE_DEFAULT_N_CORES;
 #else
@@ -214,7 +216,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
     switch (c)
     {
       case 301 :
-        
+
         switch (optarg[0]) {
           case 'w':
           case 'W':   CURRENT_ISS = ARMv6;
@@ -222,13 +224,13 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
           default:    printf("Fatal error: Invalid value %c for option --core! Use -h for help\n\n", optarg[0]);
           exit(1);
         }
-        
+
         if (CURRENT_ISS == ARMv6 && !HAVE_ARMv6) {
           printf("Fatal error: Invalid value %c for option --core: core unavailable! Use -h for help\n\n", optarg[0]);
           exit(1);
         }
         break;
-        
+
       case 302 :
         switch (optarg[0]) {
           case 'c':
@@ -249,7 +251,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
           default:    printf("Fatal error: Invalid value for option --intc! Use -h for help\n\n");
           exit(1);
         }
-        
+
         if ((CURRENT_ARCH == SINGLE_CLUSTER && !HAVE_SINGLE_CLUSTER) ||
           (CURRENT_ARCH == NOC2 && !HAVE_NOC2) ||
           (CURRENT_ARCH == NOC3 && !HAVE_NOC3) ||
@@ -257,9 +259,9 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
           printf("Fatal error: Invalid value %c for option --intc: interconnect unavailable! Use -h for help\n\n", optarg[0]);
           exit(1);
         }
-        
+
         break;
-        
+
       case 303:   // --tc   core number per tile
         N_CORES_TILE = atoi(optarg);
         if(N_CORES_TILE <= 64 && N_CORES_TILE >= 1 ) {
@@ -269,7 +271,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
           exit(1);
         }
         break;
-        
+
       /*** -- tn **************************************************************/
 
       //case 304: //tile number
@@ -278,7 +280,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
         /*
         N_TILE = atoi(optarg);
         if( N_TILE <= 4 && N_TILE >= 2 )
-            printf("[parser] N_TILE = %d \n", N_TILE );	
+            printf("[parser] N_TILE = %d \n", N_TILE );
         else {
             printf("Fatal error: Invalid value %d for option --tn must be >= 2 and <= 4\n", N_TILE);
             exit(1);
@@ -312,7 +314,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
           exit(1);
         }
         break;
-        
+
       case 308 : // cluster Icache size (KB)
         CL_ICACHE_SIZE = atoi(optarg);
         if(CL_ICACHE_SIZE != 1 && CL_ICACHE_SIZE != 2 && CL_ICACHE_SIZE != 4 && CL_ICACHE_SIZE != 8 && CL_ICACHE_SIZE != 16) {
@@ -330,7 +332,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
           exit(1);
         }
         break;
-        
+
       case 310 :
         DRAM_MC_PORTS = atoi(optarg);
         if(DRAM_MC_PORTS != 1 && DRAM_MC_PORTS != 2 && DRAM_MC_PORTS != 4) {
@@ -338,7 +340,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
             exit(1);
         }
         break;
-        
+
       //case 311:
         //L3_MUX_STATIC_MAP = !L3_MUX_STATIC_MAP;
 //        {
@@ -365,7 +367,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
       case 401 :
         STATSFILENAME = optarg ;
         break;
-    
+
       case 501:
         DRAM = !DRAM;
         break;
@@ -379,7 +381,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
         break;
 
       case 'c':
-        N_CORES = atoi(optarg);       
+        N_CORES = atoi(optarg);
         if (N_CORES < 1 || N_CORES > 256) {
           printf("Fatal error: Invalid value %u for option -c! Use -h for help\n", N_CORES);
           exit(1);
@@ -399,7 +401,7 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
             puts("Please use the -h/--help option alone on the command line!");
             exit(1);
         }
-        
+
         printf("\nAvailable options:\n\n");
         printf("-b x        Sets the wait states of memories (back-to-back) to x (default %hu)\n", MEM_BB_WS);
         printf("-c x        Sets the platform as having x cores (max 64) (default %hu)\n", N_CORES);
@@ -417,9 +419,9 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
                             HAVE_NOC2 ? "yes" : "no",
                             HAVE_NOC3 ? "yes" : "no",
                             HAVE_NOC4 ? "yes" : "no",
-                            (CURRENT_ARCH == NOC2 ? "NOC2" : 
+                            (CURRENT_ARCH == NOC2 ? "NOC2" :
                             (CURRENT_ARCH == NOC3 ? "NOC3" :
-                            (CURRENT_ARCH == NOC4 ? "NOC4" : 
+                            (CURRENT_ARCH == NOC4 ? "NOC4" :
                             "SINGLE_CLUSTER"))));
         printf("-m x        Sets the wait states of memories (initial) to x (default %hu)\n", MEM_IN_WS);
         printf("--mcp=x     Sets the number of ports for the Memory Controller to x (default %hu, valid values are 1, 2 or 4)\n", DRAM_MC_PORTS);
@@ -475,12 +477,12 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
   } //end of while
 
   if (CURRENT_ARCH == SINGLE_CLUSTER) {
-    
+
     N_CORES_TILE = N_CORES;
-    
+
     //---------------------------------------------------------------
     // Creation of global structure used for statistic collection
-    
+
     int nc = CL_ICACHE_PRIV ? N_CORES : N_SHR_CACHE_BANKS;
     CL_CORE_METRICS = new bool[N_CORES];
     ARM11_IDLE = new bool[N_CORES];
@@ -492,9 +494,9 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
     CL_CACHE_METRICS = new bool[nc];
     for(int i=0; i<nc; i++)
       CL_CACHE_METRICS[i] = false;
-    
+
     //---------------------------------------------------------------
-    
+
   }
 
   if (optind < argc) {
@@ -515,5 +517,5 @@ void parseArgs(int argc, char *argv[], char *envp[], int *new_argc, char **new_a
   N_MEMORIES = N_TILE * (N_CL_BANKS + 1);
   N_SLAVES = N_TILE * (N_CL_BANKS + 1 + 1);
 
-  
+
 }

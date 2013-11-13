@@ -6,11 +6,17 @@
 #ifndef DEBUG_CONSOLE_HPP
 #define DEBUG_CONSOLE_HPP
 
-#include "libsimsoc/interfaces/tlm_helper.hpp"
-#include "libsimsoc/components/stop_box.hpp"
-#include "libsimsoc/module.hpp"
+#include <sysc/kernel/sc_spawn_options.h>
+#include <sysc/kernel/sc_spawn.h>
+#include <sysc/kernel/sc_boost.h>
+
 #include <tlm_utils/simple_initiator_socket.h>
 #include <tlm_utils/simple_target_socket.h>
+
+#include <libsimsoc/interfaces/tlm_helper.hpp>
+#include <libsimsoc/components/stop_box.hpp>
+#include <libsimsoc/module.hpp>
+
 
 namespace simsoc {
 

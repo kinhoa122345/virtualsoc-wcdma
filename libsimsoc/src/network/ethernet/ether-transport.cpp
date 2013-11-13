@@ -3,8 +3,8 @@
 // LGPL license version 3
 //
 
-#include "simsoc-config.h"
-#include "libsimsoc/network/ethernet/ether-transport.hpp"
+#include <libsimsoc/simsoc-config.h>
+#include <libsimsoc/network/ethernet/ether-transport.hpp>
 
 #include <cstdlib>
 #include <string>

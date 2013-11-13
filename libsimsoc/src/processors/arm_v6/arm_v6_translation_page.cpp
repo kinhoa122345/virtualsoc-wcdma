@@ -3,11 +3,12 @@
 // LGPL license version 3
 //
 
-#include "arm_v6_translation_page.hpp"
-#include "arm_v6_processor.hpp"
-#include "arm_v6_dyntrans.hpp"
-#include <libsimsoc/config.h>
 #include <cstring>
+
+#include <libsimsoc/config.h>
+#include "libsimsoc/processors/arm_v6/arm_v6_translation_page.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_processor.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_dyntrans.hpp"
 
 namespace simsoc {
 
@@ -70,5 +71,5 @@ namespace simsoc {
       instructions[n].sem_fct = slv6_instruction_functions[instructions[n].args.g0.id];
     }
   }
-  
+
 } // namespace simsoc

@@ -3,9 +3,11 @@
 // LGPL license version 3
 //
 
-#include "primecell_uart.hpp"
-#include "libsimsoc/display.hpp"
-#include "libsimsoc/interfaces/yield.hpp"
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/components/primecell_uart.hpp>
+#include <libsimsoc/interfaces/yield.hpp>
+
+
 using namespace std;
 using namespace sc_core;
 
@@ -155,7 +157,7 @@ uint16_t PrimeCellUart::read_half(uint32_t addr) {
   case ICR:
     warning() <<"invalid read access of write-only register ICR" <<endl;
 //    exit(1);
-	return icr;
+  return icr;
 
   case DMACR:
     return dmacr;

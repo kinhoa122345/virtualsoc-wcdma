@@ -6,9 +6,10 @@
 // FIXME: this file describes the TLB of the ARM architecture version 5
 // it should be replaced by a description of the TLB corresponding to version 6
 
-#include "arm_v5_tlb.hpp"
-#include "arm_v5_mmu.hpp"
 #include <cassert>
+
+#include "libsimsoc/processors/arm_v6/arm_v5_tlb.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v5_mmu.hpp"
 
 namespace simsoc {
 

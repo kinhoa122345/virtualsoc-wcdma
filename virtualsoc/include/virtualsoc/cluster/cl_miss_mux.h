@@ -4,19 +4,20 @@
 #define SC_INCLUDE_DYNAMIC_PROCESSES
 
 #include <systemc.h>
-#include "globals.h"
-#include "core_signal.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
+#include "virtualsoc/core/globals.h"
+#include "virtualsoc/core/core_signal.h"
 
 SC_MODULE(cl_miss_mux) {
 
 public:
 
     sc_in<bool>                 clock;
-    
+
     sc_in<bool>                 *request_miss_cache;
     sc_out<bool>                *ready_miss_cache;
     sc_inout<PINOUT>            *pinout_miss_cache;
@@ -26,12 +27,12 @@ public:
     sc_inout<PINOUT>            pinout_muxL3;
 
     ///////////////////////////////////////
-    // segnali e variabili interne 
-    /////////////////////////////////////// 
-    
+    // segnali e variabili interne
+    ///////////////////////////////////////
+
     // segnali per attivare le 2 fsm e per riattivare il polling
     sc_signal<bool> go_fsm, *served;
-    
+
     enum ctrl_state { IDLE=0, READ=1, WRITE=2 };
     ctrl_state cs;
 
@@ -42,25 +43,25 @@ public:
     // idc_fsm	: id del core che deve servire la fsm				settati da arbiter()
     // busy		: 0/1 se la fsm sta gia' servendo un core			settati da arbiter() e fsm()
 
-    ////////////////////////////////////// 
+    //////////////////////////////////////
     // prototipi
-    ///////////////////////////////////// 
-    
+    /////////////////////////////////////
+
     void req_polling(int index);
     void arbiter();
     void fsm();
 
 private:
     unsigned char ID;
-    unsigned int num_caches; 
+    unsigned int num_caches;
     unsigned char delay, miss_mux_sched;
 public:
 
-    ////////////////////////////////////// 
-    // costruttore 
-    ////////////////////////////////////// 
+    //////////////////////////////////////
+    // costruttore
+    //////////////////////////////////////
     SC_HAS_PROCESS(cl_miss_mux);
-    cl_miss_mux(sc_module_name nm, 
+    cl_miss_mux(sc_module_name nm,
             unsigned char ID,
             unsigned int num_caches,
             unsigned char delay,
@@ -73,7 +74,7 @@ public:
             delay(delay),
             miss_mux_sched(miss_mux_sched)
     {
-    
+
     char buffer[100];
     unsigned char i;
 
@@ -91,7 +92,7 @@ public:
     //////////////////////////////////////////////////
     //static and dynamic process creation
     ////////////////////////////////////////////////////
-    SC_METHOD(arbiter);	
+    SC_METHOD(arbiter);
         sensitive << clock.pos();
     SC_THREAD(fsm);
         sensitive << clock.pos();
@@ -104,7 +105,7 @@ public:
 
     //init
     for(i=0; i<(int)num_caches; i++)
-    {		
+    {
         served[i].write(false);
         req[i] = 0;
     }
@@ -137,23 +138,23 @@ public:
         sc_trace(tf, idc_fsm, buffer);
 
         sprintf(buffer, "muxL3_next_to_serve");
-        sc_trace(tf, next_to_serve, buffer);	
+        sc_trace(tf, next_to_serve, buffer);
 
         sprintf(buffer, "muxL3_cs");
-        sc_trace(tf, (char)cs, buffer);	
+        sc_trace(tf, (char)cs, buffer);
     }
 
     } //costruttore
 
     ~cl_miss_mux()
     {
-		delete [] request_miss_cache;
-		delete [] ready_miss_cache;
-		delete [] pinout_miss_cache;
+    delete [] request_miss_cache;
+    delete [] ready_miss_cache;
+    delete [] pinout_miss_cache;
 
-		delete [] req;
-		delete [] served;
+    delete [] req;
+    delete [] served;
     }
-}; 
+};
 
 #endif

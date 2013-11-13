@@ -3,8 +3,10 @@
 // LGPL license version 3
 //
 
-#include "dce_null_modem.hpp"
-#include "libsimsoc/display.hpp"
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/components/dce_null_modem.hpp>
+
+
 using namespace sc_core;
 using namespace std;
 

@@ -3,21 +3,22 @@
 // LGPL license version 3
 //
 
-#include "arm_v6_processor.hpp"
-#include "arm_v6_translation_page.hpp"
-#include "arm_v6_dyntrans.hpp"
-#include "arm_v6_debugger.hpp"
-#include "arm_v6_printers.hpp"
-#include "simlight/slv6_iss_grouped.h"
-#include <libsimsoc/simsoc-config.h>
-#include <libsimsoc/processors/iss_exception.hpp>
-#include <libsimsoc/processors/llvm_gen_parameters.hpp>
 #include <errno.h>
 #include <iomanip>
 #include <sys/mman.h>
 
+#include "libsimsoc/processors/arm_v6/arm_v6_processor.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_translation_page.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_dyntrans.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_debugger.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_printers.hpp"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_iss_grouped.h"
+#include <libsimsoc/simsoc-config.h>
+#include <libsimsoc/processors/iss_exception.hpp>
+#include <libsimsoc/processors/llvm_gen_parameters.hpp>
+
 #ifdef SIMSOC_HAVE_LLVM
-#include "arm_v6_llvm_server.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_llvm_server.hpp"
 #endif
 
 using namespace sc_core;
@@ -155,7 +156,7 @@ namespace simsoc {
     pending_flags(0),
     raw_stats(NULL)/*,
     ID(ID)*/
-  {    
+  {
     this->ID = ID;
     this->TILE_ID = TILE_ID;
     //cout << "arm11 creato - ID "<< (int)ID << endl;
@@ -191,7 +192,7 @@ namespace simsoc {
         is.close();
       }
     }
-    
+
   }
 
   ARMv6_Processor::~ARMv6_Processor() {
@@ -267,7 +268,7 @@ namespace simsoc {
 #ifndef NO_MMU
   tlm::tlm_initiator_socket<> &ARMv6_Processor::get_rw_port() {
     return mmu.rw_socket;
-  }  
+  }
 #endif
   SignalTargetPort<bool> &ARMv6_Processor::get_it_port() {
     return irq_port;
@@ -296,30 +297,30 @@ namespace simsoc {
       try {
         while (true) {
           if (inst_size(&slv6_proc)==4) {
-	    if(prefetch_flag){
+      if(prefetch_flag){
 //       	      cout<<"Before reading prefetched instruction" << "@ " << sc_time_stamp()<<endl;
-	      bincode = mmu.read_from_fifoI();
+        bincode = mmu.read_from_fifoI();
 // 	      cout<<"Prefetched istruction: "<< hex << bincode << "@ " << sc_time_stamp()<<endl;
-	      prefetch_flag = false;
-	    }
-	    else
-	      bincode = mmu.load_instr_32(address_of_current_instruction(&slv6_proc));
-  	    	 /*   	  
-	    cout << "bincode & 0xE000000: "<< hex << (unsigned int)(bincode & 0xE000000) << endl;
-	    
-	     
-	    */
-	    //prefetch executed only if the current instruction is not a load with pc as destination.
-	    if((((bincode & 0xC000000) == 0x4000000) && ((bincode & 0x10F000)!= 0x10F000)) || ((bincode & 0xE000000) == 0x8000000) && ((bincode & 0x108000)!= 0x108000)){
+        prefetch_flag = false;
+      }
+      else
+        bincode = mmu.load_instr_32(address_of_current_instruction(&slv6_proc));
+           /*
+      cout << "bincode & 0xE000000: "<< hex << (unsigned int)(bincode & 0xE000000) << endl;
+
+
+      */
+      //prefetch executed only if the current instruction is not a load with pc as destination.
+      if((((bincode & 0xC000000) == 0x4000000) && ((bincode & 0x10F000)!= 0x10F000)) || ((bincode & 0xE000000) == 0x8000000) && ((bincode & 0x108000)!= 0x108000)){
 // 	      cout<<"Memory istruction: "<< hex << bincode << "@ " << sc_time_stamp()<<endl;
-	      prefetch_flag = true;
-	      mmu.write_to_fifoI(address_of_next_instruction(&slv6_proc));
+        prefetch_flag = true;
+        mmu.write_to_fifoI(address_of_next_instruction(&slv6_proc));
 // 	      cout<<"Next Instruction: "<< hex << address_of_next_instruction(&slv6_proc)<<endl;
-	    }
-	    else{
+      }
+      else{
 // 	      cout<<"No Memory istruction: "<< hex << bincode << "@ " << sc_time_stamp()<<endl;
-	    }
-	    
+      }
+
             arm_decode_and_store(&instr,bincode);
           } else {
             bincode = mmu.load_instr_16(address_of_current_instruction(&slv6_proc));

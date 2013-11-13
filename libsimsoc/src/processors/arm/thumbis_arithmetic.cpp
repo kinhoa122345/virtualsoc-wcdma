@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "thumbis_arithmetic.hpp"
+#include "libsimsoc/processors/arm/thumbis_arithmetic.hpp"
 #include "libsimsoc/processors/arm/arm_cpu.hpp"
 #include "libsimsoc/processors/arm/arm_shift.hpp"
 #include "libsimsoc/processors/arm/arm_processor.hpp"

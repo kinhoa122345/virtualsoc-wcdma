@@ -3,7 +3,9 @@
 // LGPL license version 3
 //
 
-#include "arm_v6_llvm_server.hpp"
+#ifdef SIMSOC_HAVE_LLVM
+
+#include "libsimsoc/processors/arm_v6/arm_v6_llvm_server.hpp"
 #include <libsimsoc/processors/compil_server.tpp>
 
 namespace simsoc {
@@ -68,3 +70,5 @@ namespace simsoc {
   }
 
 } // namespace simsoc
+
+#endif // SIMSOC_HAVE_LLVM

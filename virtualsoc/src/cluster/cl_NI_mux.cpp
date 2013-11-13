@@ -1,5 +1,4 @@
-
-#include "cl_NI_mux.h"
+#include "virtualsoc/cluster/cl_NI_mux.h"
 
 #define MUXL3_LOW_ID_HI_PRI
 
@@ -32,7 +31,7 @@ inline int cl_NI_mux::IsInMissBuffer(unsigned int address)
       buff_line_hit[i]++;
       break;
     }
-      
+
   return found ? i : RETVAL_ICACHE_MISS;
 }
 
@@ -40,13 +39,13 @@ void cl_NI_mux::arbiter() {
 
   int id, current;
   bool req_table[n_mst];
-  
+
   // CUSTOM DELAY
   for (id = 0; id < (int)delay; id++)
     wait();
-  
+
   go_fsm.write(false);
-    
+
   for(id = 0; id < (int)n_mst; id++)
     req_table[id] = (req[id] && !served[id]) ? true : false;
 
@@ -67,7 +66,7 @@ void cl_NI_mux::arbiter() {
                             served[id].write(true);
                         }
                     break;
-                    
+
         case 1 : 	//////////////////
                     //ROUND ROBIN
                     //////////////////
@@ -85,11 +84,11 @@ void cl_NI_mux::arbiter() {
                         }
                     }
                     break;
-                    
+
         case 2 :	//////////////////
-                    //2 Levels : 
+                    //2 Levels :
                     //////////////////
-#if 0                    
+#if 0
                     //higher priority for CORE 0
                     if(req_table[0] && !busy_fsm)
                     {
@@ -117,11 +116,11 @@ void cl_NI_mux::arbiter() {
                     cout << name() << " 2 levels not implemented!" << endl;
                     exit(1);
                     break;
-                    
+
         default :   printf("[%s] error in scheduling value!\n", name());
                     exit(1);
                     break;
-                    
+
     }
 }
 
@@ -149,9 +148,9 @@ void cl_NI_mux::fsm()
   bool rw;
   cs = IDLE;
   int hit_line=0;
-  
+
   while(true)
-  { 
+  {
     switch(cs) {
 
       case IDLE :
@@ -159,7 +158,7 @@ void cl_NI_mux::fsm()
                 wait( go_fsm.posedge_event() );
 
                 pinout = pinout_core[idc_fsm].read();
-                
+
                 is_curr_acc_inst = IsInstrAccess(idc_fsm);
 
 #ifdef __DEBUG_MISS_CACHE
@@ -174,31 +173,31 @@ void cl_NI_mux::fsm()
                     cout << "\t[LINE " << dec << k << "]\t";
                     for(r=0;r<4;r++)
                       printf("- %08X ", miss_buffer[k][r].address + 0x4*r);
-                     
+
                     cout << "\n";
-                    
+
                     cout << "\t DATA\t\t";
                     for(r=0;r<4;r++)
                       printf("- %08X ", miss_buffer[k][r].data);
-                    
+
                     cout << "\n";
                   }
                 }
 #endif
-                
-              
+
+
                 burst = (int)pinout.burst;
                 rw = pinout.rw;
 
-                
+
                 hit_line = IsInMissBuffer(pinout.address);
-                
+
                 if(is_curr_acc_inst && miss_filter && (hit_line != RETVAL_ICACHE_MISS) && !is_buff_empty)
                 {
                   //cout << name() << " ADDRESS " <<  hex << pinout.address << " by core " << dec << (int)idc_fsm << " found in line " << hit_line << " @ " << sc_time_stamp() << endl;
                   cs = CACHED_LINE;
                 }
-                else 
+                else
                 {
                   if(!rw)
                     cs = READ;
@@ -213,10 +212,10 @@ void cl_NI_mux::fsm()
                   request_to_L3.write( true );
                 }
 
-                break;				
+                break;
 
       case READ :
-                
+
                 for (burst_ctr = 0; burst_ctr < burst; burst_ctr++)
                 {
                       // modificato dopo aver settato mem_in_ws, mem_bb_w > 0
@@ -227,13 +226,13 @@ void cl_NI_mux::fsm()
 #endif
                       wait(ready_from_L3.posedge_event());
                       pinout = pinout_L3.read();
-                      
+
                       if(is_curr_acc_inst && miss_filter)
                       {
                         is_buff_empty= false;
                         miss_buffer[curr_buff_line][burst_ctr] = pinout;
                       }
-                      
+
                       pinout_core[idc_fsm].write( pinout );
                       ready_to_core[idc_fsm].write(true);
 
@@ -251,7 +250,7 @@ void cl_NI_mux::fsm()
                   curr_buff_line %= miss_buff_depth;
                   //cout <<"next line is " << dec << curr_buff_line << endl;
                 }
-                
+
                 ready_to_core[idc_fsm].write(false);
                 request_to_L3.write(false);
 
@@ -272,13 +271,13 @@ void cl_NI_mux::fsm()
                 {
                     wait(ready_from_L3.posedge_event());
                     ready_to_core[idc_fsm].write(true);
-    
+
                     wait( ready_from_L3.negedge_event() );
                     request_to_L3.write( false );
                     ready_to_core[idc_fsm].write( false);
 
                     // ### [Wed Apr 7 16:11:28]
-                    // per evitare problemi quando il core tiene sempre alto 
+                    // per evitare problemi quando il core tiene sempre alto
                     // request e fa pi� scritture consecutive
                     //wait(clock.posedge_event());
                     __DELTA_L1;
@@ -294,9 +293,9 @@ void cl_NI_mux::fsm()
 
                 cs = IDLE;
                 break;
-                
+
       case CACHED_LINE :
-                //cout << "[" << name() << "] CACHED_LINE state - core " << (int)idc_fsm << " line " << dec << hit_line << " @ " << sc_time_stamp() << endl; 
+                //cout << "[" << name() << "] CACHED_LINE state - core " << (int)idc_fsm << " line " << dec << hit_line << " @ " << sc_time_stamp() << endl;
                 for (burst_ctr = 0; burst_ctr < burst; burst_ctr++)
                 {
                   pinout_core[idc_fsm].write(miss_buffer[hit_line][burst_ctr]);

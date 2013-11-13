@@ -6,10 +6,10 @@
 #if !defined(LIBSIMSOC_NETWORK_ETHTR_HPP__)
 # define LIBSIMSOC_NETWORK_ETHTR_HPP__
 
-# include "simsoc-config.h"
+# include <libsimsoc/simsoc-config.h>
 
-# include "libsimsoc/network/ethernet/ether-buffer.hpp"
-# include "libsimsoc/network/pcaplog.hpp"
+# include <libsimsoc/network/ethernet/ether-buffer.hpp>
+# include <libsimsoc/network/pcaplog.hpp>
 
 # include <cstring>
 # include <cerrno>

@@ -6,9 +6,10 @@
 // FIXME: this file describes the cp15 of the ARM architecture version 5
 // it should be replaced by a description of the cp15 corresponding to version 6
 
-#include "arm_v5_systemcontrol_coproc.hpp"
-#include "arm_v5_mmu.hpp"
 #include <cassert>
+
+#include "libsimsoc/processors/arm_v6/arm_v5_systemcontrol_coproc.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v5_mmu.hpp"
 
 using namespace std;
 using namespace sc_core;

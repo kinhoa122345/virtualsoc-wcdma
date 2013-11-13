@@ -5,7 +5,7 @@
 
 #ifndef NO_TLM_OSCI
 
-#include "tlm.hpp"
+#include <libsimsoc/interfaces/tlm.hpp>
 
 namespace simsoc {
   int RW_TargetPort::n = 0;

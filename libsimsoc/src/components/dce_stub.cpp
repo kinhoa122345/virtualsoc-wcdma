@@ -3,7 +3,9 @@
 // LGPL license version 3
 //
 
-#include "dce_stub.hpp"
+#include <libsimsoc/components/dce_stub.hpp>
+
+
 using namespace sc_core;
 using namespace std;
 

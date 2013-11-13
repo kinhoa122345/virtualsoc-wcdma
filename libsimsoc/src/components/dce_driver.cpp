@@ -3,7 +3,8 @@
 // LGPL license version 3
 //
 
-#include "dce_driver.hpp"
+#include <libsimsoc/components/dce_driver.hpp>
+
 
 using namespace std;
 
@@ -25,7 +26,7 @@ namespace simsoc {
   }
 
   bool DCE_Driver::did_success() const {return ok;}
-  
+
   void DCE_Driver::wait_line(const char *line) {
     info() <<"waiting line : \"" <<line <<"\"\n";
     bool same;

@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "RS232.hpp"
+#include <libsimsoc/interfaces/RS232.hpp>
 
 namespace simsoc {
 

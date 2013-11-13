@@ -10,6 +10,8 @@
 
 # include <systemc>
 # include <sysc/kernel/sc_spawn.h>
+# include <sysc/kernel/sc_boost.h>
+
 # include <tlm_utils/simple_target_socket.h>
 # include <tlm_utils/simple_initiator_socket.h>
 
@@ -72,7 +74,7 @@ namespace TI_AM1x {
   protected:
     outport_t        m_outport;
     sc_core::sc_time m_delay;
-    
+
   private:
     TI_AM1x_oport(const TI_AM1x_oport&);            // GNI
     TI_AM1x_oport& operator=(const TI_AM1x_oport&); // GNI

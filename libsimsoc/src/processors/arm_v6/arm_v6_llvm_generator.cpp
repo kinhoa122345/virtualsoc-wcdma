@@ -3,8 +3,10 @@
 // LGPL license version 3
 //
 
-#include "arm_v6_llvm_generator.hpp"
-#include "arm_v6_dyntrans.hpp"
+#ifdef SIMSOC_HAVE_LLVM
+
+#include "libsimsoc/processors/arm_v6/arm_v6_llvm_generator.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_dyntrans.hpp"
 #include <libsimsoc/processors/llvm_gen_parameters.hpp>
 #include <libsimsoc/display.hpp>
 #include <llvm/Bitcode/ReaderWriter.h>
@@ -126,7 +128,7 @@ namespace simsoc {
       profstream.close();
     if (prof_total) {
       cout <<"[ARMv6 LLVM generator] " <<prof_icount <<" instructions in "
-           <<prof_bbcount <<" blocks compiled in " <<prof_time <<endl; 
+           <<prof_bbcount <<" blocks compiled in " <<prof_time <<endl;
     }
   }
 
@@ -206,3 +208,5 @@ namespace simsoc {
 #include "simlight/slv6_iss-llvm_generator.hpp"
 
 } // namespace simsoc
+
+#endif // SIMSOC_HAVE_LLVM

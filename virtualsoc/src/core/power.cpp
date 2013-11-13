@@ -1,4 +1,4 @@
-#include "power.h"
+#include "virtualsoc/core/power.h"
 
 using std::cerr ;
 using std::endl ;

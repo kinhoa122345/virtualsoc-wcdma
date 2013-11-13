@@ -3,8 +3,10 @@
 // LGPL license version 3
 //
 
-#include "debug_mem_loader.hpp"
-#include "libsimsoc/display.hpp"
+#include <libsimsoc/components/debug_mem_loader.hpp>
+#include <libsimsoc/display.hpp>
+
+
 using namespace std;
 using namespace sc_core;
 

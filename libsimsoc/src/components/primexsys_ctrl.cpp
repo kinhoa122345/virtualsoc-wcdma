@@ -3,8 +3,10 @@
 // LGPL license version 3
 //
 
-#include "primexsys_ctrl.hpp"
-#include "libsimsoc/display.hpp"
+#include <libsimsoc/components/primexsys_ctrl.hpp>
+#include <libsimsoc/display.hpp>
+
+
 using namespace std;
 using namespace sc_core;
 

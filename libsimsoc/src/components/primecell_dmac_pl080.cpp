@@ -3,7 +3,12 @@
 // LGPL license version 3
 //
 
-#include "primecell_dmac_pl080.hpp"
+#include <sysc/kernel/sc_spawn.h>
+#include <sysc/kernel/sc_spawn_options.h>
+#include <sysc/kernel/sc_boost.h>
+
+#include <libsimsoc/components/primecell_dmac_pl080.hpp>
+
 
 using namespace std;
 using namespace sc_core;

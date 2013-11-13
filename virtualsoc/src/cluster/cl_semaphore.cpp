@@ -1,4 +1,4 @@
-#include "cl_semaphore.h"
+#include "virtualsoc/cluster/cl_semaphore.h"
 
 void cl_semaphore::working()
 {
@@ -8,19 +8,19 @@ void cl_semaphore::working()
   PINOUT mast_pinout;
   unsigned long int data;
   bool must_wait = true;
-  
-  
+
+
   ready.write(false);
-  
+
   while (true)
   {
-    
+
     must_wait = true;
     __DELTA_L1;
-    
+
     // Wait until someone requests something
     if(!request.read())
-    	wait(request.posedge_event());
+      wait(request.posedge_event());
     // What's up?
     mast_pinout = pinout.read();
     // Word, half word or byte?
@@ -35,17 +35,17 @@ void cl_semaphore::working()
       default : cout << "[" << name() << "] Fatal error: detected a malformed data size @ " << sc_time_stamp() << endl;
       exit(1);
     }
-    
+
     burst = (int)mast_pinout.burst;
     wr = mast_pinout.rw;
-    
+
     addr = mast_pinout.address;
-    
+
     //////////////////////////////////
     // Wait for MEM_IN_WS cycles
     for(i = 0; i < (int)mem_in_ws; i++)
       wait();
-    
+
     // ------------------------------ READ ACCESS ------------------------------
     if (!wr)
     {
@@ -57,20 +57,20 @@ void cl_semaphore::working()
           ready.write(false);
           data = this->Read(addr,mast_pinout.bw,&must_wait);
         } while (must_wait == true);
-        
-        // Wait cycles between burst beat 
+
+        // Wait cycles between burst beat
         for(j=0; j<(int)mem_bb_ws && i!=0; j++)
           wait();
-        
+
         prev_addr = addr;
         // Increment the address for the next beat
         addr += size;
-        
+
         mast_pinout.data = data;
         pinout.write(mast_pinout);
         ready.write(true);
       } // end for
-      
+
       wait();
       ready.write(false);
     }
@@ -86,17 +86,17 @@ void cl_semaphore::working()
           ready.write(false);
           this->Write(addr, data, bw, &must_wait);
         } while (must_wait == true);
-        
+
         ///////////////////////////////////////
-        // Wait cycles between burst beat 
+        // Wait cycles between burst beat
         for(j=0; j<(int)mem_bb_ws && i!=0; j++)
           wait( (int)mem_bb_ws );
-        
+
         // Increment the address for the next beat
         prev_addr = addr;
         addr += size;
         ready.write(true);
-      } 
+      }
       wait();
       ready.write(false);
     }

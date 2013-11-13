@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "arm_status_register.hpp"
+#include "libsimsoc/processors/arm/arm_status_register.hpp"
 
 using namespace std;
 
@@ -50,7 +50,7 @@ namespace simsoc {
   ostream& operator<<(ostream& os, const simsoc::ARM_Mode& m) {
     return os <<simsoc::ARM_MODE_NAMES[m];
   }
-  
+
   ostream& ARM_StatusRegister::display(ostream& os) const {
     return os <<(n?'N':'n') <<(z?'Z':'z') <<(c?'C':'c')
               <<(v?'V':'v') <<", " <<(q?'Q':'q') <<", "

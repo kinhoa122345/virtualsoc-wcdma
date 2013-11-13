@@ -41,4 +41,4 @@ add_definitions(
   -DMAKEFILE_TRACE_ISS=false -DCLUSTERBUILD)
 
 add_executable(${PROJECT_NAME} ${HEADER} ${SOURCE})
-target_link_libraries(${PROJECT_NAME} ${SystemC_LIBRARIES} ${SimSoc_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${SystemC_LIBRARIES} simsoc dramsim)

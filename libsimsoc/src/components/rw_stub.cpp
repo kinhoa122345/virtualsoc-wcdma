@@ -3,8 +3,10 @@
 // LGPL license version 3
 //
 
-#include "rw_stub.hpp"
-#include "libsimsoc/display.hpp"
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/components/rw_stub.hpp>
+
+
 using namespace std;
 using namespace sc_core;
 

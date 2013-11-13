@@ -3,10 +3,10 @@
 // LGPL license version 3
 //
 
-#include "armis_coproc.hpp"
+#include "libsimsoc/display.hpp"
+#include "libsimsoc/processors/arm/armis_coproc.hpp"
 #include "libsimsoc/processors/arm/arm_processor.hpp"
 #include "libsimsoc/processors/arm/arm_coproc.hpp"
-#include "libsimsoc/display.hpp"
 
 using namespace std;
 

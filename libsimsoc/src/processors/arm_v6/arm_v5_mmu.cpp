@@ -6,10 +6,11 @@
 // FIXME: this file describes the MMU of the ARM architecture version 5
 // it should be replaced by a description of the MMU corresponding to version 6
 
-#include "arm_v5_mmu.hpp"
-#include "arm_v6_processor.hpp"
-#include "arm_v5_systemcontrol_coproc.hpp"
 #include "libsimsoc/display.hpp"
+
+#include "libsimsoc/processors/arm_v6/arm_v5_mmu.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v6_processor.hpp"
+#include "libsimsoc/processors/arm_v6/arm_v5_systemcontrol_coproc.hpp"
 
 using namespace sc_core;
 using namespace std;
@@ -45,7 +46,7 @@ namespace simsoc {
     assert(proc);
     isUnified = getTLBs();
   }
-  
+
   ARMv6_MMU::~ARMv6_MMU() {}
 
   bool ARMv6_MMU::getTLBs()

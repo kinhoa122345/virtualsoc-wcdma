@@ -3,10 +3,11 @@
 // LGPL license version 3
 //
 
-#include "debug_console.hpp"
-#include "libsimsoc/display.hpp"
-#include "libsimsoc/processors/common.hpp"
-#include "libsimsoc/context.hpp"
+#include <libsimsoc/display.hpp>
+#include <libsimsoc/processors/common.hpp>
+#include <libsimsoc/context.hpp>
+
+#include <libsimsoc/components/debug_console.hpp>
 
 using namespace std;
 using namespace sc_core;

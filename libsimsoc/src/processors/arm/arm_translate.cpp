@@ -3,16 +3,18 @@
 // LGPL license version 3
 //
 
-#include "arm_translate.hpp"
-#include "armis_arithmetic.hpp"
-#include "armis_control.hpp"
-#include "armis_coproc.hpp"
-#include "armis_edsp.hpp"
-#include "armis_loadstore.hpp"
-#include "armpi.hpp"
+#include <cassert>
+
 #include <libsimsoc/translation_page.hpp>
 #include <libsimsoc/display.hpp>
-#include <cassert>
+
+#include <libsimsoc/processors/arm/arm_translate.hpp>
+#include <libsimsoc/processors/arm/armis_arithmetic.hpp>
+#include <libsimsoc/processors/arm/armis_control.hpp>
+#include <libsimsoc/processors/arm/armis_coproc.hpp>
+#include <libsimsoc/processors/arm/armis_edsp.hpp>
+#include <libsimsoc/processors/arm/armis_loadstore.hpp>
+#include <libsimsoc/processors/arm/armpi.hpp>
 
 namespace simsoc {
 

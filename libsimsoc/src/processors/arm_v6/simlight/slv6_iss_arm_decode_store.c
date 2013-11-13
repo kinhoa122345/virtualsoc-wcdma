@@ -1,4 +1,4 @@
-#include "slv6_iss_c_prelude.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_iss_c_prelude.h"
 
 /* A4.1.23--A5.2.2
  * LDR -- Load and Store Word or Unsigned Byte - Immediate offset */

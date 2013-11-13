@@ -3,9 +3,9 @@
 // LGPL license version 3
 //
 
-#include "debugger.hpp"
-#include "libsimsoc/network/socket-inet4.hpp"
-#include "libsimsoc/io.hpp"
+#include <libsimsoc/tools/debugger/debugger.hpp>
+#include <libsimsoc/network/socket-inet4.hpp>
+#include <libsimsoc/io.hpp>
 
 #include <cstring>
 #include <cctype>

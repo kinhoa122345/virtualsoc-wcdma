@@ -1,4 +1,4 @@
-#include "cache_storagetypes.h"
+#include "virtualsoc/core/cache_storagetypes.h"
 
 //This function is used to read a record from a direct cache. the input parameter
 // is the index value.
@@ -35,7 +35,7 @@ int direct_storage::write_tag(uint32_t addr, uint32_t tag,int i=0)
   storing[addr].Ch_Tag=tag;
   return 1;
 }
-//This function used to sed the Dirty flag. The RPU sets this bit 
+//This function used to sed the Dirty flag. The RPU sets this bit
 // in case of an update
 int direct_storage::set_dirty(uint32_t addr, uint32_t val,int i=0)
 {
@@ -96,7 +96,7 @@ int full_storage::write_cache(uint32_t addr,uint32_t data,int loc,int i=0)
   }
   return 0;
 }
-//This function used to sed the Dirty flag. The RPU sets this bit 
+//This function used to sed the Dirty flag. The RPU sets this bit
 // in case of an update, the Tag number is added as a parameter know which
 // record will be updated
 int full_storage::set_dirty(uint32_t addr, uint32_t val,int i=0)
