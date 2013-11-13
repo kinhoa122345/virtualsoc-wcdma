@@ -16,6 +16,7 @@ include_directories(
   ${SystemC_INCLUDE_DIRS}
   "DRAMSim2/include"
   "libsimsoc/include"
+  "virtualsoc/include"
   "fir/include")
 
 add_subdirectory(DRAMSim2)

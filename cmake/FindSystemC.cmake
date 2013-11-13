@@ -117,11 +117,16 @@ if ("${SystemC_MINOR}" LESS "3")
     HINTS ${_TLM_HINTS}
     PATHS ${_TLM_PATHS})
 
-  message(STATUS "TLM include: ${TLM_INCLUDE_DIRS}")
-
   if (NOT TLM_INCLUDE_DIRS_NOTFOUND)
+    set(TLM_INCLUDE_DIRS
+      "${TLM_INCLUDE_DIRS}"
+      "${TLM_INCLUDE_DIRS}/tlm_utils"
+      "${TLM_INCLUDE_DIRS}/tlm_h"
+      "${TLM_INCLUDE_DIRS}/tlm_l")
     set(SystemC_INCLUDE_DIRS ${SystemC_INCLUDE_DIRS} ${TLM_INCLUDE_DIRS})
   endif()
+
+  message(STATUS "TLM include: ${TLM_INCLUDE_DIRS}")
 
 endif()
 

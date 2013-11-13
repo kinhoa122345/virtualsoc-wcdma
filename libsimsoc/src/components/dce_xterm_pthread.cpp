@@ -3,9 +3,6 @@
 // LGPL license version 3
 //
 
-#include "dce_xterm_pthread.hpp"
-#include "libsimsoc/interfaces/yield.hpp"
-#include "libsimsoc/display.hpp"
 #include <termios.h>
 #include <errno.h>
 #include <signal.h>
@@ -16,6 +13,11 @@
 #include <sys/types.h>
 #include <time.h>
 #include <sys/stat.h>
+
+#include <libsimsoc/components/dce_xterm_pthread.hpp>
+#include <libsimsoc/interfaces/yield.hpp>
+#include <libsimsoc/display.hpp>
+
 using namespace std;
 using namespace sc_core;
 

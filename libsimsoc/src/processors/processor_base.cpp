@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "processor_base.hpp"
+#include <libsimsoc/processors/processor_base.hpp>
 
 namespace simsoc {
 

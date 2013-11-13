@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "bus.hpp"
+#include <libsimsoc/components/bus.hpp>
 #include <algorithm>
 
 using namespace std;

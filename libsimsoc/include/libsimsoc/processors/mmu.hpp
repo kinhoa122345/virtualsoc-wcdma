@@ -34,11 +34,11 @@
 using namespace std;
 
 // --- VirtualSoC ---
-#include "PINOUT.h"
-#include "sim_support.h"
-#include "globals.h"
-#include "address.h"
-#include "stats.h"
+#include <virtualsoc/core/PINOUT.h>
+#include <virtualsoc/core/sim_support.h>
+#include <virtualsoc/core/globals.h>
+#include <virtualsoc/core/address.h>
+#include <virtualsoc/core/stats.h>
 
 typedef unsigned int UINT32_t;
 

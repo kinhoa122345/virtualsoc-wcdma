@@ -5,8 +5,8 @@
 
 #include "iss.tpp"
 
-#include "arm/arm_processor.hpp"
-#include "arm/armis.hpp"
+#include <libsimsoc/processors/arm/arm_processor.hpp>
+#include <libsimsoc/processors/arm/armis.hpp>
 //#include "mips/mips_processor.hpp"
 //#include "mips/mipspi.hpp"
 //#include "ppc/ppc_processor.hpp"

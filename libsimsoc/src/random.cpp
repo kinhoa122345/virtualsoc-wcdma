@@ -29,7 +29,7 @@ namespace simsoc {
       while (where != sizeof(myseed)) {
         ssize_t rr;
 
-        rr = read(fd, ((char*) myseed) + where, sizeof(myseed) - where);
+        rr = read(fd, reinterpret_cast<char*>(myseed) + where, sizeof(myseed) - where);
         if (rr < 0 && errno != EINTR && errno != EAGAIN)
           break ;
         where += rr;

@@ -7,11 +7,11 @@
 // This file is included only by "iss.cpp"
 
 #ifdef HAVE_CONFIG_H
-# include "libsimsoc/config.h"
+# include <libsimsoc/config.h>
 #endif
 
-#include "iss.hpp"
-#include "libsimsoc/tools/debugger/debugger.hpp"
+#include <libsimsoc/processors/iss.hpp>
+#include <libsimsoc/tools/debugger/debugger.hpp>
 
 using namespace std;
 

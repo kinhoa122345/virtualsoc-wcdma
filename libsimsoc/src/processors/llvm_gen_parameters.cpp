@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "llvm_gen_parameters.hpp"
+#include <libsimsoc/processors/llvm_gen_parameters.hpp>
 
 namespace simsoc {
 

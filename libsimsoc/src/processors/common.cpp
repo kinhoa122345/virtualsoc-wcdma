@@ -3,8 +3,8 @@
 // LGPL license version 3
 //
 
-#include "common.hpp"
 #include <cassert>
+#include <libsimsoc/processors/common.hpp>
 
 namespace simsoc {
 

@@ -6,10 +6,12 @@
 #if !defined (LIBSIMSOC_TI_AM1X_RTC_HPP__)
 # define LIBSIMSOC_TI_AM1X_RTC_HPP__
 
-# include "libsimsoc/module.hpp"
-# include "libsimsoc/interfaces/tlm.hpp"
-# include "libsimsoc/interfaces/tlm_signal.hpp"
-# include "libsimsoc/components/ti_am1x_core.hpp"
+# include <sysc/kernel/sc_spawn_options.h>
+
+# include <libsimsoc/module.hpp>
+# include <libsimsoc/interfaces/tlm.hpp>
+# include <libsimsoc/interfaces/tlm_signal.hpp>
+# include <libsimsoc/components/ti_am1x_core.hpp>
 
 namespace simsoc  {
 namespace TI_AM1x {

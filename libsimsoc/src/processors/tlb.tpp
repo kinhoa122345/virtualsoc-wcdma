@@ -5,9 +5,9 @@
 
 // Implementation of "tlb.hpp"
 // This file is included only by "tlb.cpp"
-#include "tlb.hpp"
-#include <libsimsoc/translation_page.hpp>
 #include <cassert>
+#include <libsimsoc/processors/tlb.hpp>
+#include <libsimsoc/translation_page.hpp>
 
 using namespace std;
 

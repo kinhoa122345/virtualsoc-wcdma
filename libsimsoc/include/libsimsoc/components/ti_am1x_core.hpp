@@ -7,11 +7,13 @@
 # define LIBSIMSOC_TI_AM1X_CORE_HPP__
 
 # include <inttypes.h>
-# include <tlm_utils/simple_target_socket.h>
-# include <tlm_utils/simple_initiator_socket.h>
-# include "libsimsoc/module.hpp"
 
 # include <systemc>
+# include <sysc/kernel/sc_spawn.h>
+# include <tlm_utils/simple_target_socket.h>
+# include <tlm_utils/simple_initiator_socket.h>
+
+# include <libsimsoc/module.hpp>
 
 namespace simsoc  {
 namespace TI_AM1x {
@@ -177,6 +179,6 @@ namespace TI_AM1x {
 } // namespace TI_AM1x
 } // namespace simsoc
 
-# include "libsimsoc/components/ti_am1x_core.hxx"
+# include <libsimsoc/components/ti_am1x_core.hxx>
 
 #endif // !LIBSIMSOC_TI_AM1X_CORE_HPP__

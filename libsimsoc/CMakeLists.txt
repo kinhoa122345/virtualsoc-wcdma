@@ -17,6 +17,10 @@ file(GLOB SOURCE
 
 include_directories("./include" "./src")
 
+add_definitions(
+  -DABS_TOP_BUILDDIR=\"${CMAKE_ROOT_DIR}\"
+  -DBINDIR=\"${EXECUTABLE_OUTPUT_PATH}\")
+
 add_library(${PROJECT_NAME} ${HEADER} ${SOURCE})
 
 add_subdirectory(utils)
