@@ -1,4 +1,4 @@
-#include "slv6_iss_c_prelude.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_iss_c_prelude.h"
 
 /* A4.1.2--A5.1.3
  * ADC -- Data processing operands - Immediate */

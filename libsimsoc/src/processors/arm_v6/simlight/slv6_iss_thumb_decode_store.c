@@ -1,4 +1,4 @@
-#include "slv6_iss_c_prelude.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_iss_c_prelude.h"
 
 /* A7.1.28
  * LDR (1) */

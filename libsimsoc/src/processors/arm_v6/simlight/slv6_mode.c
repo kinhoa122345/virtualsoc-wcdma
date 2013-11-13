@@ -3,7 +3,7 @@
 
 /* The modes of an ARM processor */
 
-#include "slv6_mode.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_mode.h"
 
 BEGIN_SIMSOC_NAMESPACE
 

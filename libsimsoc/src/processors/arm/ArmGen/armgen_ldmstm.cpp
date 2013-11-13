@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "armgen_ldmstm.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_ldmstm.hpp"
 
 using namespace std;
 
@@ -257,10 +257,10 @@ void LdmStmGenerator::generate_ldm_instruction(const string func_name,
     default: Fatal("illegal LDMSTM instructions");
     }
     if(w_bit==1)
-      		generate_Rn_address_offset(body,addr_m);
-	if(opcode==LDM_3)
-	{
-		body <<"proc.spsr_to_cpsr();"<<endl;
+          generate_Rn_address_offset(body,addr_m);
+  if(opcode==LDM_3)
+  {
+    body <<"proc.spsr_to_cpsr();"<<endl;
       if(reg_pc == 1)
         { body <<"  uint32_t value = proc.mmu.read_word(address);"<<endl;
           body <<"  address += 4; "<<endl;
@@ -276,7 +276,7 @@ void LdmStmGenerator::generate_ldm_instruction(const string func_name,
           body <<"     proc.cpu.regs[ARM_CPU::PC] = value+8;}"<<endl;
           //body <<" proc.cpu.regs[ARM_CPU::PC] = value+8;"<<endl;
          }
-	}
+  }
   if(reg_pc == 1)
     code_file << body.str() << "  return BRANCH ;" << endl << "}" << endl;
   else
@@ -334,7 +334,7 @@ void LdmStmGenerator::generate_stm_instruction(const string func_name,
     default: Fatal("illegal LDMSTM instructions");
     }
     if(w_bit==1)
-      		generate_Rn_address_offset(body,addr_m);
+          generate_Rn_address_offset(body,addr_m);
 
   code_file << body.str() << "  return OK ;" << endl << "}" << endl;
   header_file << func_name << " " ;

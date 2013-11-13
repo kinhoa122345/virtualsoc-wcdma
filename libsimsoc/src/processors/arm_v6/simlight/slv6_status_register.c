@@ -3,8 +3,8 @@
 
 /* Status registers (such as CPSR) */
 
-#include "slv6_status_register.h"
-#include "slv6_math.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_status_register.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_math.h"
 
 BEGIN_SIMSOC_NAMESPACE
 

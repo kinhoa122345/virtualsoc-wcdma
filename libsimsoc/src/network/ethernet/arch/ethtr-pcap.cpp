@@ -3,6 +3,8 @@
 // LGPL license version 3
 //
 
+#ifdef SIMSOC_HAVE_PCAP
+
 #include "libsimsoc/network/ethernet/ether-transport.hpp"
 
 #include <pcap.h>
@@ -82,3 +84,5 @@ namespace simsoc {
     return pcap_fileno(m_pcap);
   }
 }
+
+#endif // SIMSOC_HAVE_PCAP

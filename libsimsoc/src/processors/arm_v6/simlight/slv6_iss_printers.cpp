@@ -1,6 +1,6 @@
-#include "slv6_iss_printers.hpp"
-#include "slv6_math.h"
-#include "slv6_processor.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_iss_printers.hpp"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_math.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_processor.h"
 
 namespace simsoc {
 

@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "armgen_loadstore.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_loadstore.hpp"
 
 using namespace std;
 
@@ -264,7 +264,7 @@ void LoadStoreGenerator::generate_ls_instruction(const string func_name,
 
   }
 
-	generate_Rn_address_offset(body, addr_m, u_bit);
+  generate_Rn_address_offset(body, addr_m, u_bit);
     code_file << body.str() << "  return OK;" << endl << "}" << endl;
     header_file << func_name << " ";
   // print function name to include file for declaration

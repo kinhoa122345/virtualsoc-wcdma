@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "armgen_dpi.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_dpi.hpp"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1500,12 +1500,12 @@ void DPI_Generator::generate_func_table(const string table_name,
                               specialize_Rd_reg, specialize_Rn_reg);
           if (opm < opm_to)
             header_file << ", " ; // debug << "/* mode */" ;
-	  close(open("/dev/null", 0));
+    close(open("/dev/null", 0));
         } //end operand loop
         closeArrayRow(header_file);
         if (opcode < opcode_to)
           header_file << ", "; // debug << " /* opcode */" ;
-	close(open("/dev/null", 0));
+  close(open("/dev/null", 0));
       } // end opcode loop
       closeArrayRow(header_file);
       if (s_bit < 1)

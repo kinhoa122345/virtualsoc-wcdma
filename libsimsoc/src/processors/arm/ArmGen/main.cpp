@@ -3,15 +3,15 @@
 // LGPL license version 3
 //
 
-#include "armgen_dpi.hpp"
-#include "armgen_loadstore.hpp"
-#include "armgen_mli.hpp"
-#include "armgen_swp.hpp"
-#include "armgen_b.hpp"
-#include "armgen_clz.hpp"
-#include "armgen_swi.hpp"
-#include "armgen_ldmstm.hpp"
-#include "armgen_mrsmsr.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_dpi.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_loadstore.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_mli.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_swp.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_b.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_clz.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_swi.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_ldmstm.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_mrsmsr.hpp"
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>

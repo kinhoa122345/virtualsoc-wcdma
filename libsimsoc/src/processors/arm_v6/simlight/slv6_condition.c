@@ -3,7 +3,7 @@
 
 /* The condition field */
 
-#include "slv6_condition.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_condition.h"
 
 BEGIN_SIMSOC_NAMESPACE
 

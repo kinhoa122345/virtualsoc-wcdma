@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "armgen.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen.hpp"
 
 using namespace std;
 

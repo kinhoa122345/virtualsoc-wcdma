@@ -3,7 +3,7 @@
 
 /* The main class */
 
-#include "slv6_processor.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_processor.h"
 
 BEGIN_SIMSOC_NAMESPACE
 

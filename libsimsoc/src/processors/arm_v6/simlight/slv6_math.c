@@ -3,7 +3,7 @@
 
 /* Arithmetic and logic functions. */
 
-#include "slv6_math.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_math.h"
 
 BEGIN_SIMSOC_NAMESPACE
 

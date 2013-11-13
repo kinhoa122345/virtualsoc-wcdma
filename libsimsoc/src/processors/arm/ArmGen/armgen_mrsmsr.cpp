@@ -3,7 +3,7 @@
 // LGPL license version 3
 //
 
-#include "armgen_mrsmsr.hpp"
+#include "libsimsoc/processors/arm/ArmGen/armgen_mrsmsr.hpp"
 
 using namespace std;
 

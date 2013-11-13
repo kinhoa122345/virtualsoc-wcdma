@@ -1,4 +1,4 @@
-#include "slv6_iss_c_prelude.h"
+#include "libsimsoc/processors/arm_v6/simlight/slv6_iss_c_prelude.h"
 
 const char *slv6_instruction_names[SLV6_TABLE_SIZE] = {
   "LDR -- Load and Store Word or Unsigned Byte - Immediate offset",
