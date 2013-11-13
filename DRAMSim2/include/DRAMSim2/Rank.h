@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,6 @@ class Rank : public SimulatorObject
 {
 private:
 	int id;
-	ostream &dramsim_log; 
 	unsigned incomingWriteBank;
 	unsigned incomingWriteRow;
 	unsigned incomingWriteColumn;
@@ -58,8 +57,7 @@ private:
 
 public:
 	//functions
-	Rank(ostream &dramsim_log_);
-	virtual ~Rank(); 
+	Rank();
 	void receiveFromBus(BusPacket *packet);
 	void attachMemoryController(MemoryController *mc);
 	int getId() const;
@@ -69,6 +67,7 @@ public:
 	void powerDown();
 
 	//fields
+	vector<Bank> banks;
 	MemoryController *memoryController;
 	BusPacket *outgoingDataPacket;
 	unsigned dataCyclesLeft;
@@ -77,9 +76,7 @@ public:
 	//these are vectors so that each element is per-bank
 	vector<BusPacket *> readReturnPacket;
 	vector<unsigned> readReturnCountdown;
-	vector<Bank> banks;
 	vector<BankState> bankStates;
-
 };
 }
 #endif

@@ -1,0 +1,465 @@
+// Compiled to arm_decode.cpp using isc.
+
+#include "libsimsoc/processors/arm/arm_decode.hpp"
+#include "libsimsoc/display.hpp"
+#include "libsimsoc/processors/arm/armis_arithmetic.hpp"
+#include "libsimsoc/processors/arm/armis_control.hpp"
+#include "libsimsoc/processors/arm/armis_loadstore.hpp"
+#include "libsimsoc/processors/arm/armis_coproc.hpp"
+#include "libsimsoc/processors/arm/armis_edsp.hpp"
+#include "libsimsoc/bitwise_operator.hpp"
+
+using namespace std;
+
+namespace simsoc {
+
+bool arm_user_level_mode = false;
+
+static int32_t branch_offset(int32_t imm24, bool h = false) {
+  return (signExtend24to32(imm24)<<2)+(h?2:0)+8;
+}
+
+ARM_Instruction * armDecode(uint32_t instr) {
+  ARM_Condition cond = (ARM_Condition) (instr>>28);
+  uint32_t bincode = (instr&0xfffffff) | ((cond==ARM_CONDITION_END)?0:(1<<28));
+%%
+10000----nnnnddddssss0--1mmmm if(n==15||d==15||s==15||m==15)
+  return new ARM_Unpredictable("Data processing instructions with register shift cannot use PC");
+100011---nnnnddddssss0--1mmmm if(n==15||d==15||s==15||m==15)
+  return new ARM_Unpredictable("Data processing instructions with register shift cannot use PC");
+100010--1nnnnddddssss0--1mmmm if(n==15||d==15||s==15||m==15)
+  return new ARM_Unpredictable("Data processing instructions with register shift cannot use PC");
+
+10000101Snnnnddddssssszz0mmmm return new ARM_NumericIS<ARM_adc>(cond,S,d,n,s,z,m);
+10000101Snnnnddddssss0zz1mmmm return new ARM_NumericRS<ARM_adc>(cond,S,d,n,s,z,m);
+10010101Snnnnddddrrrriiiiiiii return new ARM_NumericImm<ARM_adc>(cond,S,d,n,r,i);
+
+10000100Snnnnddddssssszz0mmmm return new ARM_NumericIS<ARM_add>(cond,S,d,n,s,z,m);
+10000100Snnnnddddssss0zz1mmmm return new ARM_NumericRS<ARM_add>(cond,S,d,n,s,z,m);
+10010100Snnnnddddrrrriiiiiiii return new ARM_NumericImm<ARM_add>(cond,S,d,n,r,i);
+
+10000011Snnnnddddssssszz0mmmm return new ARM_NumericIS<ARM_rsb>(cond,S,d,n,s,z,m);
+10000011Snnnnddddssss0zz1mmmm return new ARM_NumericRS<ARM_rsb>(cond,S,d,n,s,z,m);
+10010011Snnnnddddrrrriiiiiiii return new ARM_NumericImm<ARM_rsb>(cond,S,d,n,r,i);
+
+10000111Snnnnddddssssszz0mmmm return new ARM_NumericIS<ARM_rsc>(cond,S,d,n,s,z,m);
+10000111Snnnnddddssss0zz1mmmm return new ARM_NumericRS<ARM_rsc>(cond,S,d,n,s,z,m);
+10010111Snnnnddddrrrriiiiiiii return new ARM_NumericImm<ARM_rsc>(cond,S,d,n,r,i);
+
+10000110Snnnnddddssssszz0mmmm return new ARM_NumericIS<ARM_sbc>(cond,S,d,n,s,z,m);
+10000110Snnnnddddssss0zz1mmmm return new ARM_NumericRS<ARM_sbc>(cond,S,d,n,s,z,m);
+10010110Snnnnddddrrrriiiiiiii return new ARM_NumericImm<ARM_sbc>(cond,S,d,n,r,i);
+
+10000010Snnnnddddssssszz0mmmm return new ARM_NumericIS<ARM_sub>(cond,S,d,n,s,z,m);
+10000010Snnnnddddssss0zz1mmmm return new ARM_NumericRS<ARM_sub>(cond,S,d,n,s,z,m);
+10010010Snnnnddddrrrriiiiiiii return new ARM_NumericImm<ARM_sub>(cond,S,d,n,r,i);
+
+
+10000000Snnnnddddssssszz0mmmm if (instr)
+                              return new ARM_BooleanIS<ARM_and>(cond,S,d,n,s,z,m);
+                              else
+                              return new ARM_Nop();
+10000000Snnnnddddssss0zz1mmmm return new ARM_BooleanRS<ARM_and>(cond,S,d,n,s,z,m);
+10010000Snnnnddddrrrriiiiiiii return new ARM_BooleanImm<ARM_and>(cond,S,d,n,r,i);
+
+10001110Snnnnddddssssszz0mmmm return new ARM_BooleanIS<ARM_bic>(cond,S,d,n,s,z,m);
+10001110Snnnnddddssss0zz1mmmm return new ARM_BooleanRS<ARM_bic>(cond,S,d,n,s,z,m);
+10011110Snnnnddddrrrriiiiiiii return new ARM_BooleanImm<ARM_bic>(cond,S,d,n,r,i);
+
+10000001Snnnnddddssssszz0mmmm return new ARM_BooleanIS<ARM_eor>(cond,S,d,n,s,z,m);
+10000001Snnnnddddssss0zz1mmmm return new ARM_BooleanRS<ARM_eor>(cond,S,d,n,s,z,m);
+10010001Snnnnddddrrrriiiiiiii return new ARM_BooleanImm<ARM_eor>(cond,S,d,n,r,i);
+
+10001100Snnnnddddssssszz0mmmm return new ARM_BooleanIS<ARM_orr>(cond,S,d,n,s,z,m);
+10001100Snnnnddddssss0zz1mmmm return new ARM_BooleanRS<ARM_orr>(cond,S,d,n,s,z,m);
+10011100Snnnnddddrrrriiiiiiii return new ARM_BooleanImm<ARM_orr>(cond,S,d,n,r,i);
+
+
+100011-1-nnnn-----------0---- if (n!=0)
+  return new ARM_Unpredictable("MOV/MVN with Rn!=0 (immediate shift)");
+100011-1-nnnn--------0--1---- if (n!=0)
+  return new ARM_Unpredictable("MOV/MVN with Rn!=0 (register shift)");
+100111-1-nnnn---------------- if (n!=0)
+  return new ARM_Unpredictable("MOV/MVN with Rn!=0 (immediate)");
+
+10001101S----ddddssssszz0mmmm return new ARM_MoveIS<ARM_mov>(cond,S,d,s,z,m);
+10001101S----ddddssss0zz1mmmm return new ARM_MoveRS<ARM_mov>(cond,S,d,s,z,m);
+10011101S----ddddrrrriiiiiiii return new ARM_MoveImm<ARM_mov>(cond,S,d,r,i);
+
+10001111S----ddddssssszz0mmmm return new ARM_MoveIS<ARM_mvn>(cond,S,d,s,z,m);
+10001111S----ddddssss0zz1mmmm return new ARM_MoveRS<ARM_mvn>(cond,S,d,s,z,m);
+10011111S----ddddrrrriiiiiiii return new ARM_MoveImm<ARM_mvn>(cond,S,d,r,i);
+
+
+100010--1----dddd-------0---- if (d!=0)
+  return new ARM_Unpredictable("CMN/CMP/TEQ/TST with Rd!=0 (immediate shift)");
+100010--1----dddd----0--1---- if (d!=0)
+  return new ARM_Unpredictable("CMN/CMP/TEQ/TST with Rd!=0 (register shift)");
+100110--1----dddd------------ if (d!=0)
+  return new ARM_Unpredictable("CMN/CMP/TEQ/TST with Rd!=0 (immediate)");
+
+100010111nnnn----ssssszz0mmmm return new ARM_CompareIS<ARM_cmn>(cond,n,s,z,m);
+100010111nnnn----ssss0zz1mmmm return new ARM_CompareRS<ARM_cmn>(cond,n,s,z,m);
+100110111nnnn----rrrriiiiiiii return new ARM_CompareImm<ARM_cmn>(cond,n,r,i);
+
+100010101nnnn----ssssszz0mmmm return new ARM_CompareIS<ARM_cmp>(cond,n,s,z,m);
+100010101nnnn----ssss0zz1mmmm return new ARM_CompareRS<ARM_cmp>(cond,n,s,z,m);
+100110101nnnn----rrrriiiiiiii return new ARM_CompareImm<ARM_cmp>(cond,n,r,i);
+
+100010011nnnn----ssssszz0mmmm return new ARM_TestIS<ARM_teq>(cond,n,s,z,m);
+100010011nnnn----ssss0zz1mmmm return new ARM_TestRS<ARM_teq>(cond,n,s,z,m);
+100110011nnnn----rrrriiiiiiii return new ARM_TestImm<ARM_teq>(cond,n,r,i);
+
+100010001nnnn----ssssszz0mmmm return new ARM_TestIS<ARM_tst>(cond,n,s,z,m);
+100010001nnnn----ssss0zz1mmmm return new ARM_TestRS<ARM_tst>(cond,n,s,z,m);
+100110001nnnn----rrrriiiiiiii return new ARM_TestImm<ARM_tst>(cond,n,r,i);
+
+
+10000001Sddddnnnnssss1001mmmm return new ARM_mla(cond,S,d,m,s,n);
+
+10000000Sddddxxxxssss1001mmmm return (x==0)?
+           (ARM_Instruction*) new ARM_mul(cond,S,d,m,s):
+           (ARM_Instruction*) new ARM_Unpredictable("bits 15:12 of MUL should be 0");
+
+
+100001---DDDDddddssss1001mmmm if (d==D)
+  return new ARM_Unpredictable("SMLAL/SMULL/UMLAL/UMULL with RdHi==RdLo");
+ else if (D==m)
+   return new ARM_Unpredictable("SMLAL/SMULL/UMLAL/UMULL with RdHi==Rm");
+ else if (d==m)
+   return new ARM_Unpredictable("SMLAL/SMULL/UMLAL/UMULL with RdLo==Rm");
+ else if (D==15||d==15||m==15||s==15)
+   return new ARM_Unpredictable("SMLAL/SMULL/UMLAL/UMULL should not use PC");
+
+10000111SDDDDddddssss1001mmmm return new ARM_longmult<ARM_smlal>(cond,S,d,D,m,s);
+10000110SDDDDddddssss1001mmmm return new ARM_longmult<ARM_smull>(cond,S,d,D,m,s);
+10000101SDDDDddddssss1001mmmm return new ARM_longmult<ARM_umlal>(cond,S,d,D,m,s);
+10000100SDDDDddddssss1001mmmm return new ARM_longmult<ARM_umull>(cond,S,d,D,m,s);
+
+
+100010110xxxxddddyyyy0001mmmm return (d==15)?
+           (ARM_Instruction*) new ARM_Unpredictable("CLZ with Rd==PC"):
+                              (m==15)?
+           (ARM_Instruction*) new ARM_Unpredictable("CLZ with Rm==PC"):
+                              (x==((1<<4)-1) && y==((1<<4)-1))?
+           (ARM_Instruction*) new ARM_clz(cond,d,m):
+           (ARM_Instruction*) new ARM_Unpredictable("bits 19:16,11:8 of CLZ should be 1");
+
+
+
+
+11010iiiiiiiiiiiiiiiiiiiiiiii return (branch_offset(i)==0 && cond==AL)?
+           (ARM_Instruction*) new ARM_Idle():
+           (ARM_Instruction*) new ARM_b(cond,branch_offset(i));
+11011iiiiiiiiiiiiiiiiiiiiiiii return new ARM_bl(cond,branch_offset(i));
+
+0101hiiiiiiiiiiiiiiiiiiiiiiii return new ARM_blx(branch_offset(i,h));
+
+100010010xxxxxxxxxxxx0011mmmm return (x==((1<<12)-1))?
+           (ARM_Instruction*) new ARM_blx2(cond,m):
+           (ARM_Instruction*) new ARM_Unpredictable("bits 19:12 of BLX(2) should be 1");
+
+100010010xxxxxxxxxxxx0001mmmm return (x==((1<<12)-1))?
+           (ARM_Instruction*) new ARM_bx(cond,m):
+           (ARM_Instruction*) new ARM_Unpredictable("bits 19:12 of BX should be 1");
+
+
+100010010iiiiiiiiiiii0111jjjj return (cond==AL)?
+           (ARM_Instruction*) new ARM_bkpt((i<<4)|j):
+           (ARM_Instruction*) new ARM_Unpredictable("BKPT with cond!=AL");
+
+
+100010R00xxxxddddyyyy0000zzzz return (x!=((1<<4)-1))?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 19:16 of MRS should be 1"):
+                              (y!=0 || z!=0)?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 11:8,3:0 of MRS should be 0"):
+                              (d==15)?
+           (ARM_Instruction*) new ARM_Unpredictable("MRS with Rd==PC"):
+           (ARM_Instruction*) new ARM_mrs(cond,d,R);
+
+100110R10ffffxxxxrrrriiiiiiii return (x!=((1<<4)-1))?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 15:12 of MSR should be 1"):
+           (ARM_Instruction*) new ARM_msr_imm(cond,R,f,rotateRight(i,2*r));
+
+100010R10ffffxxxxyyyy0000mmmm return (x!=((1<<4)-1))?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 15:12 of MSR should be 1"):
+                              (y!=0)?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 11:8 of MSR should be 0"):
+           (ARM_Instruction*) new ARM_msr_reg(cond,R,f,m);
+
+
+11111iiiiiiiiiiiiiiiiiiiiiiii return new ARM_swi(cond,i,arm_user_level_mode);
+
+
+
+
+1010P-BW-nnnndddd------------ if (d==n && (W||!P))
+  return new ARM_Unpredictable("LDR*/STR* with writeback and Rd==Rn (immediate)");
+ else if (d==15 && B)
+   return new ARM_Unpredictable("LDRB/LDRBT/STRB/STRBT with Rd==PC (immediate)");
+ else if ((!P || P&&W ) && n==15)
+   return new ARM_Unpredictable("LDR*/STR* with Rn==PC (immediate + post/pre-index)");
+1011P-BW-nnnndddd-------0mmmm if (d==n && (W||!P))
+  return new ARM_Unpredictable("LDR*/STR* with writeback and Rd==Rn (register)");
+ else if (d==15 && B)
+   return new ARM_Unpredictable("LDRB/LDRBT/STRB/STRBT with Rd==PC (register)");
+ else if (m==15)
+   return new ARM_Unpredictable("LDR*/STR* with Rm==PC (register)");
+ else if (!P || P&&W )
+   if (n==15)
+     return new ARM_Unpredictable("LDR*/STR* with Rn==PC (register + post/pre-index)");
+   else if (m==n)
+     return new ARM_Unpredictable("LDR*/STR* with Rn==Rm (register + post/pre-index)");
+
+10100U011nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_ldrt>(cond,d,false,U,false,n,i);
+10110U011nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_ldrt>(cond,d,false,U,false,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldrt>(cond,d,false,U,false,n,m);
+
+10101U0W1nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_ldr>(cond,d,true,U,W,n,i);
+10100U001nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_ldr>(cond,d,false,U,false,n,i);
+10111U0W1nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_ldr>(cond,d,true,U,W,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldr>(cond,d,true,U,W,n,m);
+10110U001nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_ldr>(cond,d,false,U,false,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldr>(cond,d,false,U,false,n,m);
+
+10100U111nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_ldrbt>(cond,d,false,U,false,n,i);
+10110U111nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_ldrbt>(cond,d,false,U,false,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldrbt>(cond,d,false,U,false,n,m);
+
+10101U1W1nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_ldrb>(cond,d,true,U,W,n,i);
+10100U101nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_ldrb>(cond,d,false,U,false,n,i);
+10111U1W1nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_ldrb>(cond,d,true,U,W,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldrb>(cond,d,true,U,W,n,m);
+10110U101nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_ldrb>(cond,d,false,U,false,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldrb>(cond,d,false,U,false,n,m);
+
+
+10100U010nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_strt>(cond,d,false,U,false,n,i);
+10110U010nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_strt>(cond,d,false,U,false,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_strt>(cond,d,false,U,false,n,m);
+
+10101U0W0nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_str>(cond,d,true,U,W,n,i);
+10100U000nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_str>(cond,d,false,U,false,n,i);
+10111U0W0nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_str>(cond,d,true,U,W,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_str>(cond,d,true,U,W,n,m);
+10110U000nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_str>(cond,d,false,U,false,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_str>(cond,d,false,U,false,n,m);
+
+10100U110nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_strbt>(cond,d,false,U,false,n,i);
+10110U110nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_strbt>(cond,d,false,U,false,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_strbt>(cond,d,false,U,false,n,m);
+
+10101U1W0nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_strb>(cond,d,true,U,W,n,i);
+10100U100nnnnddddiiiiiiiiiiii return new ARM_LoadStoreImm<ARM_strb>(cond,d,false,U,false,n,i);
+10111U1W0nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_strb>(cond,d,true,U,W,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_strb>(cond,d,true,U,W,n,m);
+10110U100nnnnddddaaaaass0mmmm return (a||s)?
+           (ARM_Instruction*) new ARM_LoadStoreScRg<ARM_strb>(cond,d,false,U,false,n,a,(ARM_Shift) s,m):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_strb>(cond,d,false,U,false,n,m);
+
+
+1000P--W1nnnndddd----1011---- if (d==n && W)
+  return new ARM_Unpredictable("LDRH with W==1 and Rd==Rn");
+ else if (d==15)
+   return new ARM_Unpredictable("LDRH with Rd==PC");
+ else if (W&&!P)
+   return new ARM_Unpredictable("LDRH with W==1 and P==0");
+1000PU1W1nnnnddddAAAA1011aaaa return new ARM_LoadStoreImm<ARM_ldrh>(cond,d,P,U,W,n,(A<<4)|a);
+1000PU0W1nnnnddddzzzz1011mmmm return (z!=0)?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 11:8 of LDRH should be 0 (register)"):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldrh>(cond,d,P,U,W,n,m);
+
+1000P--W1nnnndddd----11-1---- if (d==n && W)
+  return new ARM_Unpredictable("LDRSB/LDRSH with W==1 and Rd==Rn");
+ else if (d==15)
+   return new ARM_Unpredictable("LDRSB/LDRSH with Rd==PC");
+ else if (W&&!P)
+   return new ARM_Unpredictable("LDRSB/LDRSH with W==1 and P==0");
+1000PU1W1nnnnddddAAAA1101aaaa return new ARM_LoadStoreImm<ARM_ldrsb>(cond,d,P,U,W,n,(A<<4)|a);
+1000PU0W1nnnnddddzzzz1101mmmm return (z!=0)?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 11:8 of LDRSB should be 0 (register)"):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldrsb>(cond,d,P,U,W,n,m);
+1000PU1W1nnnnddddAAAA1111aaaa return new ARM_LoadStoreImm<ARM_ldrsh>(cond,d,P,U,W,n,(A<<4)|a);
+1000PU0W1nnnnddddzzzz1111mmmm return (z!=0)?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 11:8 of LDRSH should be 0 (register)"):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldrsh>(cond,d,P,U,W,n,m);
+
+1000P--W0nnnndddd----1011---- if (d==n && W)
+  return new ARM_Unpredictable("STRH with W==1 and Rd==Rn");
+ else if (d==15)
+   return new ARM_Unpredictable("STRH with Rd==PC");
+ else if (W&&!P)
+   return new ARM_Unpredictable("STRH with W==1 and P==0");
+1000PU1W0nnnnddddAAAA1011aaaa return new ARM_LoadStoreImm<ARM_strh>(cond,d,P,U,W,n,(A<<4)|a);
+1000PU0W0nnnnddddzzzz1011mmmm return (z!=0)?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 11:8 of STRH should be 0 (register)"):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_strh>(cond,d,P,U,W,n,m);
+
+1000P--W0nnnndddd----1101---- if (d==n && W)
+  return new ARM_Unpredictable("LDRD with W==1 and Rd==Rn");
+ else if (d&1)
+   return new ARM_Unpredictable("LDRD with odd-numbered Rd");
+ else if (d==14)
+   return new ARM_Unpredictable("LDRD with Rd==LR");
+ else if (W&&!P)
+   return new ARM_Unpredictable("LDRD with W==1 and P==0");
+1000PU1W0nnnnddddAAAA1101aaaa return new ARM_LoadStoreImm<ARM_ldrd>(cond,d,P,U,W,n,(A<<4)|a);
+1000PU0W0nnnnddddzzzz1101mmmm return (z!=0)?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 11:8 of LDRD should be 0 (register)"):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_ldrd>(cond,d,P,U,W,n,m);
+
+1000P--W0nnnndddd----1111---- if (d==n && W)
+  return new ARM_Unpredictable("STRD with W==1 and Rd==Rn");
+ else if (d&1)
+   return new ARM_Unpredictable("STRD with odd-numbered Rd");
+ else if (d==14)
+   return new ARM_Unpredictable("STRD with Rd==LR");
+ else if (W&&!P)
+   return new ARM_Unpredictable("STRD with W==1 and P==0");
+1000PU1W0nnnnddddAAAA1111aaaa return new ARM_LoadStoreImm<ARM_strd>(cond,d,P,U,W,n,(A<<4)|a);
+1000PU0W0nnnnddddzzzz1111mmmm return (z!=0)?
+           (ARM_Instruction*) new ARM_Unpredictable("bits 11:8 of STRD should be 0 (register)"):
+           (ARM_Instruction*) new ARM_LoadStoreReg<ARM_strd>(cond,d,P,U,W,n,m);
+
+
+100010-00nnnnddddxxxx1001mmmm if (x!=0)
+  return new ARM_Unpredictable("bits 11:8 of SWP/SWPB should be 0");
+ else if (n==m)
+   return new ARM_Unpredictable("SWP/SWPB with Rn==Rm");
+ else if (n==d)
+   return  new ARM_Unpredictable("SWP/SWPB with Rn==Rd");
+ else if (n==15||d==15||m==15)
+   return new ARM_Unpredictable("SWP/SWPB cannot use PC");
+
+100010000nnnndddd----1001mmmm return new ARM_swp(cond,d,m,n);
+100010100nnnndddd----1001mmmm return new ARM_swpb(cond,d,m,n);
+
+
+1100---W1nnnnLLLLLLLLLLLLLLLL if (W && (L&(1<<n)))
+  return new ARM_Unpredictable("LDM with Rn in the register list");
+ else if (n==15)
+   return new ARM_Unpredictable("LDM with Rn==PC");
+ else if (L==0)
+   return new ARM_Unpredictable("LDM with empty register list");
+
+1100aa0W1nnnnLLLLLLLLLLLLLLLL return new ARM_ldm(cond,a,W,n,L);
+1100aa101nnnn0LLLLLLLLLLLLLLL return new ARM_ldm_2(cond,a,n,L);
+1100aa1W1nnnn1LLLLLLLLLLLLLLL return new ARM_ldm_3(cond,a,W,n,L|(1<<15));
+1100--111----0--------------- return new ARM_Unpredictable("LDM(3) without PC in registers");
+
+
+1100---W0nnnnLLLLLLLLLLLLLLLL if (W && (L&(1<<n)) && ((L<<(16-n)) & 0xffff))
+  return new ARM_Unpredictable("STM with Rn in the register list, but not first");
+ else if (n==15)
+   return new ARM_Unpredictable("STM with Rn==PC");
+ else if (L==0)
+   return new ARM_Unpredictable("STM with empty register list");
+
+1100aa0W0nnnnLLLLLLLLLLLLLLLL return new ARM_stm(cond,a,W,n,L);
+1100--110-------------------- return new ARM_Unpredictable("STM(2) with W==1");
+1100aa100nnnnLLLLLLLLLLLLLLLL return new ARM_stm_2(cond,a,n,L);
+
+
+00101u101nnnn1111iiiiiiiiiiii return new ARM_pld_imm(n,u,i);
+00111u101nnnn1111aaaaass0mmmm if (a||s) return new ARM_pld_scrg(n,u,a,(ARM_Shift) s,m);
+                              else return new ARM_pld_reg(n,u,m);
+
+
+
+1110PUNW1nnnnddddCCCCoooooooo return new ARM_ldc(cond,N,C,d,P,U,n,W,o);
+0110PUNW1nnnnddddCCCCoooooooo return new ARM_ldc2(N,C,d,P,U,n,W,o);
+
+1110PUNW0nnnnddddCCCCoooooooo return new ARM_stc(cond,N,C,d,P,U,n,W,o);
+0110PUNW0nnnnddddCCCCoooooooo return new ARM_stc2(N,C,d,P,U,n,W,o);
+
+11110oooonnnnddddCCCCppp0mmmm return new ARM_cdp(cond,C,o,d,n,m,p);
+01110oooonnnnddddCCCCppp0mmmm return new ARM_cdp2(C,o,d,n,m,p);
+
+11110ooo0nnnnddddCCCCppp1mmmm return (d==15)?
+           (ARM_Instruction*) new ARM_Unpredictable("MCR with Rd==PC"):
+           (ARM_Instruction*) new ARM_mcr(cond,C,o,d,n,m,p);
+01110ooo0nnnnddddCCCCppp1mmmm return (d==15)?
+           (ARM_Instruction*) new ARM_Unpredictable("MCR2 with Rd==PC"):
+           (ARM_Instruction*) new ARM_mcr2(C,o,d,n,m,p);
+
+11110ooo1nnnnddddCCCCppp1mmmm return new ARM_mrc(cond,C,o,d,n,m,p);
+01110ooo1nnnnddddCCCCppp1mmmm return new ARM_mrc2(C,o,d,n,m,p);
+
+100010000nnnndddd----0101mmmm return (n==15||d==15||m==15)
+            ? (ARM_Instruction*) new ARM_Unpredictable("QADD with REG==15")
+            : (ARM_Instruction*) new ARM_EDSP_qadd(d,m,n);
+
+100010100nnnndddd----0101mmmm return (n==15||d==15||m==15)
+            ? (ARM_Instruction*) new ARM_Unpredictable("QDADD with REG==15")
+            : (ARM_Instruction*) new ARM_EDSP_qdadd(d,m,n);
+
+100010010nnnndddd----0101mmmm return (n==15||d==15||m==15)
+            ? (ARM_Instruction*) new ARM_Unpredictable("QSUB with REG==15")
+            : (ARM_Instruction*) new ARM_EDSP_qsub(d,m,n);
+
+100010110nnnndddd----0101mmmm return (n==15||d==15||m==15)
+            ? (ARM_Instruction*) new ARM_Unpredictable("QDSUB with REG==15")
+            : (ARM_Instruction*) new ARM_EDSP_qdsub(d,m,n);
+
+100010000ddddnnnnssss1yx0mmmm return (n==15||d==15||m==15||s==15)
+            ? (ARM_Instruction*) new ARM_Unpredictable("SMLA with REG==15")
+            : (ARM_Instruction*) new ARM_EDSP_smla(d,n,s,y,m,x);
+
+100010100iiiioooossss1yx0mmmm return (i==15||o==15||s==15||m==15||i==o)
+            ? (ARM_Instruction*) new ARM_Unpredictable("SMLAL with REG==15")
+            : (ARM_Instruction*) new ARM_EDSP_smlal(i,o,s,y,m,x);
+
+100010010ddddnnnnssss1y00mmmm return (d==15||n==15||s==15||m==15)
+            ? (ARM_Instruction*) new ARM_Unpredictable("SMLAW with REG==15")
+            : (ARM_Instruction*) new ARM_EDSP_smlaw(d,n,s,y,m);
+
+100010110dddd----ssss1yx0mmmm return (d==15||s==15||m==15)
+            ? (ARM_Instruction*) new ARM_Unpredictable("SMUL with REG==15")
+            : (ARM_Instruction*) new ARM_EDSP_smul(d,s,y,m,x);
+
+100010010dddd----ssss1y10mmmm return (d==15||s==15||m==15)
+            ? (ARM_Instruction*) new ARM_Unpredictable("SMULW with REG==15")
+            : (ARM_Instruction*) new ARM_EDSP_smulw(d,s,y,m);
+
+1011--------------------1---- return new ARM_Undefined("undefined instruction space");
+
+1000001--------------1001---- return new ARM_Undefined(
+                                                       "arithmetic instruction extension space");
+
+100010--0------------1--0---- return new ARM_Undefined("control instruction extension space");
+100010--0------------01-0---- return new ARM_Undefined("control instruction extension space");
+100010--0------------0010---- return new ARM_Undefined("control instruction extension space");
+100010110------------01-1---- return new ARM_Undefined("control instruction extension space");
+100010110------------0011---- return new ARM_Undefined("control instruction extension space");
+100010-00------------0--1---- return new ARM_Undefined("control instruction extension space");
+100010010------------0101---- return new ARM_Undefined("control instruction extension space");
+100110-00-------------------- return new ARM_Undefined("control instruction extension space");
+
+100011---------------1001---- return new ARM_Undefined(
+                                                       "load/store instruction extension space");
+100010-1-------------1001---- return new ARM_Undefined(
+                                                       "load/store instruction extension space");
+100010-01------------1001---- return new ARM_Undefined(
+                                                       "load/store instruction extension space");
+
+00--------------------------- return
+                              new ARM_Undefined("unconditional instruction extension space");
+0100------------------------- return
+                              new ARM_Undefined("unconditional instruction extension space");
+01111------------------------ return
+                              new ARM_Undefined("unconditional instruction extension space");
+%%
+}
+
+} // namespace simsoc

@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -31,14 +31,13 @@
 
 
 
-#include <string>
-#include <stdint.h>
-#include <DRAMSim.h>
+
+#include <MemorySystem.h>
 
 class some_object
 {
 	public: 
 		void read_complete(unsigned, uint64_t, uint64_t);
 		void write_complete(unsigned, uint64_t, uint64_t);
-		int add_one_and_run(DRAMSim::MultiChannelMemorySystem *mem, uint64_t addr);
+		int add_one_and_run();
 };

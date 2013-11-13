@@ -49,7 +49,7 @@ endif("${SimSoc_MAJOR}" MATCHES "2")
 message(STATUS "SimSoc version = ${SimSoc_VERSION}")
 
 FIND_PATH(SimSoc_INCLUDE_DIRS
-  NAMES simsoc-config.h
+  NAMES libsimsoc/simsoc-config.h
   HINTS ${_SIMSOC_HINTS}
   PATHS ${_SIMSOC_PATHS}
 )
@@ -63,4 +63,4 @@ FIND_PATH(SimSoc_LIBRARY_DIRS
 set(SimSoc_LIBRARIES ${SimSoc_LIBRARY_DIRS}/libsimsoc.a)
 
 message(STATUS "SimSoc library = ${SimSoc_LIBRARIES}")
-
+message(STATUS "SimSoc include = ${SimSoc_INCLUDE_DIRS}")

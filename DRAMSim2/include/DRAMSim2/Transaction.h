@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -36,9 +36,8 @@
 //Header file for transaction object
 
 #include "SystemConfiguration.h"
-#include "BusPacket.h"
 
-using std::ostream; 
+using namespace std;
 
 namespace DRAMSim
 {
@@ -51,7 +50,6 @@ enum TransactionType
 
 class Transaction
 {
-	Transaction();
 public:
 	//fields
 	TransactionType transactionType;
@@ -59,54 +57,18 @@ public:
 	void *data;
 	uint64_t timeAdded;
 	uint64_t timeReturned;
+    int tr_id;
 
 
-	friend ostream &operator<<(ostream &os, const Transaction &t);
 	//functions
 	Transaction(TransactionType transType, uint64_t addr, void *data);
-	Transaction(const Transaction &t);
+   	Transaction();
 
-	BusPacketType getBusPacketType()
-	{
-		switch (transactionType)
-		{
-			case DATA_READ:
-			if (rowBufferPolicy == ClosePage)
-			{
-				return READ_P;
-			}
-			else if (rowBufferPolicy == OpenPage)
-			{
-				return READ; 
-			}
-			else
-			{
-				ERROR("Unknown row buffer policy");
-				abort();
-			}
-			break;
-		case DATA_WRITE:
-			if (rowBufferPolicy == ClosePage)
-			{
-				return WRITE_P;
-			}
-			else if (rowBufferPolicy == OpenPage)
-			{
-				return WRITE; 
-			}
-			else
-			{
-				ERROR("Unknown row buffer policy");
-				abort();
-			}
-			break;
-		default:
-			ERROR("This transaction type doesn't have a corresponding bus packet type");
-			abort();
-		}
-	}
+    //[_drugo] overloading constructor to pass port id
+    Transaction(TransactionType transType, uint64_t addr, void *data, int port_id); 
+
+	void print();
 };
-
 }
 
 #endif

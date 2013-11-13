@@ -31,69 +31,102 @@ message(STATUS "Searching for SystemC")
 # The HINTS option should only be used for values computed from the system.
 SET(_SYSTEMC_HINTS
   "[HKEY_LOCAL_MACHINE\\SOFTWARE\\SystemC\\2.2;SystemcHome]/include"
-  ${SYSTEMC_PREFIX}/include
-  ${SYSTEMC_PREFIX}/lib
-  ${SYSTEMC_PREFIX}/lib-linux
-  ${SYSTEMC_PREFIX}/lib-linux64
-  ${SYSTEMC_PREFIX}/lib-macos
-  $ENV{SYSTEMC_PREFIX}/include
-  $ENV{SYSTEMC_PREFIX}/lib
-  $ENV{SYSTEMC_PREFIX}/lib-linux
-  $ENV{SYSTEMC_PREFIX}/lib-linux64
-  $ENV{SYSTEMC_PREFIX}/lib-macos
-  ${CMAKE_INSTALL_PREFIX}/include
-  ${CMAKE_INSTALL_PREFIX}/lib
-  ${CMAKE_INSTALL_PREFIX}/lib-linux
-  ${CMAKE_INSTALL_PREFIX}/lib-linux64
-  ${CMAKE_INSTALL_PREFIX}/lib-macos
-  )
+  "${SYSTEMC_PREFIX}/include"
+  "${SYSTEMC_PREFIX}/lib"
+  "${SYSTEMC_PREFIX}/lib-linux"
+  "${SYSTEMC_PREFIX}/lib-linux64"
+  "${SYSTEMC_PREFIX}/lib-macos"
+  "$ENV{SYSTEMC_PREFIX}/include"
+  "$ENV{SYSTEMC_PREFIX}/lib"
+  "$ENV{SYSTEMC_PREFIX}/lib-linux"
+  "$ENV{SYSTEMC_PREFIX}/lib-linux64"
+  "$ENV{SYSTEMC_PREFIX}/lib-macos"
+  "${CMAKE_INSTALL_PREFIX}/include"
+  "${CMAKE_INSTALL_PREFIX}/lib"
+  "${CMAKE_INSTALL_PREFIX}/lib-linux"
+  "${CMAKE_INSTALL_PREFIX}/lib-linux64"
+  "${CMAKE_INSTALL_PREFIX}/lib-macos")
+
 # Hard-coded guesses should still go in PATHS. This ensures that the user
 # environment can always override hard guesses.
-SET(_SYSTEMC_PATHS
-  /usr/include/systemc
-  /usr/lib
-  /usr/lib-linux
-  /usr/lib-linux64
-  /usr/lib-macos
-  /usr/local/lib
-  /usr/local/lib-linux
-  /usr/local/lib-linux64
-  /usr/local/lib-macos
-  )
-FIND_FILE(_SYSTEMC_VERSION_FILE
-  NAMES sc_ver.h
+set(_SYSTEMC_PATHS
+  "/usr/include/systemc"
+  "/usr/lib"
+  "/usr/lib-linux"
+  "/usr/lib-linux64"
+  "/usr/lib-macos"
+  "/usr/local/lib"
+  "/usr/local/lib-linux"
+  "/usr/local/lib-linux64"
+  "/usr/local/lib-macos")
+
+find_file(_SYSTEMC_VERSION_FILE
+  NAMES "sc_ver.h"
   HINTS ${_SYSTEMC_HINTS}
   PATHS ${_SYSTEMC_PATHS}
-  PATH_SUFFIXES sysc/kernel
-)
+  PATH_SUFFIXES "sysc/kernel")
 
-EXEC_PROGRAM("cat ${_SYSTEMC_VERSION_FILE} |grep '#define SC_API_VERSION_STRING' | cut -d '_' -f 7 "
+exec_program("cat ${_SYSTEMC_VERSION_FILE} |grep '#define SC_API_VERSION_STRING' | cut -d '_' -f 7 "
              OUTPUT_VARIABLE SystemC_MAJOR)
-EXEC_PROGRAM("cat ${_SYSTEMC_VERSION_FILE} |grep '#define SC_API_VERSION_STRING' | cut -d '_' -f 8 "
+exec_program("cat ${_SYSTEMC_VERSION_FILE} |grep '#define SC_API_VERSION_STRING' | cut -d '_' -f 8 "
              OUTPUT_VARIABLE SystemC_MINOR)
-EXEC_PROGRAM("cat ${_SYSTEMC_VERSION_FILE} |grep '#define SC_API_VERSION_STRING' | cut -d '_' -f 9 "
+exec_program("cat ${_SYSTEMC_VERSION_FILE} |grep '#define SC_API_VERSION_STRING' | cut -d '_' -f 9 "
              OUTPUT_VARIABLE SystemC_REV)
 
 set(SystemC_VERSION ${SystemC_MAJOR}.${SystemC_MINOR}.${SystemC_REV})
 
 if("${SystemC_MAJOR}" MATCHES "2")
   set(SystemC_FOUND TRUE)
-endif("${SystemC_MAJOR}" MATCHES "2")
+endif()
 
 message(STATUS "SystemC version = ${SystemC_VERSION}")
 
-FIND_PATH(SystemC_INCLUDE_DIRS
-  NAMES systemc.h
+find_path(SystemC_INCLUDE_DIRS
+  NAMES "systemc.h"
   HINTS ${_SYSTEMC_HINTS}
-  PATHS ${_SYSTEMC_PATHS}
-)
+  PATHS ${_SYSTEMC_PATHS})
 
-FIND_PATH(SystemC_LIBRARY_DIRS
-  NAMES libsystemc.a
+find_path(SystemC_LIBRARY_DIRS
+  NAMES "libsystemc.a"
   HINTS ${_SYSTEMC_HINTS}
-  PATHS ${_SYSTEMC_PATHS}
-)
+  PATHS ${_SYSTEMC_PATHS})
+
+if ("${SystemC_MINOR}" LESS "3")
+
+  message(STATUS "Searching for TLM")
+
+  set(_TLM_HINTS
+    "[HKEY_LOCAL_MACHINE\\SOFTWARE\\TLM\\2.2;TlmHome]/include/tlm"
+    "${TLM_PREFIX}/include/tlm"
+    "$ENV{TLM_PREFIX}/include/tlm"
+    "${CMAKE_INSTALL_PREFIX}/include/tlm")
+
+  set(_TLM_PATHS
+    "/usr/include"
+    "/usr/lib"
+    "/usr/lib-linux"
+    "/usr/lib-linux64"
+    "/usr/lib-macos"
+    "/usr/local/lib"
+    "/usr/local/lib-linux"
+    "/usr/local/lib-linux64"
+    "/usr/local/lib-macos")
+
+  find_path(TLM_INCLUDE_DIRS
+    NAMES "tlm_h/tlm_version.h"
+    HINTS ${_TLM_HINTS}
+    PATHS ${_TLM_PATHS})
+
+  message(STATUS "TLM include: ${TLM_INCLUDE_DIRS}")
+
+  if (NOT TLM_INCLUDE_DIRS_NOTFOUND)
+    set(SystemC_INCLUDE_DIRS ${SystemC_INCLUDE_DIRS} ${TLM_INCLUDE_DIRS})
+  endif()
+
+endif()
 
 set(SystemC_LIBRARIES ${SystemC_LIBRARY_DIRS}/libsystemc.a pthread)
 
 message(STATUS "SystemC library = ${SystemC_LIBRARIES}")
+message(STATUS "SystemC include = ${SystemC_INCLUDE_DIRS}")
+

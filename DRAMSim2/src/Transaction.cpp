@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,13 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
+
+
+
+
+
+
+
 //Transaction.cpp
 //
 //Class file for transaction object
@@ -37,46 +44,39 @@
 #include <DRAMSim2/Transaction.h>
 #include <DRAMSim2/PrintMacros.h>
 
-using std::endl;
-using std::hex; 
-using std::dec; 
+using namespace DRAMSim;
+using namespace std;
 
-namespace DRAMSim {
+Transaction::Transaction() {}
 
-Transaction::Transaction(TransactionType transType, uint64_t addr, void *dat) :
-	transactionType(transType),
-	address(addr),
-	data(dat)
-{}
-
-Transaction::Transaction(const Transaction &t)
-	: transactionType(t.transactionType)
-	  , address(t.address)
-	  , data(NULL)
-	  , timeAdded(t.timeAdded)
-	  , timeReturned(t.timeReturned)
+Transaction::Transaction(TransactionType transType, uint64_t addr, void *dat)
 {
-	#ifndef NO_STORAGE
-	ERROR("Data storage is really outdated and these copies happen in an \n improper way, which will eventually cause problems. Please send an \n email to dramninjas [at] gmail [dot] com if you need data storage");
-	abort(); 
-	#endif
+	transactionType = transType;
+	address = addr;
+	data = dat;
 }
 
-ostream &operator<<(ostream &os, const Transaction &t)
+Transaction::Transaction(TransactionType transType, uint64_t addr, void *dat, int port_id = 0xf)
 {
-	if (t.transactionType == DATA_READ)
-	{
-		os<<"T [Read] [0x" << hex << t.address << "]" << dec <<endl;
-	}
-	else if (t.transactionType == DATA_WRITE)
-	{
-		os<<"T [Write] [0x" << hex << t.address << "] [" << dec << t.data << "]" <<endl;
-	}
-	else if (t.transactionType == RETURN_DATA)
-	{
-		os<<"T [Data] [0x" << hex << t.address << "] [" << dec << t.data << "]" <<endl;
-	}
-	return os; 
+	transactionType = transType;
+	address = addr;
+	data = dat;
+    tr_id = port_id;
 }
+
+void Transaction::print()
+{
+	if (transactionType == DATA_READ)
+	{
+		PRINT("T [Read] [0x" << hex << address << "]" << dec );
+	}
+	else if (transactionType == DATA_WRITE)
+	{
+		PRINT("T [Write] [0x" << hex << address << "] [" << dec << data << "]" );
+	}
+	else if (transactionType == RETURN_DATA)
+	{
+		PRINT("T [Data] [0x" << hex << address << "] [" << dec << data << "]" );
+	}
 }
 

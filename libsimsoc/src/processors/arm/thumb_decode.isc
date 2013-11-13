@@ -1,0 +1,144 @@
+#include "libsimsoc/processors/arm/thumb_decode.hpp"
+#include "libsimsoc/bitwise_operator.hpp"
+#include "libsimsoc/processors/arm/arm_condition.hpp"
+#include "libsimsoc/processors/arm/thumbis_arithmetic.hpp"
+#include "libsimsoc/processors/arm/thumbis_control.hpp"
+#include "libsimsoc/processors/arm/thumbis_loadstore.hpp"
+
+using namespace std;
+
+namespace simsoc {
+
+extern bool arm_user_level_mode;
+
+static int32_t branch_offset_8(int8_t imm8) {
+  return (((int32_t)imm8)<<1)+4;
+}
+
+static int32_t branch_offset_11(uint16_t imm11) {
+  return (signExtend11to32(imm11)<<1)+4;
+}
+
+ARM_Instruction *thumb_decode_bl_blx1(uint32_t offset1, uint16_t next_half) {
+  if (0xe800!=next_half&0xe800)
+    return new ARM_Unpredictable("missing second part of BL or BLX(1)");
+  const uint32_t offset2 = next_half&0x7ff;
+  uint32_t offset1_shifted = offset1<<12;
+  if (offset1&(1<<10))
+    offset1_shifted |= 0xff800000;
+  const int32_t offset = offset1_shifted + 2*offset2 + 4;
+  if (next_half&0x1000)
+    return new THUMB_bl_blx1(false,offset);
+  else
+    if (next_half&1)
+      return new ARM_Unpredictable("bit 0 of BLX1 should be zero");
+    else
+      return new THUMB_bl_blx1(true,offset);
+}
+
+ARM_Instruction * thumbDecode(uint16_t bincode, uint16_t next_half) {
+  //Data_processing instructions
+%%
+0100000101mmmddd return new THUMB_adc(d,m);
+0001110iiinnnddd if (i==0)
+    return new THUMB_mov2(d,n);
+  else
+    return new THUMB_add1(i,d,n);
+00110dddiiiiiiii return new THUMB_add2(i,d);
+0001100mmmnnnddd return new THUMB_add3(m,d,n);
+01000100Hhmmmddd return (H==0 && h==0)?
+   (ARM_Instruction*) new ARM_Unpredictable("H1 and H2 should not be 0 at the same time"):
+  (ARM_Instruction*) new THUMB_add4((H<<3)|d,(h<<3)|m);
+10100dddiiiiiiii return new THUMB_add5(i,d);
+10101dddiiiiiiii return new THUMB_add6(i,d);
+101100000iiiiiii return new THUMB_add7(i);
+0100000000mmmddd return new THUMB_and(m,d);
+00010iiiiimmmddd return new THUMB_asr1(i,d,m);
+0100000100sssddd return new THUMB_asr2(s,d);
+0100001110mmmddd return new THUMB_bic(m,d);
+0100001011mmmnnn return new THUMB_cmn(m,n);
+00101nnniiiiiiii return new THUMB_cmp1(i,n);
+0100001010mmmnnn return new THUMB_cmp2(m,n);
+01000101Hhmmmnnn return  (H==0 && h==0)?
+   (ARM_Instruction*) new ARM_Unpredictable("H1 and H2 should not be 0 at the same time"):
+   (ARM_Instruction*) new THUMB_cmp3((h<<3)|m,(H<<3)|n);
+0100000001mmmddd return new THUMB_eor(m,d);
+00000iiiiimmmddd return new THUMB_lsl1(i,m,d);
+0100000010sssddd return new THUMB_lsl2(s,d);
+00001iiiiimmmddd return new THUMB_lsr1(i,m,d);
+0100000011sssddd return new THUMB_lsr2(s,d);
+00100dddiiiiiiii return new THUMB_mov1(d,i);
+  //0001110000nnnddd return new THUMB_mov2(n,d); => cf add1
+01000110Hhmmmddd return  (H==0 && h==0)?
+  (ARM_Instruction*) new ARM_Unpredictable("H1 and H2 should not be 0 at the same time"):
+  (ARM_Instruction*) new THUMB_mov3((h<<3)|m,(H<<3)|d);
+0100001101mmmddd return (m==d)?
+   (ARM_Instruction*) new ARM_Unpredictable("Rd and Rm should not be same register"):
+   (ARM_Instruction*) new THUMB_mul(m,d);
+0100001111mmmddd return new THUMB_mvn(m,d);
+0100001001mmmddd return new THUMB_neg(m,d);
+0100001100mmmddd return new THUMB_orr(m,d);
+0100000111sssddd return new THUMB_ror(s,d);
+0100000110mmmddd return new THUMB_sbc(m,d);
+0001111iiinnnddd return new THUMB_sub1(i,d,n);
+00111dddiiiiiiii return new THUMB_sub2(i,d);
+0001101mmmnnnddd return new THUMB_sub3(m,d,n);
+101100001iiiiiii return new THUMB_sub4(i);
+0100001000mmmnnn return new THUMB_tst(m,n);
+  //Branch instructions
+
+1101cccciiiiiiii if ((ARM_Condition) c==AL)
+    return new ARM_Undefined("Condition code should not be AL");
+  else if (c==0xf)
+    return new THUMB_swi(i);
+  else
+    return new THUMB_b( (ARM_Condition) c, branch_offset_8(i));
+11100iiiiiiiiiii return new THUMB_b(AL,branch_offset_11(i));
+11110iiiiiiiiiii return thumb_decode_bl_blx1(i,next_half);
+11101----------0 return new ARM_Unpredictable("missing first part of a BLX(1)");
+11101----------1 return new ARM_Undefined("BLX(1) with last bit equal one");
+11111----------- return new ARM_Unpredictable("missing first part of a BL");
+01000111Lmmmmyyy  if (L&&m==15)
+     return new ARM_Unpredictable("Rm should not be R15");
+   else if (y!=0)
+     return new ARM_Unpredictable("bits 2:0 should be 0");
+   else
+     return new THUMB_bx_blx2(L,m);
+ //Load and Store instructions
+
+01101iiiiinnnddd return new THUMB_ldr1(i*4,n,d);
+0101100mmmnnnddd return new THUMB_ldr2(m,n,d);
+01001dddiiiiiiii return new THUMB_ldr3(d,i);
+10011dddiiiiiiii return new THUMB_ldr4(d,i);
+01111iiiiinnnddd return new THUMB_ldrb1(i,n,d);
+0101110mmmnnnddd return new THUMB_ldrb2(m,n,d);
+10001iiiiinnnddd return new THUMB_ldrh1(i,n,d);
+0101101mmmnnnddd return new THUMB_ldrh2(m,n,d);
+0101011mmmnnnddd return new THUMB_ldrsb(m,n,d);
+0101111mmmnnnddd return new THUMB_ldrsh(m,n,d);
+01100iiiiinnnddd return new THUMB_str1(i*4,n,d);
+0101000mmmnnnddd return new THUMB_str2(m,n,d);
+10010dddiiiiiiii return new THUMB_str3(d,i);
+01110iiiiinnnddd return new THUMB_strb1(i,n,d);
+0101010mmmnnnddd return new THUMB_strb2(m,n,d);
+10000iiiiinnnddd return new THUMB_strh1(i,n,d);
+0101001mmmnnnddd return new THUMB_strh2(m,n,d);
+11001nnnLLLLLLLL return  (L==0)?
+   (ARM_Instruction*) new ARM_Unpredictable("registers list should not be zero"):
+   (ARM_Instruction*) new THUMB_ldmia(n,L);
+11000nnnLLLLLLLL return  (L==0)?
+   (ARM_Instruction*) new ARM_Unpredictable("registers list should not be zero"):
+   (ARM_Instruction*) new THUMB_stmia(n,L);
+1011110rLLLLLLLL return (r==0 && L==0)?
+   (ARM_Instruction*) new ARM_Unpredictable("R and registers list should not be zero at the same time"):
+   (ARM_Instruction*) new THUMB_pop(r,L);
+1011010rLLLLLLLL return (r==0 && L==0)?
+   (ARM_Instruction*) new ARM_Unpredictable("R and registers list should not be zero at the same time"):
+   (ARM_Instruction*) new THUMB_push(r,L);
+ //interrupt
+10111110iiiiiiii return new THUMB_bkpt(i);
+1011------------ return new ARM_Undefined("undefined thumb instruction");
+%%
+}
+
+} // namespace simsoc

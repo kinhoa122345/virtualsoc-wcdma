@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -53,8 +53,6 @@ namespace DRAMSim
 {
 class CommandQueue : public SimulatorObject
 {
-	CommandQueue();
-	ostream &dramsim_log;
 public:
 	//typedefs
 	typedef vector<BusPacket *> BusPacket1D;
@@ -62,7 +60,8 @@ public:
 	typedef vector<BusPacket2D> BusPacket3D;
 
 	//functions
-	CommandQueue(vector< vector<BankState> > &states, ostream &dramsim_log);
+	CommandQueue(vector< vector<BankState> > &states);
+	CommandQueue();
 	virtual ~CommandQueue(); 
 
 	void enqueue(BusPacket *newBusPacket);
@@ -73,7 +72,6 @@ public:
 	void needRefresh(unsigned rank);
 	void print();
 	void update(); //SimulatorObject requirement
-	vector<BusPacket *> &getCommandQueue(unsigned rank, unsigned bank);
 
 	//fields
 	

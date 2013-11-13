@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,12 @@
 *********************************************************************************/
 
 
+
+
+
+
+
+
 //BankState.cpp
 //
 //Class file for bank state object
@@ -36,14 +42,11 @@
 
 #include <DRAMSim2/BankState.h>
 
-
 using namespace std;
 using namespace DRAMSim;
 
-
 //All banks start precharged
-BankState::BankState(ostream &dramsim_log_):
-		dramsim_log(dramsim_log_),
+BankState::BankState():
 		currentBankState(Idle),
 		openRowAddress(0),
 		nextRead(0),
@@ -54,7 +57,6 @@ BankState::BankState(ostream &dramsim_log_):
 		lastCommand(READ),
 		stateChangeCountdown(0)
 {}
-
 
 void BankState::print()
 {

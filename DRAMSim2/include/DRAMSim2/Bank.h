@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,6 @@
 #include "SimulatorObject.h"
 #include "BankState.h"
 #include "BusPacket.h"
-#include <iostream>
 
 namespace DRAMSim
 {
@@ -62,7 +61,7 @@ class Bank
 
 public:
 	//functions
-	Bank(ostream &dramsim_log_);
+	Bank();
 	void read(BusPacket *busPacket);
 	void write(const BusPacket *busPacket);
 
@@ -72,7 +71,6 @@ public:
 private:
 	// private member
 	std::vector<DataStruct *> rowEntries;
-	ostream &dramsim_log; 
 
 	static DataStruct *searchForRow(unsigned row, DataStruct *head);
 };

@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,13 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
+
+
+
+
+
+
+
 //SimulatorObject.cpp
 //
 //Base class for all classes in the simulator
@@ -36,10 +43,8 @@
 #include <cstdlib>
 #include <DRAMSim2/SimulatorObject.h>
 
-
 using namespace DRAMSim;
 using namespace std;
-
 
 void SimulatorObject::step()
 {

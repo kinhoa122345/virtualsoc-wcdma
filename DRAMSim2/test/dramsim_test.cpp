@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 
 
 
-#include <stdio.h>
+
 #include "dramsim_test.h"
 
 using namespace DRAMSim;
@@ -50,34 +50,33 @@ void some_object::write_complete(unsigned id, uint64_t address, uint64_t clock_c
 /* FIXME: this may be broken, currently */
 void power_callback(double a, double b, double c, double d)
 {
-//	printf("power callback: %0.3f, %0.3f, %0.3f, %0.3f\n",a,b,c,d);
+	printf("power callback: %0.3f, %0.3f, %0.3f, %0.3f\n",a,b,c,d);
 }
 
-int some_object::add_one_and_run(MultiChannelMemorySystem *mem, uint64_t addr)
+int some_object::add_one_and_run()
 {
+	/* pick a DRAM part to simulate */
+	MemorySystem *mem = new MemorySystem(0, "ini/DDR2_micron_16M_8b_x8_sg3E.ini", "system.ini", "..", "resultsfilename", 2048); 
+
+	/* create and register our callback functions */
+	Callback_t *read_cb = new Callback<some_object, void, unsigned, uint64_t, uint64_t>(this, &some_object::read_complete);
+	Callback_t *write_cb = new Callback<some_object, void, unsigned, uint64_t, uint64_t>(this, &some_object::write_complete);
+	mem->RegisterCallbacks(read_cb, write_cb, power_callback);
 
 	/* create a transaction and add it */
-	bool isWrite = false; 
-	mem->addTransaction(isWrite, addr);
+	Transaction tr = Transaction(DATA_READ, 0x50000, NULL);
+	mem->addTransaction(tr);
 
-	// send a read to channel 1 on the same cycle 
-	addr = 1LL<<33 | addr; 
-	mem->addTransaction(isWrite, addr);
-
+	/* do a bunch of updates (i.e. clocks) -- at some point the callback will fire */
 	for (int i=0; i<5; i++)
 	{
 		mem->update();
 	}
 
 	/* add another some time in the future */
+	Transaction tw = Transaction(DATA_WRITE, 0x90012, NULL);
+	mem->addTransaction(tw);
 
-	// send a write to channel 0 
-	addr = 0x900012; 
-	isWrite = true; 
-	mem->addTransaction(isWrite, addr);
-	
-
-	/* do a bunch of updates (i.e. clocks) -- at some point the callback will fire */
 	for (int i=0; i<45; i++)
 	{
 		mem->update();
@@ -91,26 +90,8 @@ int some_object::add_one_and_run(MultiChannelMemorySystem *mem, uint64_t addr)
 
 int main()
 {
-	some_object obj;
-	TransactionCompleteCB *read_cb = new Callback<some_object, void, unsigned, uint64_t, uint64_t>(&obj, &some_object::read_complete);
-	TransactionCompleteCB *write_cb = new Callback<some_object, void, unsigned, uint64_t, uint64_t>(&obj, &some_object::write_complete);
-
-	/* pick a DRAM part to simulate */
-	MultiChannelMemorySystem *mem = getMemorySystemInstance("ini/DDR2_micron_16M_8b_x8_sg3E.ini", "system.ini", "..", "example_app", 16384); 
-
-
-	mem->RegisterCallbacks(read_cb, write_cb, power_callback);
-	MultiChannelMemorySystem *mem2 = getMemorySystemInstance("ini/DDR2_micron_16M_8b_x8_sg3E.ini", "system.ini", "..", "example_app", 16384); 
-
-	mem2->RegisterCallbacks(read_cb, write_cb, power_callback);
-
 	printf("dramsim_test main()\n");
-	printf("-----MEM1------\n");
-	obj.add_one_and_run(mem, 0x100001UL);
-	obj.add_one_and_run(mem, 0x200002UL);
-
-	printf("-----MEM2------\n");
-	obj.add_one_and_run(mem2, 0x300002UL);
-	return 0; 
+	some_object obj;
+	obj.add_one_and_run();
 }
 

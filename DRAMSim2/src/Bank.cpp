@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,13 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
+
+
+
+
+
+
+
 //Bank.cpp
 //
 //Class file for bank object
@@ -36,17 +43,12 @@
 #include <DRAMSim2/Bank.h>
 #include <DRAMSim2/BusPacket.h>
 
-
 using namespace std;
 using namespace DRAMSim;
 
-
-Bank::Bank(ostream &dramsim_log_):
-		currentState(dramsim_log_), 
-		rowEntries(NUM_COLS),
-		dramsim_log(dramsim_log_)
+Bank::Bank():
+		rowEntries(NUM_COLS)
 {}
-
 
 /* The bank class is just a glorified sparse storage data structure
  * that keeps track of written data in case the simulator wants a
@@ -61,8 +63,9 @@ Bank::Bank(ostream &dramsim_log_):
  * read() searches for a node with the right row value, if not found
  * 	returns the tracer value 0xDEADBEEF
  * 
- *	TODO: if anyone wants to actually store data, see the 'data_storage' branch and perhaps try to merge that into master
+ *	TODO: if anyone wants to actually store data, this should be changed to an STL unordered_map 
  */
+
 
 
 Bank::DataStruct *Bank::searchForRow(unsigned row, DataStruct *head)
@@ -81,7 +84,6 @@ Bank::DataStruct *Bank::searchForRow(unsigned row, DataStruct *head)
 	return NULL;
 }
 
-
 void Bank::read(BusPacket *busPacket)
 {
 	DataStruct *rowHeadNode = rowEntries[busPacket->column];
@@ -90,7 +92,7 @@ void Bank::read(BusPacket *busPacket)
 	if ((foundNode = Bank::searchForRow(busPacket->row, rowHeadNode)) == NULL)
 	{
 		// the row hasn't been written before, so it isn't in the list
-		//if(SHOW_SIM_OUTPUT) DEBUG("== Warning - Read from previously unwritten row " << busPacket->row);
+		//if(SHOW_SIM_OUTPUT) _DEBUG("== Warning - Read from previously unwritten row " << busPacket->row);
 		void *garbage = calloc(BL * (JEDEC_DATA_BUS_BITS/8),1);
 		((long *)garbage)[0] = 0xdeadbeef; // tracer value
 		busPacket->data = garbage;
@@ -139,7 +141,7 @@ void Bank::write(const BusPacket *busPacket)
 		if (DEBUG_BANKS)
 		{
 			PRINTN(" -- Bank "<<busPacket->bank<<" writing to physical address 0x" << hex << busPacket->physicalAddress<<dec<<":");
-			busPacket->printData();
+			BusPacket::printData(busPacket->data);
 			PRINT("");
 		}
 	}

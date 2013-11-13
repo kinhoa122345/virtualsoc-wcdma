@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -29,8 +29,6 @@
 *********************************************************************************/
 
 
-
-#include <stdint.h> // uint64_t
 
 #ifndef CALLBACK_H
 #define CALLBACK_H

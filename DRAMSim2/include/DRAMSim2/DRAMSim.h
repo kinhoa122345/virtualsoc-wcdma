@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,8 @@
 *********************************************************************************/
 
 
+
+
 #ifndef DRAMSIM_H
 #define DRAMSIM_H
 /*
@@ -36,28 +38,24 @@
  * provide all necessary functionality to talk to an external simulator
  */
 #include "Callback.h"
-#include <string>
 using std::string;
 
 namespace DRAMSim 
 {
-
-	class MultiChannelMemorySystem {
-		public: 
+	class MemorySystem
+	{
+		public:
 			bool addTransaction(bool isWrite, uint64_t addr);
-			void setCPUClockSpeed(uint64_t cpuClkFreqHz);
+			bool WillAcceptTransaction();
 			void update();
-			void printStats(bool finalStats);
-			bool willAcceptTransaction(); 
-			bool willAcceptTransaction(uint64_t addr); 
-			std::ostream &getLogFile();
-
+			void printStats();
 			void RegisterCallbacks( 
 				TransactionCompleteCB *readDone,
 				TransactionCompleteCB *writeDone,
 				void (*reportPower)(double bgpower, double burstpower, double refreshpower, double actprepower));
 	};
-	MultiChannelMemorySystem *getMemorySystemInstance(const string &dev, const string &sys, const string &pwd, const string &trc, unsigned megsOfMemory, std::string *visfilename=NULL);
+	MemorySystem *getMemorySystemInstance(unsigned id, string dev, string sys, string pwd, string trc, unsigned megsOfMemory);
 }
+
 
 #endif

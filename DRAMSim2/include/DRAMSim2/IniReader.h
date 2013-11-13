@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,13 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
+
+
+
+
+
+
+
 #ifndef INIREADER_H
 #define INIREADER_H
 
@@ -35,11 +42,11 @@
 #include <fstream>
 #include <sstream>
 #include <string>
-#include <map> 
 #include "SystemConfiguration.h"
 
 using namespace std;
 
+// Uhhh, apparently the #name equals "name" -- HOORAY MACROS!
 #define DEFINE_UINT_PARAM(name, paramtype) {#name, &name, UINT, paramtype, false}
 #define DEFINE_STRING_PARAM(name, paramtype) {#name, &name, STRING, paramtype, false}
 #define DEFINE_FLOAT_PARAM(name,paramtype) {#name, &name, FLOAT, paramtype, false}
@@ -63,13 +70,9 @@ typedef struct _configMap
 
 class IniReader
 {
-
 public:
-	typedef std::map<string, string> OverrideMap;
-	typedef OverrideMap::const_iterator OverrideIterator; 
-
 	static void SetKey(string key, string value, bool isSystemParam = false, size_t lineNumber = 0);
-	static void OverrideKeys(const OverrideMap *map);
+	static void OverrideKeys(vector<string> keys, vector<string> values);
 	static void ReadIniFile(string filename, bool isSystemParam);
 	static void InitEnumsFromStrings();
 	static bool CheckIfAllSet();

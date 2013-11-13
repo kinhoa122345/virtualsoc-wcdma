@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -105,12 +105,25 @@ extern unsigned tXP;
 
 extern unsigned tCMD;
 
-/* For power parameters (current and voltage), see externs in MemoryController.cpp */ 
-
+extern unsigned IDD0;
+extern unsigned IDD1;
+extern unsigned IDD2P;
+extern unsigned IDD2Q;
+extern unsigned IDD2N;
+extern unsigned IDD3Pf;
+extern unsigned IDD3Ps;
+extern unsigned IDD3N;
+extern unsigned IDD4W;
+extern unsigned IDD4R;
+extern unsigned IDD5;
+extern unsigned IDD6;
+extern unsigned IDD6L;
+extern unsigned IDD7;
+extern float Vdd; 
 extern unsigned NUM_DEVICES;
 
 //same bank
-#define READ_TO_PRE_DELAY (AL+BL/2+ max(tRTP,tCCD)-tCCD)
+#define READ_TO_PRE_DELAY (AL+BL/2+max(((int)tRTP),2)-2)
 #define WRITE_TO_PRE_DELAY (WL+BL/2+tWR)
 #define READ_TO_WRITE_DELAY (RL+BL/2+tRTRS-WL)
 #define READ_AUTOPRE_DELAY (AL+tRTP+tRP)
@@ -147,8 +160,7 @@ enum AddressMappingScheme
 	Scheme3,
 	Scheme4,
 	Scheme5,
-	Scheme6,
-	Scheme7
+	Scheme6
 };
 
 // used in MemoryController and CommandQueue
@@ -201,11 +213,6 @@ unsigned inline dramsim_log2(unsigned value)
 	if ((unsigned)1<<logbase2<orig)logbase2++;
 	return logbase2;
 }
-inline bool isPowerOfTwo(unsigned long x)
-{
-	return (1UL<<dramsim_log2(x)) == x;
-}
-
 
 };
 

@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,12 @@
 *********************************************************************************/
 
 
+
+
+
+
+
+
 #ifndef MEMORYCONTROLLER_H
 #define MEMORYCONTROLLER_H
 
@@ -44,10 +50,10 @@
 #include "BusPacket.h"
 #include "BankState.h"
 #include "Rank.h"
-#include "CSVWriter.h"
 #include <map>
 
 using namespace std;
+using namespace DRAMSim;
 
 namespace DRAMSim
 {
@@ -57,25 +63,24 @@ class MemoryController : public SimulatorObject
 
 public:
 	//functions
-	MemoryController(MemorySystem* ms, CSVWriter &csvOut_, ostream &dramsim_log_);
+	MemoryController(MemorySystem* ms, std::ofstream *outfile);
 	virtual ~MemoryController();
 
-	bool addTransaction(Transaction *trans);
+	bool addTransaction(Transaction &trans);
 	bool WillAcceptTransaction();
-	void returnReadData(const Transaction *trans);
+	void returnReadData(const Transaction &trans);
 	void receiveFromBus(BusPacket *bpacket);
-	void attachRanks(vector<Rank *> *ranks);
+	void attachRanks(vector<Rank> *ranks);
 	void update();
 	void printStats(bool finalStats = false);
-	void resetStats(); 
 
 
 	//fields
-	vector<Transaction *> transactionQueue;
-private:
-	ostream &dramsim_log;
+	vector<Transaction> transactionQueue;
 	vector< vector <BankState> > bankStates;
+private:
 	//functions
+	void addressMapping(uint64_t physicalAddress, unsigned &rank, unsigned &bank, unsigned &row, unsigned &col);
 	void insertHistogram(unsigned latencyValue, unsigned rank, unsigned bank);
 
 	//fields
@@ -86,15 +91,15 @@ private:
 	vector<unsigned>refreshCountdown;
 	vector<BusPacket *> writeDataToSend;
 	vector<unsigned> writeDataCountdown;
-	vector<Transaction *> returnTransaction;
-	vector<Transaction *> pendingReadTransactions;
+	vector<Transaction> returnTransaction;
+	vector<Transaction> pendingReadTransactions;
 	map<unsigned,unsigned> latencies; // latencyValue -> latencyCount
 	vector<bool> powerDown;
 
-	vector<Rank *> *ranks;
+	vector<Rank> *ranks;
 
 	//output file
-	CSVWriter &csvOut; 
+	std::ofstream *visDataOut;
 
 	// these packets are counting down waiting to be transmitted on the "bus"
 	BusPacket *outgoingCmdPacket;

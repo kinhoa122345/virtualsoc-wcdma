@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -28,42 +28,40 @@
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
 
+
+
+
 #include <DRAMSim2/Rank.h>
 #include <DRAMSim2/MemoryController.h>
-
 
 using namespace std;
 using namespace DRAMSim;
 
-
-Rank::Rank(ostream &dramsim_log_) :
-	id(-1),
-	dramsim_log(dramsim_log_),
-	isPowerDown(false),
-	refreshWaiting(false),
-	readReturnCountdown(0),
-	banks(NUM_BANKS, Bank(dramsim_log_)),
-	bankStates(NUM_BANKS, BankState(dramsim_log_))
-
+Rank::Rank() :
+		// store the rank #, mostly for convenience and printing
+		id(-1),
+		isPowerDown(false),
+		refreshWaiting(false),
+		readReturnCountdown(0)
 {
 
 	memoryController = NULL;
 	outgoingDataPacket = NULL;
 	dataCyclesLeft = 0;
+	bankStates = vector<BankState>(NUM_BANKS, BankState());
 	currentClockCycle = 0;
 
 #ifndef NO_STORAGE
+	banks = vector<Bank>(NUM_BANKS, Bank());
 #endif
 
 }
-
 
 // mutators
 void Rank::setId(int id)
 {
 	this->id = id;
 }
-
 
 // attachMemoryController() must be called before any other Rank functions
 // are called
@@ -72,20 +70,10 @@ void Rank::attachMemoryController(MemoryController *memoryController)
 	this->memoryController = memoryController;
 }
 
-
-Rank::~Rank()
-{
-	for (size_t i=0; i<readReturnPacket.size(); i++)
-	{
-		delete readReturnPacket[i];
-	}
-	readReturnPacket.clear(); 
-	delete outgoingDataPacket; 
-}
-
-
 void Rank::receiveFromBus(BusPacket *packet)
 {
+	BusPacket returnPacket;
+
 	if (DEBUG_BUS)
 	{
 		PRINTN(" -- R" << this->id << " Receiving On Bus    : ");
@@ -296,12 +284,10 @@ void Rank::receiveFromBus(BusPacket *packet)
 	}
 }
 
-
 int Rank::getId() const
 {
 	return this->id;
 }
-
 
 void Rank::update()
 {
@@ -348,7 +334,6 @@ void Rank::update()
 	}
 }
 
-
 //power down the rank
 void Rank::powerDown()
 {
@@ -367,7 +352,6 @@ void Rank::powerDown()
 
 	isPowerDown = true;
 }
-
 
 //power up the rank
 void Rank::powerUp()

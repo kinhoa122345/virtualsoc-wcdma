@@ -3,7 +3,7 @@
 *                             Paul Rosenfeld
 *                             Bruce Jacob
 *                             University of Maryland 
-*                             dramninjas [at] gmail [dot] com
+*                             dramninjas [at] umd [dot] edu
 *  All rights reserved.
 *  
 *  Redistribution and use in source and binary forms, with or without
@@ -27,6 +27,13 @@
 *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 *********************************************************************************/
+
+
+
+
+
+
+
 
 #ifndef BUSPACKET_H
 #define BUSPACKET_H
@@ -53,8 +60,6 @@ enum BusPacketType
 
 class BusPacket
 {
-	BusPacket();
-	ostream &dramsim_log; 
 public:
 	//Fields
 	BusPacketType busPacketType;
@@ -64,16 +69,19 @@ public:
 	unsigned rank;
 	uint64_t physicalAddress;
 	void *data;
+    int id;
 
 	//Functions
-	BusPacket(BusPacketType packtype, uint64_t physicalAddr, unsigned col, unsigned rw, unsigned r, unsigned b, void *dat, ostream &dramsim_log_);
+	BusPacket(BusPacketType packtype, uint64_t physicalAddr, unsigned col, unsigned rw, unsigned r, unsigned b, void *dat);
+	BusPacket();
+
+	BusPacket(BusPacketType packtype, uint64_t physicalAddr, unsigned col, unsigned rw, unsigned r, unsigned b, void *dat, int myd);
 
 	void print();
 	void print(uint64_t currentClockCycle, bool dataStart);
-  static void printData(uint64_t const* data);
-  inline void printData(void) const { printData(reinterpret_cast<uint64_t const*>(data)); }
+	static void printData(const void *data);
 };
+}
 
-} // DRAMSim
+#endif
 
-#endif // BUSPACKET_H
