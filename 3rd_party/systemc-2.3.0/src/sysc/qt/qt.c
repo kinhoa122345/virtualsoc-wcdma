@@ -1,5 +1,5 @@
-#include "copyright.h"
-#include "qt.h"
+#include "sysc/qt/copyright.h"
+#include "sysc/qt/qt.h"
 
 // static void *qt_sp_bottom_save;
 
