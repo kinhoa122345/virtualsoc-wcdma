@@ -25,7 +25,7 @@
  *****************************************************************************/
 
 
-#include "sc_vector.h"
+#include "sysc/utils/sc_vector.h"
 
 #include "sysc/utils/sc_hash.h"
 #include "sysc/utils/sc_list.h"
