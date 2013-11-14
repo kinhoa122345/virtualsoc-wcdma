@@ -17,7 +17,7 @@ int sc_main(int argc, char** argv)
   std::string filename;
   {
     std::stringstream ss;
-    ss << "./wave/waveform" << FIR_SIZE;
+    ss << "./waveform" << FIR_SIZE;
     filename = ss.str();
   }
 

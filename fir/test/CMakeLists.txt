@@ -1,3 +1,5 @@
+init_test_directory()
+
 file(GLOB HEADER
   "../include/*/*.h"
   "../include/*/*.hpp"
@@ -11,7 +13,7 @@ foreach(SIZE ${SIZES_TO_BUILD})
 
   set(CURRENT_TARGET "${PROJECT_NAME}${SIZE}")
   add_executable(${CURRENT_TARGET} ${HEADER} ${SOURCE})
-  target_link_libraries(${CURRENT_TARGET} ${SystemC_LIBRARIES})
+  target_link_libraries(${CURRENT_TARGET} systemc pthread)
 
   get_target_property(TEMP ${CURRENT_TARGET} COMPILE_FLAGS)
   if(TEMP STREQUAL "TEMP-NOTFOUND")

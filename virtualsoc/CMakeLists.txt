@@ -42,3 +42,6 @@ add_definitions(
 
 add_executable(${PROJECT_NAME} ${HEADER} ${SOURCE})
 target_link_libraries(${PROJECT_NAME} systemc simsoc dramsim pthread)
+
+#add_test_directory(test)
+

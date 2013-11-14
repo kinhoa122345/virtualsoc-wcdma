@@ -1,6 +1,4 @@
 project("fir")
 
-if(BUILD_TESTS)
-  add_subdirectory(test)
-endif()
+add_test_directory(test)
 
