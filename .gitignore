@@ -4,3 +4,6 @@ lib
 wave
 CMakeLists.txt.user
 *.vcd
+*.o
+*~
+.*.swp
