@@ -55,7 +55,7 @@ void cl_pic::arbiter()
       }
       else if (addresser->IsInSemSpace(address[id], ID))
       {
-        ids = num_slaves-2;
+        ids = num_slaves-3;
 #ifdef DEBUG_PIC_ROUTING
         printf("%s - 0x%08X\tIsInSemSpace - core %d slave %d @ %.1f\n", name(), address[id], id, ids, sc_simulation_time());
 
@@ -64,11 +64,22 @@ void cl_pic::arbiter()
       }
       else if (addresser->IsInDmaSpace(address[id], ID))
       {
-        ids = num_slaves-1;
+        ids = num_slaves-2;
 #ifdef DEBUG_PIC_ROUTING
         printf("%s - 0x%08X\tIsInDmaSpace - core %d slave %d @ %.1f\n", name(), address[id], id, ids, sc_simulation_time());
 
 #endif
+        req_table[(ids*num_masters)+id] = true;
+      }
+      else if (addresser->IsInCOUNTERSpace(address[id], ID))
+      {
+        ids = num_slaves - 1;
+
+#ifdef DEBUG_PIC_ROUTING
+        printf("%s ­‐ 0x%08X\tIsInCOUNTERSpace ­‐ core %d slave %d @ %.1f\n",
+               name(), address[id], id, ids, sc_simulation_time());
+#endif
+
         req_table[(ids*num_masters)+id] = true;
       }
       else
@@ -78,159 +89,159 @@ void cl_pic::arbiter()
       }
     }
 
-    // --------- statistics -----------
-    for(id = 0; id < (int)num_masters; id++)
+  // --------- statistics -----------
+  for(id = 0; id < (int)num_masters; id++)
+  {
+    if(CL_CORE_METRICS[id] && req[id])
     {
-      if(CL_CORE_METRICS[id] && req[id])
-      {
-        pinout[id] = pinout_core[id].read();
-        address[id] = pinout[id].address;
-        if(req[id] && addresser->IsInL3Space(address[id], ID))
-          L3_lat[id]++;
-        if(req[id] && addresser->IsInSemSpace(address[id], ID))
-          sem_lat[id]++;
-        if(req[id] && addresser->IsInHWSSpace(address[id], ID))
-          HWS_lat[id]++;
-      }
+      pinout[id] = pinout_core[id].read();
+      address[id] = pinout[id].address;
+      if(req[id] && addresser->IsInL3Space(address[id], ID))
+        L3_lat[id]++;
+      if(req[id] && addresser->IsInSemSpace(address[id], ID))
+        sem_lat[id]++;
+      if(req[id] && addresser->IsInHWSSpace(address[id], ID))
+        HWS_lat[id]++;
     }
-    //----------------------------------
+  }
+  //----------------------------------
 
 
 
 
-    //---------- scheduling ------------
-    switch(xbar_sched)
+  //---------- scheduling ------------
+  switch(xbar_sched)
+  {
+    case 0 : //FIXED PRIORITY
     {
-      case 0 : //FIXED PRIORITY
-      {
 
-        //cerco il primo match
-        for (ids = 0; ids < (int)num_slaves; ids++)
+      //cerco il primo match
+      for (ids = 0; ids < (int)num_slaves; ids++)
 #ifdef TCDM_LOW_ID_HI_PRI
-          //lower ID higher priority
-          for(id = 0; id < (int)num_masters; id++)
+        //lower ID higher priority
+        for(id = 0; id < (int)num_masters; id++)
 #else     //higher ID higher priority
-          for(id = (int)num_masters-1; id >= 0; id--)
+        for(id = (int)num_masters-1; id >= 0; id--)
 #endif
-            if(req_table[(ids*num_masters)+id] && !busy_fsm[ids])
-            {
-                hp_addr[ids] = pinout[id].address;
-                hp_rw[ids] = pinout[id].rw;
-                idc_fsm[ids*num_masters+id] = true;
-                served[id].write(true);
-
-                hp_served[ids] = id;
-                break;
-            }
-#ifdef PIC_MCAST
-        //multicast
-        for (ids = 0; ids < (int)num_slaves; ids++)
-#ifdef TCDM_LOW_ID_HI_PRI
-          //lower ID higher priority
-          for(id = 0/*hp_served[ids]+1*/; id < (int)num_masters; id++)
-#else
-          for(id = 0/*hp_served[ids]-1*/; id >= 0; id--)
-#endif
-            if(req_table[(ids*num_masters)+id] && (pinout[id].address == hp_addr[ids]) && (pinout[id].rw == hp_rw[ids]) && (pinout[id].rw == false) && (unsigned int)id != hp_served[ids] && !pending_req[ids])
-              {
-                num_mc++;
-                idc_fsm[ids*num_masters+id] = true;
-                served[id].write(true);
-              }
-#endif
-        //pending request
-        for (ids = 0; ids < (int)num_slaves; ids++)
-        {
-          for(id = 0; id < (int)num_masters; id++)
-            if(req_table[(ids*num_masters)+id] && !served[id])
-              queued_cores[ids]++;
-
-          pending_req[ids] = (queued_cores[ids] >= 1) ? true : false;
-
-          //cout << "slave " << dec << ids << " - " << queued_cores[ids] << " pending req! @ " << sc_time_stamp() << endl;
-        }
-        //lock della risorsa
-        for (ids = 0; ids < (int)num_slaves; ids++)
-          for(id = 0; id < (int)num_masters; id++)
-            if(req_table[(ids*num_masters)+id])
-            {
-              busy_fsm[ids] = true;
-              go_fsm[ids].write(true);
-              break;
-            }
-        break;
-      }
-
-      case 1 ://ROUND ROBIN
-      {
-        //cerco il primo match a partire da next_to_serve
-        for (ids = 0; ids < (int)num_slaves; ids++)
-          for(id = 0; id < (int)num_masters; id++)
+          if(req_table[(ids*num_masters)+id] && !busy_fsm[ids])
           {
-            current = (next_to_serve[ids] + id) % num_masters;
-            if(req_table[(ids*num_masters)+current] && !busy_fsm[ids])
-            {
-              //cout << "slave " << dec << ids << " is serving core " << current << " @  " << sc_time_stamp() << endl;
-              hp_addr[ids] = pinout[current].address;
-              hp_rw[ids] = pinout[current].rw;
-              idc_fsm[ids*num_masters+current] = true;
-              served[current].write(true);
-              next_to_serve[ids] = current+1;
-              hp_served[ids] = current;
-              break;
-            }
+            hp_addr[ids] = pinout[id].address;
+            hp_rw[ids] = pinout[id].rw;
+            idc_fsm[ids*num_masters+id] = true;
+            served[id].write(true);
+
+            hp_served[ids] = id;
+            break;
           }
 #ifdef PIC_MCAST
-        //multicast
-        for (ids = 0; ids < (int)num_slaves; ids++)
-          for(id = 0; id < (int)num_masters; id++)
-            if(req_table[(ids*num_masters)+id] && (pinout[id].address == hp_addr[ids]) && (pinout[id].rw == hp_rw[ids]) && (pinout[id].rw == false /*read*/) && (unsigned int)id != hp_served[ids] && !pending_req[ids])
-              {
-                if(stat_mc[ids])
-                {
-                  num_mc++;
-                  stat_mc[ids] = false;
-                }
-                idc_fsm[ids*num_masters+id] = true;
-                served[id].write(true);
-              }
+      //multicast
+      for (ids = 0; ids < (int)num_slaves; ids++)
+#ifdef TCDM_LOW_ID_HI_PRI
+        //lower ID higher priority
+        for(id = 0/*hp_served[ids]+1*/; id < (int)num_masters; id++)
+#else
+        for(id = 0/*hp_served[ids]-1*/; id >= 0; id--)
 #endif
-        //pending request
-        for (ids = 0; ids < (int)num_slaves; ids++)
-        {
-          for(id = 0; id < (int)num_masters; id++)
-            if(req_table[(ids*num_masters)+id] && !served[id] && !idc_fsm[ids*num_masters+id])
-              queued_cores[ids]++;
-
-          pending_req[ids] = (queued_cores[ids] >= 1) ? true : false;
-
-          //cout << "slave " << dec << ids << " - " << queued_cores[ids] << " pending req! @ " << sc_time_stamp() << endl;
-        }
-        //lock della risorsa
-        for (ids = 0; ids < (int)num_slaves; ids++)
-          for(id = 0; id < (int)num_masters; id++)
-            if(req_table[(ids*num_masters)+id])
-            {
-              busy_fsm[ids] = true;
-              go_fsm[ids].write(true);
-              break;
-            }
-        break;
-
-      }
-      case 2 :
+          if(req_table[(ids*num_masters)+id] && (pinout[id].address == hp_addr[ids]) && (pinout[id].rw == hp_rw[ids]) && (pinout[id].rw == false) && (unsigned int)id != hp_served[ids] && !pending_req[ids])
+          {
+            num_mc++;
+            idc_fsm[ids*num_masters+id] = true;
+            served[id].write(true);
+          }
+#endif
+      //pending request
+      for (ids = 0; ids < (int)num_slaves; ids++)
       {
-          cout << name() << " 2 Levels : Not implemented yet. aborting" << endl;
-          exit(1);
-          break;
+        for(id = 0; id < (int)num_masters; id++)
+          if(req_table[(ids*num_masters)+id] && !served[id])
+            queued_cores[ids]++;
+
+        pending_req[ids] = (queued_cores[ids] >= 1) ? true : false;
+
+        //cout << "slave " << dec << ids << " - " << queued_cores[ids] << " pending req! @ " << sc_time_stamp() << endl;
       }
-      default :
-        {
-          cout << "[" << name() << "] error in scheduling value!" << endl;
-          exit(1);
-          break;
-        }
+      //lock della risorsa
+      for (ids = 0; ids < (int)num_slaves; ids++)
+        for(id = 0; id < (int)num_masters; id++)
+          if(req_table[(ids*num_masters)+id])
+          {
+            busy_fsm[ids] = true;
+            go_fsm[ids].write(true);
+            break;
+          }
+      break;
     }
+
+    case 1 ://ROUND ROBIN
+    {
+      //cerco il primo match a partire da next_to_serve
+      for (ids = 0; ids < (int)num_slaves; ids++)
+        for(id = 0; id < (int)num_masters; id++)
+        {
+          current = (next_to_serve[ids] + id) % num_masters;
+          if(req_table[(ids*num_masters)+current] && !busy_fsm[ids])
+          {
+            //cout << "slave " << dec << ids << " is serving core " << current << " @  " << sc_time_stamp() << endl;
+            hp_addr[ids] = pinout[current].address;
+            hp_rw[ids] = pinout[current].rw;
+            idc_fsm[ids*num_masters+current] = true;
+            served[current].write(true);
+            next_to_serve[ids] = current+1;
+            hp_served[ids] = current;
+            break;
+          }
+        }
+#ifdef PIC_MCAST
+      //multicast
+      for (ids = 0; ids < (int)num_slaves; ids++)
+        for(id = 0; id < (int)num_masters; id++)
+          if(req_table[(ids*num_masters)+id] && (pinout[id].address == hp_addr[ids]) && (pinout[id].rw == hp_rw[ids]) && (pinout[id].rw == false /*read*/) && (unsigned int)id != hp_served[ids] && !pending_req[ids])
+          {
+            if(stat_mc[ids])
+            {
+              num_mc++;
+              stat_mc[ids] = false;
+            }
+            idc_fsm[ids*num_masters+id] = true;
+            served[id].write(true);
+          }
+#endif
+      //pending request
+      for (ids = 0; ids < (int)num_slaves; ids++)
+      {
+        for(id = 0; id < (int)num_masters; id++)
+          if(req_table[(ids*num_masters)+id] && !served[id] && !idc_fsm[ids*num_masters+id])
+            queued_cores[ids]++;
+
+        pending_req[ids] = (queued_cores[ids] >= 1) ? true : false;
+
+        //cout << "slave " << dec << ids << " - " << queued_cores[ids] << " pending req! @ " << sc_time_stamp() << endl;
+      }
+      //lock della risorsa
+      for (ids = 0; ids < (int)num_slaves; ids++)
+        for(id = 0; id < (int)num_masters; id++)
+          if(req_table[(ids*num_masters)+id])
+          {
+            busy_fsm[ids] = true;
+            go_fsm[ids].write(true);
+            break;
+          }
+      break;
+
+    }
+    case 2 :
+    {
+      cout << name() << " 2 Levels : Not implemented yet. aborting" << endl;
+      exit(1);
+      break;
+    }
+    default :
+    {
+      cout << "[" << name() << "] error in scheduling value!" << endl;
+      exit(1);
+      break;
+    }
+  }
 }
 
 //FIXME wrong - doesn't work with DRAM
@@ -245,7 +256,7 @@ void cl_pic::req_polling(int i)
     {
       wait( served[i].negedge_event() );
       wait( clock.posedge_event() );
-/*      if(CL_CORE_METRICS[i])
+      /*      if(CL_CORE_METRICS[i])
       {
         t2[i] = (sc_simulation_time() - t1[i])/CLOCKPERIOD;
         if(t2[i] > MIN_L3_LAT)
@@ -255,7 +266,7 @@ void cl_pic::req_polling(int i)
     else
     {
       wait( request_core[i].posedge_event() );
-/*      if(CL_CORE_METRICS[i])
+      /*      if(CL_CORE_METRICS[i])
       {
         t1[i] = sc_simulation_time();
       }*/
@@ -291,7 +302,7 @@ void cl_pic::fsm(int i)
         rw = pinout.rw;
         burst = (int)pinout.burst;
 
-//         cout << name() << " IDLE waking up - ADDR " << hex << pinout.address << " by " << dec << k << " at " << sc_time_stamp() << endl;
+        //         cout << name() << " IDLE waking up - ADDR " << hex << pinout.address << " by " << dec << k << " at " << sc_time_stamp() << endl;
 
         pinout_slave[i].write( pinout );
         request_slave[i].write( true );
@@ -501,24 +512,24 @@ void cl_pic::stats()
     tot_HWS_lat += HWS_lat[i];
 
     printf("%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", i, L3_acc[i], L3_lat[i], L3_confl[i],
-                                                sem_acc[i], sem_lat[i], HWS_acc[i], HWS_lat[i]);
+           sem_acc[i], sem_lat[i], HWS_acc[i], HWS_lat[i]);
   }
-   printf("TOTAL\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", tot_L3_acc, tot_L3_lat,
-                                               tot_L3_confl, tot_sem_acc, tot_sem_lat,
-                                               tot_HWS_acc,  tot_HWS_lat);
+  printf("TOTAL\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n", tot_L3_acc, tot_L3_lat,
+         tot_L3_confl, tot_sem_acc, tot_sem_lat,
+         tot_HWS_acc,  tot_HWS_lat);
 
-   printf("CL_AVG\t%.2f\t%.1f\t\t%.2f\t%.2f\t%.2f\t%.2f\n",
-                                                   (double)tot_L3_acc/(double)num_masters,
-                                                   (double)tot_L3_lat/(double)num_masters,
-                                                   (double)tot_sem_acc/(double)num_masters,
-                                                   (double)tot_sem_lat/(double)num_masters,
-                                                   (double)tot_HWS_lat/(double)num_masters,
-                                                   (double)tot_HWS_acc/(double)num_masters);
-   printf("W_AVG\t%.2f\t%.1f\t\t%.2f\t%.2f\n",
-                                                   (double)tot_L3_acc/(double)num_masters,
-                                                   (double)tot_L3_lat/(double)num_masters,
-                                                   (double)tot_sem_acc/(double)num_masters,
-                                                   (double)tot_sem_lat/(double)num_masters);
+  printf("CL_AVG\t%.2f\t%.1f\t\t%.2f\t%.2f\t%.2f\t%.2f\n",
+         (double)tot_L3_acc/(double)num_masters,
+         (double)tot_L3_lat/(double)num_masters,
+         (double)tot_sem_acc/(double)num_masters,
+         (double)tot_sem_lat/(double)num_masters,
+         (double)tot_HWS_lat/(double)num_masters,
+         (double)tot_HWS_acc/(double)num_masters);
+  printf("W_AVG\t%.2f\t%.1f\t\t%.2f\t%.2f\n",
+         (double)tot_L3_acc/(double)num_masters,
+         (double)tot_L3_lat/(double)num_masters,
+         (double)tot_sem_acc/(double)num_masters,
+         (double)tot_sem_lat/(double)num_masters);
 
 }
 

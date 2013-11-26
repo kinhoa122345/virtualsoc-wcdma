@@ -66,6 +66,16 @@ bool Addresser::IsInDmaSpace(uint32_t address, uint16_t tile_id)
          (address <= (uint32_t)(tile_id*TILE_SPACING + CL_DMA_BASE + CL_DMA_SIZE))) ? true : false;;
 }
 
+bool Addresser::IsInCOUNTERSpace(
+    uint32_t address, uint16_t tile_id)
+{
+  return ((address >= (uint32_t)(tile_id*TILE_SPACING + COUNTER_BASE_ADDR)) &&
+  (address <	(uint32_t)(tile_id*TILE_SPACING	+	COUNTER_BASE_ADDR	+	COUNTER_MEM_SIZE)))
+  ?	true
+  :	false;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Logical2Physical - Converts logical addresses (as seen by processors) to
 //                    physical addresses (as seen by bus).

@@ -2,15 +2,16 @@
 #define __ADDRESS_H__
 
 #include <systemc.h>
-#include "config.h"
-#include "globals.h"
-#include "mem_class.h" 
+
+#include <virtualsoc/core/config.h>
+#include <virtualsoc/core/globals.h>
+#include <virtualsoc/core/mem_class.h>
 
 class Addresser
 {
   public:
-    Addresser();
-    ~Addresser(){};
+    Addresser(void);
+    ~Addresser(void) {}
 
     uint32_t Logical2Physical(uint32_t address, uint8_t ID);
     uint32_t Physical2Logical(uint32_t address, uint8_t ID);
@@ -24,13 +25,14 @@ class Addresser
     bool IsInHWSSpace(uint32_t address, uint16_t tile_id);
     bool IsOffCluster(uint32_t address, uint16_t tile_id);
     bool IsInDmaSpace(uint32_t address, uint16_t tile_id);
-        
+    bool IsInCOUNTERSpace(uint32_t	address, uint16_t tile_id);
+
     bool PhysicalInSimSupportSpace(uint32_t address);
     uint32_t ReturnSimSupportPhysicalAddress();
-    
-    char **pMemoryDebug;    
+
+    char **pMemoryDebug;
     Mem_class **pMem_classDebug;
-    
+
 };
 
 extern Addresser *addresser;

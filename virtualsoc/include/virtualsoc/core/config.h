@@ -6,13 +6,13 @@
 //------------------------------------------------------------
 
 #define BUILTIN_DEFAULT_CURRENT_ISS          ARMv6
-#define BUILTIN_DEFAULT_CURRENT_ARCH       SINGLE_CLUSTER
+#define BUILTIN_DEFAULT_CURRENT_ARCH         SINGLE_CLUSTER
 #define BUILTIN_DEFAULT_N_CORES              4
 #define BUILTIN_DEFAULT_SHARED_CACHE         false
 #define BUILTIN_DEFAULT_NSIMCYCLES           -1
-#define BUILTIN_DEFAULT_VCD                  false 
+#define BUILTIN_DEFAULT_VCD                  false
 #define BUILTIN_DEFAULT_AUTOSTARTMEASURING   false //TODO keep it! check in stats
-#define BUILTIN_DEFAULT_FREQSCALING          false 
+#define BUILTIN_DEFAULT_FREQSCALING          false
 #define BUILTIN_DEFAULT_FREQSCALINGDEVICE    false
 
 #define BUILTIN_DEFAULT_MEM_IN_WS            50
@@ -74,13 +74,13 @@
 
 // Hardware Synchronizer (HWS)
 #define HWS_BASE                             0x0B000000
-#define HWS_SIZE                             0x00001000 
+#define HWS_SIZE                             0x00001000
 #define N_HWS_EVENTS                         16
 #define N_HWS_PRG_PORTS                      1
 #define N_HWS_SLV_PORTS                      1
 #define N_HWS_PORTS                          (N_HWS_PRG_PORTS + N_HWS_SLV_PORTS)
 
-// DMA 
+// DMA
 #define DMA_FREE_SLOT_REG                    0x0   // free slots address register
 #define DMA_ADDR1_REG                        0x1   // addr1 address register
 #define DMA_ADDR2_REG                        0x2   // addr2 address register
@@ -96,6 +96,13 @@
 #define DMA_REGS_DECODE(address)             (address)
 #define DMA_EVENT_OFF                        0xFF
 #define DMA_WAIT_EVENT_ADDR                  (CL_DMA_BASE + DMA_EVENT_OFF)
+
+// Counter
+
+#define COUNTER_BASE_ADDR                    0x0D000000
+#define COUNTER_MEM_SIZE                     0x10
+#define COUNTER_INIT_ADDR                    0x0D000000
+#define COUNTER_GET_ADDR                     0x0D000004
 
 //-------- HACK delta cycles ---------------
 
