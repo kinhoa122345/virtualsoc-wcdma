@@ -1,1 +1,1 @@
-void QPSKinv ( int* dataI, int* dataQ, int dataSize, int* result, int* amp ) ;
+void QPSKinv ( int* dataI, int* dataQ, int dataSize, int* result ) ;

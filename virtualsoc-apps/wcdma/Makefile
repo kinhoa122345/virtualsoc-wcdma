@@ -14,7 +14,7 @@ OBJCOPY   = arm-elf-objcopy
 OBJDUMP   = arm-elf-objdump
 
 ## Paths
-LIBGOMP_PATH      = ${VSOC_APP_DIR}/libgomp
+LIBGOMP_PATH      = ${VSOC_APP_DIR}/gomp
 VSOC_CONFIG_PATH  = ${LIBGOMP_PATH}/config/vsoc
 SUPPORT_PATH	  = ${VSOC_APP_DIR}/support/simulator
 
@@ -25,7 +25,7 @@ LIBGOMP_FLAGS	+= -DSTACK_IN_SHARED
 LIBGOMP_FLAGS	+= -DSINGLE_WS
 
 ## Other FLags
-INCDIR       = -I. -I.. -I${VSOC_SRC_DIR} -I${VSOC_APP_DIR}/support
+INCDIR       = -I. -I.. -I${VSOC_SRC_DIR} -I${VSOC_APP_DIR}/support -I${LIBGOMP_PATH}/include
 COMMON_CFLAGS 	= $(INCDIR)  -msoft-float -mcpu=arm7 -Winline
 CFLAGS	 	= -O2 -g $(COMMON_CFLAGS) $(LIBGOMP_FLAGS)
 ASFLAGS    	= -mfpu=softfpa
@@ -35,7 +35,7 @@ LDFLAGS	    	+= -L${VSOC_APP_DIR}/support/lib -lgcc
 
 #################### FILES ##########################
 #CSRCS  += ${LIBGOMP_PATH}/root.c
-CSRCS  += ${VSOC_APP_DIR}/support/simulator/appsupport.c 
+CSRCS  += ${VSOC_APP_DIR}/support/simulator/appsupport.c #$(wildcard ${LIBGOMP_PATH}/src/*.c)
 CSRCS  += fir.c
 CSRCS  += qpsk.c
 #CSRCS  += ${VSOC_APP_DIR}/support/simulator/accsupport.c
@@ -54,7 +54,7 @@ ASSRCS = ${SUPPORT_PATH}/boot.s
 COBJS  		= $(CSRCS:.c=.o)
 ASOBJS 		= $(ASSRCS:.s=.o)
 OMP_COBJS  	= $(OMP_CSRCS:.c=.o)
-OBJS   		= $(COBJS) $(ASOBJS)
+OBJS   		= $(COBJS) $(ASOBJS) ../lib/libgomp.a
 
 
 #################### BUILD ##########################
