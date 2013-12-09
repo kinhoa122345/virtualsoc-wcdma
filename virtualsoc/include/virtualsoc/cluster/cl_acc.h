@@ -27,6 +27,11 @@ SC_MODULE(cl_acc)
   sc_inout<PINOUT> slave_port;
   sc_in<bool> sl_req;
   sc_out<bool> sl_rdy;
+  sc_signal<int> fir_input;
+  sc_signal<int> fir_output;
+
+  //Fir
+  fir::fir<64, fir::STATIC> fir_module;
 
   //Status
   enum cl_status
@@ -136,7 +141,8 @@ SC_MODULE(cl_acc)
     sc_module(nm),
     ID(id),
     START_ADDRESS(START_ADDRESS),
-    TARGET_MEM_SIZE(TARGET_MEM_SIZE)
+    TARGET_MEM_SIZE(TARGET_MEM_SIZE),
+    fir_module("fir")
   {
     printf("Build accelerator...");
 
@@ -151,6 +157,20 @@ SC_MODULE(cl_acc)
     sensitive << start_processing;
     dont_initialize();
 
+    int coeff[64] =
+    {
+      67108864,372,-323,252,-172,96 ,-34,-5,
+      24      ,-26,17  ,-15,-6  ,-13,-10,15,
+      0       ,3  ,6   ,-12,1   ,0  ,-13,8,
+      -2      ,0  ,-2  ,-5 ,2   ,0  ,-2 ,3,
+      -1      ,0  ,0   ,-1 ,1   ,0  ,1  ,0,
+      -1      ,3  ,0   ,0  ,2   ,0  ,2  ,0,
+      0       ,1  ,0   ,0  ,0   ,0  ,1  ,0,
+      0       ,0  ,0   ,0  ,-1  ,0  ,0  ,0
+    };
+    fir_module.init_coefficient(coeff);
+    fir_module.x(fir_input);
+    fir_module.y(fir_output);
     printf("Done!\n");
   }
 
