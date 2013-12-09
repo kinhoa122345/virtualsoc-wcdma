@@ -57,7 +57,7 @@ int essai=0;
     //It is a READ request
     if (!wr)
     {
-      if (addr==ACC_READY_ADDR)
+      if (addr==ACCELERATOR_READY_ADDR)
       {
         //Debug
         cout << "ACCELERATOR Wait for the end of the processing at "<<sc_time_stamp()<<endl;
@@ -119,7 +119,7 @@ int essai=0;
       data = tmp_pinout.data;
 
       //Control part
-      if (addr==ACC_START_ADDR)
+      if (addr==ACCELERATOR_START_ADDR)
       {
         if (data==1)
         {

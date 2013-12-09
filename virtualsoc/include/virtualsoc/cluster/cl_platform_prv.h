@@ -29,6 +29,7 @@
 #include <virtualsoc/cluster/cl_hws.h>
 #include <virtualsoc/cluster/cl_dma.h>
 #include <virtualsoc/cluster/cl_counter.h>
+#include <virtualsoc/cluster/cl_acc.h>
 
 #include <virtualsoc/cluster/cl_platform_defs.h>
 
@@ -56,6 +57,7 @@ SC_MODULE(cl_platform_prv) {
   cl_1st_stage_demux* dma_ext_demux;
   cl_semaphore *sem;
   cl_counter* counter;
+  cl_acc* accelerator;
 
   void stats();
 
@@ -124,6 +126,11 @@ SC_MODULE(cl_platform_prv) {
   sc_signal<PINOUT>   pinout_counter_slv_port;
   sc_signal<bool>     request_counter_slv_port;
   sc_signal<bool>     ready_counter_slv_port;
+
+  //Signals Accelerator
+  sc_signal<PINOUT>   pinout_accelerator_slv_port;
+  sc_signal<bool>     request_accelerator_slv_port;
+  sc_signal<bool>     ready_accelerator_slv_port;
 
   //Signals DMA
   sc_signal<PINOUT>   pinout_dma_slv;
@@ -346,7 +353,7 @@ SC_MODULE(cl_platform_prv) {
     pic = new cl_pic(
           buffer, 0,
           N_CORES + 2,
-          N_CORES + 2 + N_HWS_PORTS + 1 + 1 + 1,
+          N_CORES + 2 + N_HWS_PORTS + 1 + 1 + 1 + 1,
           XBAR_TCDM_DELAY, XBAR_TCDM_SCHED, tf, tracing);
     pic->clock(ClockGen_1);
     //wiring cores to pic
@@ -385,13 +392,18 @@ SC_MODULE(cl_platform_prv) {
 
     //wiring pic to DMA slave itf
     pic->request_slave[N_CORES+2 + N_HWS_PORTS + 1](request_dma_slv);
-    pic->ready_slave[N_CORES+2 + N_HWS_PORTS + 1](ready_dma_slv);
-    pic->pinout_slave[N_CORES+2 + N_HWS_PORTS + 1](pinout_dma_slv);
+    pic->ready_slave  [N_CORES+2 + N_HWS_PORTS + 1](ready_dma_slv);
+    pic->pinout_slave [N_CORES+2 + N_HWS_PORTS + 1](pinout_dma_slv);
 
     // Wiring counter
-    pic->request_slave[N_CORES+2+N_HWS_PORTS+1+1](request_counter_slv_port);
-    pic->ready_slave  [N_CORES+2 + N_HWS_PORTS+1+1](ready_counter_slv_port);
-    pic->pinout_slave [N_CORES+2 + N_HWS_PORTS+1+1](pinout_counter_slv_port);
+    pic->request_slave[N_CORES+2 + N_HWS_PORTS + 1 + 1](request_counter_slv_port);
+    pic->ready_slave  [N_CORES+2 + N_HWS_PORTS + 1 + 1](ready_counter_slv_port);
+    pic->pinout_slave [N_CORES+2 + N_HWS_PORTS + 1 + 1](pinout_counter_slv_port);
+
+    // Wiring accelerator
+    pic->request_slave[N_CORES+2 + N_HWS_PORTS + 1 + 1 + 1](request_accelerator_slv_port);
+    pic->ready_slave  [N_CORES+2 + N_HWS_PORTS + 1 + 1 + 1](ready_accelerator_slv_port);
+    pic->pinout_slave [N_CORES+2 + N_HWS_PORTS + 1 + 1 + 1](pinout_accelerator_slv_port);
 
     // --------------- HWS -----------------
     sprintf(buffer, "HWS");
@@ -419,6 +431,14 @@ SC_MODULE(cl_platform_prv) {
     counter->slave_port(pinout_counter_slv_port);
     counter->sl_rdy(ready_counter_slv_port);
     counter->sl_req(request_counter_slv_port);
+
+    // ----------- ACCELERATOR ------------
+    sprintf(buffer, "ACCELERATOR");
+    accelerator = new cl_acc(buffer, 0x0, ACCELERATOR_BASE_ADDR, ACCELERATOR_MEM_SIZE);
+    accelerator->clock(ClockGen_1);
+    accelerator->slave_port(pinout_accelerator_slv_port);
+    accelerator->sl_rdy(ready_accelerator_slv_port);
+    accelerator->sl_req(request_accelerator_slv_port);
 
     //---------------- DMA ----------------
     sprintf(buffer, "dma");
@@ -817,6 +837,7 @@ SC_MODULE(cl_platform_prv) {
     delete pic;
     delete dma;
     delete counter;
+    delete accelerator;
     delete hws;
 
     delete dma_ext_demux;
