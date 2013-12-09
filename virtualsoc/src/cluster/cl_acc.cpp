@@ -48,11 +48,11 @@ void cl_acc::execute()
 
     //Get request
     tmp_pinout = slave_port.read();
-    addr = tmp_pinout.address;	//Address
-    burst = tmp_pinout.burst;	  //Size of burst
-    bw = tmp_pinout.bw;			    //Size of data
-    wr = tmp_pinout.rw; 		    //Read/write cmd
-    size = get_word_size ( bw );
+    addr       = tmp_pinout.address; //Address
+    burst      = tmp_pinout.burst;   //Size of burst
+    bw         = tmp_pinout.bw;      //Size of data
+    wr         = tmp_pinout.rw;      //Read/write cmd
+    size       = get_word_size ( bw );
 
     cout<<"ACCELERATOR Execute function call"<<endl;
 
@@ -153,7 +153,13 @@ void cl_acc::execute()
         status = CL_ACC_WRITE;
 
         //Debug
-        cout << "ACCELERATOR Write at the address "<<hex<<addr<<" the value "<<data<< " at "<<sc_time_stamp()<<endl;
+        cout << "ACCELERATOR Write at the address "
+             << hex << addr
+             << " the value "
+             << data
+             << " at "
+             << sc_time_stamp()
+             << endl;
 
         //Write the data in the request
         for (int i = 0; i < burst; i ++)
@@ -191,18 +197,29 @@ void cl_acc::acc_processing()
   {
     // Wait for an input.
     wait(start_processing);
-    uint32_t const& input = Read(INPUT_ADDR,MEM_WORD);
+
+    std::cout << "Processing request." << std::endl;
+    uint32_t const& input = Read(INPUT_ADDR, MEM_WORD);
     // Send value to FIR.
+    std::cout << "FIR input: " << reinterpret_cast<int const&>(input) << std::endl;
     fir_input.write(reinterpret_cast<int const&>(input));
-    wait(fir_module.y.event());
-    // Get FIR result.
+
+    // Wait for high clock.
+    // Because the pipeline need one tick to compute the pipelined result.
+    // This will put a latency between input and output.
+    wait();
+
+    // Get FIR(t-6) result.
     int const& output = fir_output.read();
-    Write(OUTPUT_ADDR,reinterpret_cast<uint32_t const&>(output),MEM_WORD);
+    Write(OUTPUT_ADDR, reinterpret_cast<uint32_t const&>(output),MEM_WORD);
 
     // Return in inactive mode.
     status = CL_ACC_INACTIVE;
+
+    std::cout << "Finish to write input in fir." << std::endl;
   }
 
   //Debug
   cout << "ACCELERATOR: DONE!"<<endl;
 }
+

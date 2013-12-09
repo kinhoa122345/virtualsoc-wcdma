@@ -39,7 +39,7 @@ CSRCS  += ${VSOC_APP_DIR}/support/simulator/appsupport.c
 CSRCS  += ${VSOC_APP_DIR}/support/simulator/accsupport.c
 CSRCS  += ${VSOC_APP_DIR}/support/simulator/countersupport.c
 
-OMP_CSRCS  = example_hw_acceleration.c
+OMP_CSRCS  = hw_acceleration.c
 
 ASSRCS = ${SUPPORT_PATH}/boot.s
 

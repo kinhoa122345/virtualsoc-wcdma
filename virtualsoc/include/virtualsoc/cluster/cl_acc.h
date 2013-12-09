@@ -151,10 +151,10 @@ SC_MODULE(cl_acc)
     acc_memory = new char [TARGET_MEM_SIZE];
 
     //Init SystemC threads
+    SC_THREAD(acc_processing);
+    sensitive << clock.pos();
     SC_THREAD(execute);
     sensitive << clock.pos();
-    SC_THREAD(acc_processing);
-    sensitive << start_processing;
     dont_initialize();
 
     int coeff[64] =

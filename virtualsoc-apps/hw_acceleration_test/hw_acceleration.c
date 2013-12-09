@@ -21,35 +21,32 @@ int main()
 	int num_proc = get_proc_id();
 	_printdecn("num proc=",num_proc);
  
-	if(num_proc==1)
+	if (num_proc==1)
 	{
 		//################ HW MODULE TEST #################
 		_printstrp("Test hw acceleration!");
 
-		//Write on the hw module
-		int i;
-		for(i=0;i<50;i++)
-		{
-			start_metric();
-
-			acc_write_word(0x4, 0x25);
-
-			stop_metric();
-		}
-
-		//Start processing on hw module
-	  	acc_start();
-
-		//Wait for the end of processing on hw module
-		acc_wait();
-
-		//Read on the hw module
-		for(i=0;i<50;i++)
-		{
 		start_metric();
-		_printhexp("Content at the address 0x4 is ", acc_read_word(0x4) );
-		stop_metric();
+
+		int i;
+		for(i = 0; i < 10; i++)
+		{
+			//Write on the hw module
+			acc_write_word(0x0, i);
+
+			//Start processing on hw module
+		  	acc_start();
+
+			//Wait for the end of processing on hw module
+			acc_wait();	
+
+			//Read on the hw module
+			uint32_t tmp_value = acc_read_word(0x0 + sizeof(int));
+			int value = *((int*)(&tmp_value));
+			_printdecp("FIR value is: ", value);
 		}
+
+		stop_metric();
 
 		//################ COUNTER TEST #################
 		_printstrp("Test counter!");
