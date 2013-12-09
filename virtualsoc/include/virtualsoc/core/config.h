@@ -99,18 +99,18 @@
 
 // Counter
 
-#define COUNTER_BASE_ADDR                    0x0D000000
-#define COUNTER_MEM_SIZE                     0x10
-#define COUNTER_INIT_ADDR                    0x0D000000
-#define COUNTER_GET_ADDR                     0x0D000004
+#define COUNTER_BASE_ADDR 0x0D000000
+#define COUNTER_MEM_SIZE  0x10
+#define COUNTER_INIT_ADDR 0x0D000000
+#define COUNTER_GET_ADDR  0x0D000004
 
 // Accelerator
 
-#define ACC_BASE_ADDR  0x0C000000
-#define ACC_READY_ADDR 0X0C000004
-#define ACC_START_ADDR 0x0C000000
-#define ACC_MEM_ADDR   0x0C000010
-#define ACC_MEM_SIZE   0x00100000
+#define ACCELERATOR_BASE_ADDR  0x0C000000
+#define ACCELERATOR_READY_ADDR 0X0C000004
+#define ACCELERATOR_START_ADDR 0x0C000000
+#define ACCELERATOR_MEM_ADDR   0x0C000010
+#define ACCELERATOR_MEM_SIZE   0x00100000
 
 //-------- HACK delta cycles ---------------
 

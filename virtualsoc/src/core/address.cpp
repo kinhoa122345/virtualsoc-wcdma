@@ -75,6 +75,15 @@ bool Addresser::IsInCOUNTERSpace(
   :	false;
 }
 
+bool Addresser::IsInACCELERATORSpace(
+    uint32_t address, uint16_t tile_id)
+{
+  return ((address >= (uint32_t)(tile_id*TILE_SPACING + ACCELERATOR_BASE_ADDR)) &&
+  (address <	(uint32_t)(tile_id*TILE_SPACING	+	ACCELERATOR_BASE_ADDR	+	ACCELERATOR_MEM_SIZE)))
+  ?	true
+  :	false;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Logical2Physical - Converts logical addresses (as seen by processors) to

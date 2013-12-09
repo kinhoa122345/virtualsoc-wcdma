@@ -1,13 +1,17 @@
 #ifndef __ACC_H__
 #define __ACC_H__
 
-#include <systemc.h>
 #include <cassert>
+#include <systemc>
+
 #include <virtualsoc/core/core_signal.h>
 #include <virtualsoc/core/stats.h>
 
-SC_MODULE(cl_acc) {
+#include <fir/fir.hpp>
 
+
+SC_MODULE(cl_acc)
+{
   protected:
   unsigned char ID;
   unsigned int START_ADDRESS;
@@ -25,10 +29,13 @@ SC_MODULE(cl_acc) {
   sc_out<bool> sl_rdy;
 
   //Status
-  enum cl_status { CL_ACC_INACTIVE = 0,
-                   CL_ACC_READ = 1,
-                   CL_ACC_WRITE = 2,
-                   CL_ACC_START = 3};
+  enum cl_status
+  {
+    CL_ACC_INACTIVE = 0,
+    CL_ACC_READ = 1,
+    CL_ACC_WRITE = 2,
+    CL_ACC_START = 3
+  };
   cl_status status;
 
   //Members

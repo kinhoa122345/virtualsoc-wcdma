@@ -13,8 +13,8 @@ uint32_t cl_acc::get_word_size( uint32_t bw )
     case 1 : size = 0x1; break;
     case 2 : size = 0x2; break;
     default :
-    cout << "Invalid word size" << endl;
-    exit(1);
+      cout << "Invalid word size" << endl;
+      exit(1);
   }
 
   return size;
@@ -32,7 +32,7 @@ void cl_acc::execute()
   bool wr;
   uint32_t size;
 
-int essai=0;
+  int essai=0;
 
   //Initializations
   sl_rdy.write(false);
@@ -57,14 +57,14 @@ int essai=0;
     //It is a READ request
     if (!wr)
     {
-      if (addr==ACC_READY_ADDR)
+      if (addr==ACCELERATOR_READY_ADDR)
       {
         //Debug
         cout << "ACCELERATOR Wait for the end of the processing at "<<sc_time_stamp()<<endl;
 
         //Wait the end of the processing
-            if (status == CL_ACC_INACTIVE ) tmp_pinout.data = 1;
-            else tmp_pinout.data = 0;
+        if (status == CL_ACC_INACTIVE ) tmp_pinout.data = 1;
+        else tmp_pinout.data = 0;
 
         //End of processing
         //tmp_pinout.data = 1;
@@ -77,9 +77,9 @@ int essai=0;
         wait();
         sl_rdy.write ( false );
         wait();
-          }
-          else
-          {
+      }
+      else
+      {
         //Change status
         status = CL_ACC_READ;
 
@@ -119,7 +119,7 @@ int essai=0;
       data = tmp_pinout.data;
 
       //Control part
-      if (addr==ACC_START_ADDR)
+      if (addr==ACCELERATOR_START_ADDR)
       {
         if (data==1)
         {
@@ -174,7 +174,7 @@ int essai=0;
 
         //Change status
         status = CL_ACC_INACTIVE;
-          }
+      }
     }
   }
 }

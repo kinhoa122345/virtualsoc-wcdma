@@ -26,6 +26,7 @@ class Addresser
     bool IsOffCluster(uint32_t address, uint16_t tile_id);
     bool IsInDmaSpace(uint32_t address, uint16_t tile_id);
     bool IsInCOUNTERSpace(uint32_t	address, uint16_t tile_id);
+    bool IsInACCELERATORSpace(uint32_t	address, uint16_t tile_id);
 
     bool PhysicalInSimSupportSpace(uint32_t address);
     uint32_t ReturnSimSupportPhysicalAddress();

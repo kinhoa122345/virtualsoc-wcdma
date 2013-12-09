@@ -5,7 +5,7 @@ else
 EXE=o-optimize/app.exe
 endif
 
-PAR1 = 
+PAR1 =
 ############## Default compiler and possible option sets
 CC        = arm-elf-gcc
 LD        = arm-elf-ld
@@ -30,6 +30,7 @@ VPATH       += ${VSOC_APP_DIR}/support/simulator
 CSRCS  += \
 		  ${VSOC_APP_DIR}/support/simulator/appsupport.c \
 		  ${VSOC_APP_DIR}/support/simulator/countersupport.c \
+		  ${VSOC_APP_DIR}/support/simulator/accsupport.c \
 		  hello_world.c
 
 ASSRCS = ${VSOC_APP_DIR}/support/simulator/boot.s

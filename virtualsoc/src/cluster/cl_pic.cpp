@@ -55,7 +55,7 @@ void cl_pic::arbiter()
       }
       else if (addresser->IsInSemSpace(address[id], ID))
       {
-        ids = num_slaves-3;
+        ids = num_slaves - 4;
 #ifdef DEBUG_PIC_ROUTING
         printf("%s - 0x%08X\tIsInSemSpace - core %d slave %d @ %.1f\n", name(), address[id], id, ids, sc_simulation_time());
 
@@ -64,7 +64,7 @@ void cl_pic::arbiter()
       }
       else if (addresser->IsInDmaSpace(address[id], ID))
       {
-        ids = num_slaves-2;
+        ids = num_slaves - 3;
 #ifdef DEBUG_PIC_ROUTING
         printf("%s - 0x%08X\tIsInDmaSpace - core %d slave %d @ %.1f\n", name(), address[id], id, ids, sc_simulation_time());
 
@@ -73,10 +73,21 @@ void cl_pic::arbiter()
       }
       else if (addresser->IsInCOUNTERSpace(address[id], ID))
       {
-        ids = num_slaves - 1;
+        ids = num_slaves - 2;
 
 #ifdef DEBUG_PIC_ROUTING
         printf("%s ­‐ 0x%08X\tIsInCOUNTERSpace ­‐ core %d slave %d @ %.1f\n",
+               name(), address[id], id, ids, sc_simulation_time());
+#endif
+
+        req_table[(ids*num_masters)+id] = true;
+      }
+      else if (addresser->IsInACCELERATORSpace(address[id], ID))
+      {
+        ids = num_slaves - 1;
+
+#ifdef DEBUG_PIC_ROUTING
+        printf("%s ­‐ 0x%08X\tIsInACCELERATORSpace ­‐ core %d slave %d @ %.1f\n",
                name(), address[id], id, ids, sc_simulation_time());
 #endif
 
