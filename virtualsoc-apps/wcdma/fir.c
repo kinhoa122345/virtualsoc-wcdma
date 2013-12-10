@@ -1,10 +1,10 @@
 #include "fir.h"
 
 
-void fir ( int* filter, int filterSize, int* dataI, int* dataQ, int dataSize, int* resultI, int* resultQ )
+void fir( int* filter, int filterSize, int* dataI, int* dataQ, int dataSize, int* resultI, int* resultQ )
 {
 	// in reality data is a tab of dataSize + filterSize elements beacause we need all these old datas to calculate all the new results (dataSize elements)
-	int i, j ;
+	//int i, j ;
 
 	#pragma omp parallel
 	{
@@ -56,6 +56,8 @@ void fir ( int* filter, int filterSize, int* dataI, int* dataQ, int dataSize, in
 
 void parallelFir(int* filter, int filterSize, int* data, int dataSize, int* result)
 {
+	int i,j;
+
 	for ( i = 0 ; i < dataSize ; i++ )
 	{
 		result[i] = 0;
