@@ -10,9 +10,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake)
 
 include(cmake/config.cmake)
 
-#find_package(SystemC REQUIRED)
-#find_package(SimSoc REQUIRED)
-
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=gnu++0x")
 
 file(GLOB THIRD_PARTY_INC_DIRS "3rd_party/*/include")
@@ -26,4 +23,3 @@ add_subdirectory(3rd_party)
 
 add_subdirectory(fir)
 add_subdirectory(virtualsoc)
-
