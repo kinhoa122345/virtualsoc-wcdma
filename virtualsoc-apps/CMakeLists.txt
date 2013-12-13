@@ -19,5 +19,5 @@ include_directories(
 
 add_subdirectory(support)
 add_subdirectory(gomp)
-add_subdirectory(hello_world)
+#add_subdirectory(hello_world)
 
