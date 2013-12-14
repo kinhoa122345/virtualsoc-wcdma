@@ -37,7 +37,7 @@ void exit(int status){
 }
 
 // ----------------------------------------------
-// Synchronization functions for single-cluster 
+// Synchronization functions for single-cluster
 // ----------------------------------------------
 
 // Hardware Test and Set
@@ -66,7 +66,7 @@ unsigned int opt_get_cycle()
 {
 asm("  mov r3, #0x7f000000\n  ldr r0, [r3, #0x308]":/*no output*/:/*no input*/:"r3","r0");
 return;
-}       
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // opt_get_time - optimized function to print current simulation time
@@ -74,7 +74,7 @@ unsigned int opt_get_time()
 {
 asm("  mov r3, #0x7f000000\n  ldr r0, [r3, #0x30C]":/*no output*/:/*no input*/:"r3","r0");
 return;
-}  
+}
 
 // -------------------------------
 // Memory-mapped support functions
@@ -108,7 +108,7 @@ unsigned int get_proc_num()
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// get_proc_tile_num - Allows getting the number of processors in a tile 
+// get_proc_tile_num - Allows getting the number of processors in a tile
 unsigned int get_proc_tile_num()
 {
   char *ptr = (char *)(SIMSUPPORT_BASE + GET_CPU_TILE_ADDRESS);
@@ -169,11 +169,11 @@ char **get_envp()
 unsigned long long int get_time()
 {
   unsigned long long int time;
-  
+
   *time_stop_ptr = 1;
   time = (((unsigned long long int)(*(unsigned long int *)time_high_ptr)) << 32) + *(unsigned long int *)time_low_ptr;
   *time_rel_ptr = 1;
-  
+
   return (time);
 }
 
@@ -182,11 +182,11 @@ unsigned long long int get_time()
 unsigned long long int get_cycle()
 {
   unsigned long long int cycle;
-  
+
   *cycle_stop_ptr = 1;
   cycle = (((unsigned long long int)(*(unsigned long int *)cycle_high_ptr)) << 32) + *(unsigned long int *)cycle_low_ptr;
   *cycle_rel_ptr = 1;
-  
+
   return (cycle);
 }
 

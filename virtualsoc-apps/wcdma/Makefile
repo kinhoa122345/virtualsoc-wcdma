@@ -7,6 +7,7 @@ endif
 
 #################### COMPILATION SETTINGS ##########################
 ## Default compiler and possible option sets
+OMP_CC    = arm-elf-gcc
 CC        = arm-elf-gcc
 LD        = arm-elf-ld
 AS        = arm-elf-as
@@ -25,21 +26,27 @@ LIBGOMP_FLAGS	+= -DSTACK_IN_SHARED
 LIBGOMP_FLAGS	+= -DSINGLE_WS
 
 ## Other FLags
-INCDIR       = -I. -I.. -I${VSOC_SRC_DIR} -I${VSOC_APP_DIR}/support -I${LIBGOMP_PATH} -I${LIBGOMP_PATH}/config/vsoc
-COMMON_CFLAGS 	= $(INCDIR)  -msoft-float -mcpu=arm7 -Winline
-CFLAGS	 	= -O2 -g $(COMMON_CFLAGS) $(LIBGOMP_FLAGS)
-ASFLAGS    	= -mfpu=softfpa
-#OMP_CFLAGS   	= -O2 -Wall ${COMMON_CFLAGS} -fopenmp -DSIZE320
-LDFLAGS	    	+= -L${VSOC_APP_DIR}/support/lib -lgcc
+INCDIR = \
+			-I. -I.. \
+			-I${VSOC_SRC_DIR} \
+			-I${VSOC_APP_DIR}/support \
+			-I${SUPPORT_PATH} \
+			-I${LIBGOMP_PATH} \
+			-I${LIBGOMP_PATH}/config/vsoc
+COMMON_CFLAGS  = $(INCDIR) -msoft-float -mcpu=arm7 -Winline
+CFLAGS         = -O2 -g $(COMMON_CFLAGS) $(LIBGOMP_FLAGS)
+ASFLAGS        = -mfpu=softfpa
+OMP_CFLAGS     = -O2 -Wall ${COMMON_CFLAGS} -fopenmp -DSIZE320
+LDFLAGS       += -L${VSOC_APP_DIR}/support/lib -lgcc
 
 
 #################### FILES ##########################
-#CSRCS  += ${LIBGOMP_PATH}/root.c
-CSRCS  += ${VSOC_APP_DIR}/support/simulator/appsupport.c #$(wildcard ${LIBGOMP_PATH}/src/*.c)
+CSRCS  += ${VSOC_APP_DIR}/support/simulator/appsupport.c
+CSRCS  += ${VSOC_APP_DIR}/support/simulator/accsupport.c
+CSRCS  += ${VSOC_APP_DIR}/support/simulator/countersupport.c
+CSRCS  += ${LIBGOMP_PATH}/root.c
 CSRCS  += fir.c
 CSRCS  += qpsk.c
-#CSRCS  += ${VSOC_APP_DIR}/support/simulator/accsupport.c
-#CSRCS  += ${VSOC_APP_DIR}/support/simulator/countersupport.c
 
 ifeq ($(optim),yes)
 	OMP_CSRCS = wcdma_optim.c
@@ -54,7 +61,7 @@ ASSRCS = ${SUPPORT_PATH}/boot.s
 COBJS  		= $(CSRCS:.c=.o)
 ASOBJS 		= $(ASSRCS:.s=.o)
 OMP_COBJS  	= $(OMP_CSRCS:.c=.o)
-OBJS   		= $(COBJS) $(ASOBJS) ../lib/libgomp.a
+OBJS   		= $(COBJS) $(ASOBJS) #../lib/libgomp.a
 
 
 #################### BUILD ##########################
