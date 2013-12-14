@@ -1,8 +1,10 @@
 project(gomp)
 
-file(GLOB HEADER "include/*/*.h")
-file(GLOB SOURCE "src/*.c")
+include_directories("." "./config/vsoc")
+
+file(GLOB SOURCE "root.c" "../support/simulator/appsupport.c")
 
 add_definitions(-msoft-float -mcpu=arm7 -Winline)
-add_library(${PROJECT_NAME} ${SOURCE} ${HEADER})
+add_library(${PROJECT_NAME} ${SOURCE})
+
 

@@ -25,7 +25,7 @@ LIBGOMP_FLAGS	+= -DSTACK_IN_SHARED
 LIBGOMP_FLAGS	+= -DSINGLE_WS
 
 ## Other FLags
-INCDIR       = -I. -I.. -I${VSOC_SRC_DIR} -I${VSOC_APP_DIR}/support -I${LIBGOMP_PATH}/include
+INCDIR       = -I. -I.. -I${VSOC_SRC_DIR} -I${VSOC_APP_DIR}/support -I${LIBGOMP_PATH} -I${LIBGOMP_PATH}/config/vsoc
 COMMON_CFLAGS 	= $(INCDIR)  -msoft-float -mcpu=arm7 -Winline
 CFLAGS	 	= -O2 -g $(COMMON_CFLAGS) $(LIBGOMP_FLAGS)
 ASFLAGS    	= -mfpu=softfpa

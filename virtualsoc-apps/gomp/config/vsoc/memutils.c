@@ -1,5 +1,5 @@
-#include <simulator/appsupport.h>
-#include <gomp/gomp.h>
+#include "appsupport.h"
+#include "libgomp.h"
 
 typedef struct {
     unsigned int start_addr;

@@ -1,8 +1,8 @@
-#include <simulator/appsupport.h>
 
 /* gomp_work_share is defined here*/
-#include <gomp/gomp_globals.h>
+#include "libgomp_globals.h"
 
+#include "appsupport.h"
 
 ALWAYS_INLINE int
 gomp_iter_dynamic_next_locked (gomp_work_share_t *ws, int * pstart, int * pend)
@@ -35,7 +35,7 @@ gomp_iter_dynamic_next_locked (gomp_work_share_t *ws, int * pstart, int * pend)
 	return 1;
 }
 
-#include <gomp/omp-lock.h>
+#include "omp-lock.h"
 
 ALWAYS_INLINE int
 gomp_iter_dynamic_next (gomp_work_share_t *ws, int * pstart, int * pend)

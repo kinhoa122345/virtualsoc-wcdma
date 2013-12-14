@@ -12,8 +12,7 @@
 #ifndef __BAR_H__
 #define __BAR_H__
 
-#include <gomp/gomp_globals.h>
-#include <gomp/config.h>
+#include "libgomp_globals.h"
 
 #define _DTYPE 								                        int
 

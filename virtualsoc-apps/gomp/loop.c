@@ -1,6 +1,6 @@
-#include <simulator/appsupport.h>
-#include <gomp/gomp.h>
 
+#include "appsupport.h"
+#include "libgomp.h"
 
 inline void
 gomp_loop_init (gomp_work_share_t *ws,

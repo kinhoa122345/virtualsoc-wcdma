@@ -1,7 +1,5 @@
 
-#ifdef GOMP_USE_P2012
-
-#include <gomp/gomp.h>
+#include "libgomp.h"
 #include "p2012_pr_control_ipgen_hal.h"
 
 extern void CC_MSGBarrier_Global_Barrier_init();
@@ -31,5 +29,3 @@ void p2012_CC_boot(){
 
 	return;
 }
-
-#endif // GOMP_USE_P2012

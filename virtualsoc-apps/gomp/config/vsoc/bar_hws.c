@@ -1,12 +1,9 @@
 
-#include <simulator/appsupport.h>
-#include <simulator/hws_support.h>
-
-#include <gomp/bar.h>
-#include <gomp/gomp_config.h>
-#include <gomp/gomp.h>
-
-#ifdef VSOC_HW_BAR
+#include "bar.h"
+#include "libgomp_config.h"
+#include "appsupport.h"
+#include "libgomp.h"
+#include "hws_support.h"
 
 extern int DOCK_EVENT LOCAL_SHARED;
 MS_BARRIER_TYPE _ms_barrier LOCAL_SHARED = (MS_BARRIER_TYPE) (DOCK_BARRIER);
@@ -164,5 +161,3 @@ ALWAYS_INLINE void gomp_hal_barrier(USR_BARRIER_TYPE b) {
 		notify_and_set(team->hw_event);
 	}
 }
-
-#endif // VSOC_HW_BAR

@@ -14,6 +14,7 @@ find_package(StandardLibs REQUIRED)
 include_directories(
   "."
   "./support"
+  "./support/simulator"
   "../virtualsoc/include"
   "./gomp/include")
 

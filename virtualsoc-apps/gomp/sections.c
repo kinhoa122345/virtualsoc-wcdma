@@ -1,7 +1,7 @@
-#include <simulator/appsupport.h>
 
-#include <gomp/gomp.h>
+#include "libgomp.h"
 
+#include "appsupport.h"
 
 inline void
 gomp_sections_init (gomp_work_share_t *ws, int count)

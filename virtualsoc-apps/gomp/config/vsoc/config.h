@@ -1,7 +1,7 @@
 #ifndef __OMP_CONFIG_H__
 #define __OMP_CONFIG_H__
 
-#include <virtualsoc/core/config.h>
+#include "vsoc_config.h"
 
 //---------------------------------------------------------
 //------------ VirtualSoC Libgomp Configuration  ----------

@@ -1,7 +1,7 @@
 #ifndef __LIBGOMP_GLOBALS_H__
 #define __LIBGOMP_GLOBALS_H__
 
-#include <simulator/appsupport.h>
+#include "appsupport.h"
 
 #ifndef NULL
 #define NULL ((void *) 0x0) /* Standard C */
@@ -21,9 +21,8 @@
 // /* TODO use N_PLR_BANKS instead */
 // extern unsigned int prv_plr_shared_size;
 
-#include <gomp/gomp_config.h>
-#include <gomp/omp-lock.h>
-#include <gomp/bar.h>
+#include "libgomp_config.h"
+#include "omp-lock.h"
 
 /* Threads/tasks support */
 typedef struct global_infos_s

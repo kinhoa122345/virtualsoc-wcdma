@@ -1,9 +1,6 @@
-#include <simulator/appsupport.h>
-
-#include <gomp/config.h>
-#include <gomp/omp-lock.h>
-#include <gomp/shmalloc.h>
-
+#include "omp-lock.h"
+#include "appsupport.h"
+#include "config.h"
 
 #ifdef HEAP_HANDLERS
 extern void *shmalloc(int handler, int size);

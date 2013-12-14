@@ -1,5 +1,5 @@
-#include <gomp/gomp.h>
 
+#include "libgomp.h"
 
 /************************* APIs *************************/
 

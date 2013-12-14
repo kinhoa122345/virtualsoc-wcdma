@@ -1,8 +1,7 @@
-#include <simulator/appsupport.h>
-#include <gomp/gomp.h>
-#include <gomp/config.h>
-#include <gomp/hal.h>
 
+
+#include "appsupport.h"
+#include "libgomp.h"
 
 /* The VSOC-GOMP compiler automatically renames the
 * MAIN function of the application into _APP_MAIN
@@ -15,8 +14,8 @@ extern int _argc LOCAL_SHARED;
 extern char **_argv LOCAL_SHARED;
 extern char **_envp LOCAL_SHARED;
 
-void omp_initenv(int, int);
-void omp_SPMD_worker(int);
+static void omp_initenv(int, int);
+static void omp_SPMD_worker(int);
 
 unsigned int timers[10]LOCAL_SHARED;
 /* main routine */
@@ -69,7 +68,8 @@ extern volatile unsigned int *scratch_next;
 extern volatile int *next_lock;
 extern void gomp_hal_barriers_init();
 /* omp_initenv() - initialize environment & synchronization constructs */
-void omp_initenv(int nprocs, int pid)
+static void
+omp_initenv(int nprocs, int pid)
 {  
 	int i;
 	gomp_team_t * root_team;
@@ -112,7 +112,8 @@ void omp_initenv(int nprocs, int pid)
 #define OMP_SLAVE_EXIT 0xdeadbeef
 
 /* omp_SPMD_worker() - worker threads spin until work provided via GOMP_parallel_start() */
-void omp_SPMD_worker(int myid)
+static void
+omp_SPMD_worker(int myid)
 {
 	/* For slaves */
 	volatile task_f  * omp_task_f;

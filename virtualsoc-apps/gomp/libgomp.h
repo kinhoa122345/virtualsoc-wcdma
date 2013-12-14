@@ -3,8 +3,6 @@
 
 #include <stddef.h>
 
-#include <gomp/gomp_globals.h>
-
 
 /************************** LIBGOMP METHODS ******************************/
 
@@ -100,14 +98,13 @@ extern void *omp_malloc(size_t size);
 void dcache_flush(void);
 
 // LOCKS: 
-#include <gomp/omp-lock.h>
+#include "omp-lock.h"
 /********************************************/
 
 // end of locks
 
-#include <simulator/appsupport.h> // in questo caso, non ha senso averlo negli altri .c
-
+#include "appsupport.h"// in questo caso, non ha senso averlo negli altri .c
 /* Dummy shared memory allocation routine */
-extern volatile unsigned shmem_next;
+extern volatile unsigned int shmem_next;
 
 #endif	/* __LIBGOMP_H__ */

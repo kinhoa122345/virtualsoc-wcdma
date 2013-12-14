@@ -1,4 +1,3 @@
-#include <simulator/appsupport.h>
 
 
 /*************BARRIER STRUCTURES DEFINITION********************/

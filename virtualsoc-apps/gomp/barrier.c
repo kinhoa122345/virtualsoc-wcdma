@@ -1,6 +1,6 @@
 
-#include <gomp/gomp_config.h>
-#include <gomp/bar.h>
+#include "libgomp_config.h"
+#include "bar.h"
 
 /* Application-level barrier */
 

@@ -1,5 +1,5 @@
 
-#include <gomp/gomp.h>
+#include "libgomp.h"
 
 inline int
 gomp_single_start(gomp_work_share_t *ws)

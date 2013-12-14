@@ -1,9 +1,8 @@
 
-#include <gomp/gomp_globals.h>
-#include <gomp/omp-lock.h>
-#include <gomp/hal.h>
+#include "libgomp_globals.h"
+#include "omp-lock.h"
 
-#include <simulator/appsupport.h>
+#include "appsupport.h"
 
 #ifdef HEAP_HANDLERS
 

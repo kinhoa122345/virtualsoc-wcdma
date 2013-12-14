@@ -1,9 +1,9 @@
+
+#include "libgomp_globals.h"
+#include "omp-lock.h"
+
 /* _POL_  for debug */
-#include <simulator/appsupport.h>
-
-#include <gomp/gomp_globals.h>
-#include <gomp/omp-lock.h>
-
+#include "appsupport.h"
 
 void
 GOMP_atomic_start (void)

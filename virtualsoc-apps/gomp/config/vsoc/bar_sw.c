@@ -1,8 +1,8 @@
 
-#include <gomp/bar.h>
-#include <gomp/gomp_config.h>
-#include <gomp/gomp.h>
-#include <simulator/appsupport.h>
+#include "bar.h"
+#include "libgomp_config.h"
+#include "appsupport.h"
+#include "libgomp.h"
 
 /* Statically allocated. */
 MS_BARRIER_TYPE _ms_barrier LOCAL_SHARED = (MS_BARRIER_TYPE) (BARRIER_BASE);

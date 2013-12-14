@@ -1,6 +1,6 @@
-#include <simulator/appsupport.h>
-#include <gomp/gomp.h>
-//#include "team.c"
+#include "appsupport.h"
+#include "libgomp.h"
+#include "team.c"
 
 void
 GOMP_parallel_start (void *fn, void *data, int num_threads)

@@ -1,6 +1,5 @@
-#include <gomp/gomp_globals.h>
-#include <gomp/mutex.h>
-#include <gomp/hal.h>
+#include "libgomp_globals.h"
+#include "mutex.h"
 
 
 extern int heap_handler;
