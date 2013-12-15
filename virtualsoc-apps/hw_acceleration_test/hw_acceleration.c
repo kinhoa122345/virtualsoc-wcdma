@@ -4,7 +4,7 @@
 #include "nop_defines.h"
 
 //HAL: Malloc (shmalloc)
-#include "gomp/hal.h"
+#include "hal.h"
 //#include "gomp/libgomp.h"
 //#include "libgomp_globals.c"
 //#include "hal-root.c"
@@ -20,7 +20,7 @@ int main()
 	//Get num proc
 	int num_proc = get_proc_id();
 	_printdecn("num proc=",num_proc);
- 
+
 	if (num_proc==1)
 	{
 		//################ HW MODULE TEST #################
@@ -38,7 +38,7 @@ int main()
 		  	acc_start();
 
 			//Wait for the end of processing on hw module
-			acc_wait();	
+			acc_wait();
 
 			//Read on the hw module
 			uint32_t tmp_value = acc_read_word(0x0 + sizeof(int));
@@ -50,7 +50,7 @@ int main()
 
 		//################ COUNTER TEST #################
 		_printstrp("Test counter!");
-		
+
 		counter_init();
 		_1000_nop_block;
 		counter_get();

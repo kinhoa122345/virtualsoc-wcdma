@@ -25,7 +25,16 @@ LIBGOMP_FLAGS	+= -DSTACK_IN_SHARED
 LIBGOMP_FLAGS	+= -DSINGLE_WS
 
 ## Other FLags
-INCDIR       	= -I. -I.. -I${SUPPORT_PATH} -I${LIBGOMP_PATH} -I${VSOC_CONFIG_PATH} -I${VSOC_SRC_DIR}/core -I${VSOC_SRC_DIR} -I${VSOC_APP_DIR}/support -I${VSOC_APP_DIR}/gomp/include
+INCDIR       	= \
+				-I. -I.. \
+				-I${SUPPORT_PATH} \
+				-I${LIBGOMP_PATH} \
+				-I${VSOC_CONFIG_PATH} \
+				-I${VSOC_SRC_DIR}/core \
+				-I${VSOC_SRC_DIR} \
+				-I${VSOC_APP_DIR}/support \
+				-I${VSOC_APP_DIR}/gomp \
+				-I${VSOC_APP_DIR}/gomp/config/vsoc
 COMMON_CFLAGS 	= $(INCDIR)  -msoft-float -mcpu=arm7 -Winline
 CFLAGS	 	= -O2 -g $(COMMON_CFLAGS) $(LIBGOMP_FLAGS)
 ASFLAGS    	= -mfpu=softfpa
@@ -35,7 +44,7 @@ LDFLAGS	    	+= -L${VSOC_APP_DIR}/support/lib -lgcc
 
 #################### FILES ##########################
 #CSRCS  += ${LIBGOMP_PATH}/root.c
-CSRCS  += ${VSOC_APP_DIR}/support/simulator/appsupport.c 
+CSRCS  += ${VSOC_APP_DIR}/support/simulator/appsupport.c
 CSRCS  += ${VSOC_APP_DIR}/support/simulator/accsupport.c
 CSRCS  += ${VSOC_APP_DIR}/support/simulator/countersupport.c
 
