@@ -1,1 +1,2 @@
-../../../../../wcdma/virtualsoc/include/virtualsoc/core/config.h
+#include "../../../../../wcdma/virtualsoc/include/virtualsoc/core/config.h"
+
