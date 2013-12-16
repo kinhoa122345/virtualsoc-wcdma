@@ -1,0 +1,5 @@
+useensta virtualsoc
+export VSOC_APP_DIR=${PWD}
+export VSOC_SRC_DIR="/opt/ensta/pack/virtualsoc/VirtualSoc/src"
+
+echo "Environment variables are set for tp3!"
