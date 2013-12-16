@@ -1,12 +1,13 @@
 #include "../support/simulator/appsupport.h"
+#include "../support/simulator/accsupport.h"
 
 #include "wcdma_signal_fixed.h"
 #include "math.h"
 #include "qpsk.h"
-#include "fir.h"
+// #include "fir.h"
 
 
-int _app_main(int argc, char** arcg, char** env)
+int main(int argc, char** arcg)
 {
   int num_proc = get_proc_id();
   start_metric();
@@ -14,19 +15,11 @@ int _app_main(int argc, char** arcg, char** env)
 
   register int a, iSymbol, iBuffer, iPosCode ;
   const int bufferSize = SF/2*SAMPLING_FACTOR;
-  int Signal_I_symb[80];
-  int Signal_Q_symb[80];
   register int bit;
   int Signal_I_filtered[bufferSize];
   int Signal_Q_filtered[bufferSize];
   int Signal [ 16 ];
 
-
-  for ( a = 0 ; a < 80 ; a++ )
-  {
-    Signal_I_symb[a] = 0 ;
-    Signal_Q_symb[a] = 0 ;
-  }
 
   for ( a = 0 ; a < bufferSize ; a++ )
   {
@@ -44,32 +37,33 @@ int _app_main(int argc, char** arcg, char** env)
     //For each symbol
     for(iSymbol=0;iSymbol<NB_SYMBOL;iSymbol++)
     {
-      //Get first symbol
-      for(iBuffer=0;iBuffer<bufferSize;iBuffer++)
-      {
-        // Shifting the old values at the beginning of the buffer
-        Signal_I_symb[iBuffer]	= Signal_I_symb[iBuffer+16] ;
-        Signal_Q_symb[iBuffer]	= Signal_Q_symb[iBuffer+16] ;
-
-        Signal_I_symb[iBuffer+16]	= Signal_I_symb[iBuffer+32] ;
-        Signal_Q_symb[iBuffer+16]	= Signal_Q_symb[iBuffer+32] ;
-
-        Signal_I_symb[iBuffer+32]	= Signal_I_symb[iBuffer+48] ;
-        Signal_Q_symb[iBuffer+32]	= Signal_Q_symb[iBuffer+48] ;
-
-        Signal_I_symb[iBuffer+48]	= Signal_I_symb[iBuffer+64] ;
-        Signal_Q_symb[iBuffer+48]	= Signal_Q_symb[iBuffer+64] ;
-
-        // Put the new values at the end of the buffer
-        Signal_I_symb[iBuffer+64]		= Signal_I[iBuffer+iSymbol*SF/2*SAMPLING_FACTOR];
-        Signal_Q_symb[iBuffer+64]		= Signal_Q[iBuffer+iSymbol*SF/2*SAMPLING_FACTOR];
-      }
-
       //-------------------------------------- FIRST STAGE -----------------------------------------------
       //FIR for I and Q
       pr("Time before FIR = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);
-      fir ( FIR_COEFF, FILTER_NB_CELL, Signal_I_symb, Signal_Q_symb, bufferSize, Signal_I_filtered, Signal_Q_filtered ) ;
-      //fir ( FIR_COEFF, FILTER_NB_CELL, Signal_Q_symb, bufferSize, Signal_Q_filtered ) ;
+      
+      for(iBuffer=0;iBuffer<bufferSize;iBuffer++)
+      {            
+        // Write on the hw FIR I
+        acc_write_word(0x0, Signal_I[iBuffer+iSymbol*SF/2*SAMPLING_FACTOR] );
+
+        // Write on the hw FIR Q
+        acc_write_word(0x0 + 2*sizeof(int), Signal_Q[iBuffer+iSymbol*SF/2*SAMPLING_FACTOR]);
+
+        // Wait for the end of processing on hw module
+        acc_wait();
+
+        // Read on the hw FIR I
+        uint32_t tmp_value = acc_read_word(0x0 + sizeof(int));
+        Signal_I_filtered[iBuffer] = *((int*)(&tmp_value));
+
+        // Read on the hw FIR Q
+        tmp_value = acc_read_word(0x0 + 3*sizeof(int));
+        Signal_Q_filtered[iBuffer] = *((int*)(&tmp_value));
+      }
+
+
+      /*fir ( FIR_COEFF, FILTER_NB_CELL, Signal_I_symb, Signal_Q_symb, bufferSize, Signal_I_filtered, Signal_Q_filtered ) ;
+      // fir ( FIR_COEFF, FILTER_NB_CELL, Signal_Q_symb, bufferSize, Signal_Q_filtered ) ;*/
       pr("Time after FIR = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);
 
       //------------------------------------- SECOND STAGE -----------------------------------------------

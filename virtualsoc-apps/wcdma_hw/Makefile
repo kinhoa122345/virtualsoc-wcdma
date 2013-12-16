@@ -36,7 +36,7 @@ INCDIR = \
 COMMON_CFLAGS  = $(INCDIR) -msoft-float -mcpu=arm7 -Winline
 CFLAGS         = -O2 -g $(COMMON_CFLAGS) $(LIBGOMP_FLAGS)
 ASFLAGS        = -mfpu=softfpa
-OMP_CFLAGS     = -O2 -Wall ${COMMON_CFLAGS} -fopenmp -DSIZE320
+#OMP_CFLAGS     = -O2 -Wall ${COMMON_CFLAGS} -fopenmp -DSIZE320
 LDFLAGS       += -L${VSOC_APP_DIR}/support/lib -lgcc
 
 
@@ -44,8 +44,8 @@ LDFLAGS       += -L${VSOC_APP_DIR}/support/lib -lgcc
 CSRCS  += ${VSOC_APP_DIR}/support/simulator/appsupport.c
 CSRCS  += ${VSOC_APP_DIR}/support/simulator/accsupport.c
 CSRCS  += ${VSOC_APP_DIR}/support/simulator/countersupport.c
-CSRCS  += ${LIBGOMP_PATH}/root.c
-CSRCS  += fir.c
+#CSRCS  += ${LIBGOMP_PATH}/root.c
+# CSRCS  += fir.c
 CSRCS  += qpsk.c
 
 ifeq ($(optim),yes)
