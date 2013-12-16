@@ -43,7 +43,7 @@ public:
     CL_ACC_READ     = 1,
     CL_ACC_WRITE    = 2,
     CL_ACC_START    = 3,
-    CL_ACC_STOP     = 4,
+    CL_ACC_STOP     = 4
   };
   cl_status status;
 
@@ -54,8 +54,7 @@ public:
   uint32_t get_word_size(uint32_t bw);
 
   //addressing
-  inline virtual uint32_t addressing(uint32_t addr)
-  { return addr - START_ADDRESS; }
+  inline virtual uint32_t addressing(uint32_t addr) { return addr - START_ADDRESS; }
 
   //Read
   inline virtual uint32_t Read(uint32_t addr, uint8_t bw)
@@ -150,7 +149,13 @@ public:
     fir_module_1("fir_1"),
     fir_module_2("fir_2")
   {
-    printf("Build accelerator...");
+    printf("Build accelerator...\n");
+
+#ifndef FIR_4_PER_4_PUSH
+    printf("Using simple version of the accelerator.");
+#else // FIR_4_PER_4_PUSH
+    printf("Using 4 per 4 push version of the accelerator.");
+#endif // FIR_4_PER_4_PUSH
 
     //Initializations
     status = CL_ACC_STOP;

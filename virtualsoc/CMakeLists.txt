@@ -1,5 +1,3 @@
-project(vsoc.x)
-
 file(GLOB HEADER
   "include/virtualsoc/*/*.h"
   "include/virtualsoc/*/*.hpp")
@@ -40,8 +38,14 @@ add_definitions(
   -DMAKEFILE_DEFAULT_L3_MUX_STATIC_MAP=false
   -DMAKEFILE_TRACE_ISS=false -DCLUSTERBUILD)
 
-add_executable(${PROJECT_NAME} ${HEADER} ${SOURCE})
-target_link_libraries(${PROJECT_NAME} systemc simsoc dramsim pthread)
+# Build the simple version of the accelerator.
+add_executable(vsoc.x ${HEADER} ${SOURCE})
+target_link_libraries(vsoc.x systemc simsoc dramsim pthread)
+
+# Build the 4 per 4 push version of the hardware accelerator.
+add_executable(vsoc2.x ${HEADER} ${SOURCE})
+set_target_properties(vsoc2.x PROPERTIES COMPILE_DEFINITIONS "FIR_4_PER_4_PUSH")
+target_link_libraries(vsoc2.x systemc simsoc dramsim pthread)
 
 #add_test_directory(test)
 

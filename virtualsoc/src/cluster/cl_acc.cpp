@@ -246,33 +246,17 @@ void cl_acc::execute(void)
 
 void cl_acc::acc_processing_fir1(void)
 {
-  //Debug
-  /*std::cout
-      << "ACCELERATOR: FIR1 START!"
-      << std::endl;*/
+#ifndef FIR_4_PER_4_PUSH
 
   while (true)
   {
     // Wait for an input.
     wait(start_processing_fir1);
 
-    /*std::cout
-        << "ACCELERATOR: Processing FIR1 request."
-        << std::endl;*/
-
     uint32_t const& input = Read(INPUT1_ADDR, MEM_WORD);
 
     // Send value to FIR.
-    /*std::cout
-        << "ACCELERATOR: FIR1 input: "
-        << reinterpret_cast<int const&>(input)
-        << std::endl;*/
-
     fir_module_1.io.x.write(reinterpret_cast<int const&>(input));
-
-    // Wait for high clock.
-    // Because the pipeline need one tick to compute the pipelined result.
-    // This will put a latency between input and output.
     wait();
 
     // Get FIR(t-6) result.
@@ -281,45 +265,52 @@ void cl_acc::acc_processing_fir1(void)
 
     // Return in inactive mode.
     status = CL_ACC_INACTIVE;
-
-    /*std::cout
-        << "ACCELERATOR: Finish to write input in FIR1."
-        << std::endl;*/
   }
 
-  // Debug
-  //cout << "ACCELERATOR: FIR1 DONE!"<<endl;
+#else // FIR_4_PER_4_PUSH
+
+  while (true)
+  {
+    // Wait for an input.
+    wait(start_processing_fir1);
+
+    uint32_t const& input = Read(INPUT1_ADDR, MEM_WORD);
+    signed char const* table = reinterpret_cast<signed char const*>(&input);
+
+    // Send value to FIR.
+    fir_module_1.io.x.write(int(table[3]));
+    wait();
+    fir_module_1.io.x.write(int(table[2]));
+    wait();
+    fir_module_1.io.x.write(int(table[1]));
+    wait();
+    fir_module_1.io.x.write(int(table[0]));
+    wait();
+
+    // Get FIR(t-6) result.
+    int const& output = fir_module_1.io.y.read();
+    Write(OUTPUT1_ADDR, reinterpret_cast<uint32_t const&>(output),MEM_WORD);
+
+    // Return in inactive mode.
+    status = CL_ACC_INACTIVE;
+  }
+
+#endif // FIR_4_PER_4_PUSH
 }
 
 void cl_acc::acc_processing_fir2(void)
-{
-  // Debug
-  /*std::cout
-      << "ACCELERATOR: FIR2 START!"
-      << std::endl;*/
+{  
+#ifndef FIR_4_PER_4_PUSH
 
   while (true)
   {
     // Wait for an input.
     wait(start_processing_fir2);
 
-    /*std::cout
-        << "ACCELERATOR: Processing FIR2 request."
-        << std::endl;*/
-
     uint32_t const& input = Read(INPUT2_ADDR, MEM_WORD);
 
     // Send value to FIR.
-    /*std::cout
-        << "ACCELERATOR: FIR2 input: "
-        << reinterpret_cast<int const&>(input)
-        << std::endl;*/
-
     fir_module_2.io.x.write(reinterpret_cast<int const&>(input));
-
-    // Wait for high clock.
-    // Because the pipeline need one tick to compute the pipelined result.
-    // This will put a latency between input and output.
     wait();
 
     // Get FIR(t-6) result.
@@ -328,13 +319,38 @@ void cl_acc::acc_processing_fir2(void)
 
     // Return in inactive mode.
     status = CL_ACC_INACTIVE;
-
-    /*std::cout
-        << "ACCELERATOR: Finish to write input in FIR2."
-        << std::endl;*/
   }
 
-  //Debug
-  //cout << "ACCELERATOR: FIR2 DONE!"<<endl;
+#else // FIR_4_PER_4_PUSH
+
+  while (true)
+  {
+    // Wait for an input.
+    wait(start_processing_fir2);
+
+    uint32_t const& input = Read(INPUT2_ADDR, MEM_WORD);
+    signed char const* table = reinterpret_cast<signed char const*>(&input);
+
+    // Send value to FIR.
+    fir_module_2.io.x.write(int(table[3]));
+    wait();
+    fir_module_2.io.x.write(int(table[2]));
+    wait();
+    fir_module_2.io.x.write(int(table[1]));
+    wait();
+    fir_module_2.io.x.write(int(table[0]));
+    wait();
+
+//    std::cout << "FIR2 output: " << (fir_module_2.io.y.read() >> 26) << std::endl;
+
+    // Get FIR(t-6) result.
+    int const& output = fir_module_2.io.y.read();
+    Write(OUTPUT2_ADDR, reinterpret_cast<uint32_t const&>(output),MEM_WORD);
+
+    // Return in inactive mode.
+    status = CL_ACC_INACTIVE;
+  }
+
+#endif // FIR_4_PER_4_PUSH
 }
 
