@@ -1,6 +1,9 @@
 #include "../support/simulator/appsupport.h"
 #include "../support/simulator/accsupport.h"
-
+#include "hws_support.h"
+#include "countersupport.h"
+#include "nop_defines.h"
+#include "hal.h"
 #include "wcdma_signal_fixed.h"
 #include "math.h"
 #include "qpsk.h"
@@ -40,7 +43,11 @@ int main(int argc, char** arcg)
       //-------------------------------------- FIRST STAGE -----------------------------------------------
       //FIR for I and Q
       pr("Time before FIR = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);
-      
+      //Start processing on hw module
+      acc_start();
+      //Wait for the end of processing on hw module
+      acc_wait();
+
       for(iBuffer=0;iBuffer<bufferSize;iBuffer++)
       {            
         // Write on the hw FIR I
@@ -54,13 +61,14 @@ int main(int argc, char** arcg)
 
         // Read on the hw FIR I
         uint32_t tmp_value = acc_read_word(0x0 + sizeof(int));
-        Signal_I_filtered[iBuffer] = *((int*)(&tmp_value));
+        if (iBuffer>6)
+          Signal_I_filtered[iBuffer-7] = *((int*)(&tmp_value)) >> 26;
 
         // Read on the hw FIR Q
         tmp_value = acc_read_word(0x0 + 3*sizeof(int));
-        Signal_Q_filtered[iBuffer] = *((int*)(&tmp_value));
+        if (iBuffer>6)
+          Signal_Q_filtered[iBuffer-7] = *((int*)(&tmp_value)) >> 26;
       }
-
 
       /*fir ( FIR_COEFF, FILTER_NB_CELL, Signal_I_symb, Signal_Q_symb, bufferSize, Signal_I_filtered, Signal_Q_filtered ) ;
       // fir ( FIR_COEFF, FILTER_NB_CELL, Signal_Q_symb, bufferSize, Signal_Q_filtered ) ;*/
@@ -72,11 +80,6 @@ int main(int argc, char** arcg)
       for ( iBuffer = 0 ; iBuffer < bufferSize/2 ; iBuffer+=2 )
       {
         Signal[iBuffer] = Signal[iBuffer+bufferSize/2] ;
-        /*Signal[iBuffer+bufferSize/2] = Signal_I_filtered[iBuffer*4] ;
-
-          Signal[iBuffer+1] = Signal[iBuffer+1+bufferSize/2] ;
-          Signal[iBuffer+1+bufferSize/2] = Signal_Q_filtered[iBuffer*4] ;	*/
-
       }
       QPSKinv ( Signal_I_filtered, Signal_Q_filtered, bufferSize/2, &Signal[8] ) ;
       pr("Time after QPSK = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);

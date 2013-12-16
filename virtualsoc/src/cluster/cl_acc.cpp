@@ -56,9 +56,9 @@ void cl_acc::execute(void)
     wr         = tmp_pinout.rw;      // Read/write cmd
     size       = get_word_size(bw);
 
-    std::cout
+    /*std::cout
         << "ACCELERATOR Execute function call."
-        << std::endl;
+        << std::endl;*/
 
     // If not started and not queried to start, then continue.
     if (status == CL_ACC_STOP &&
@@ -71,7 +71,7 @@ void cl_acc::execute(void)
       sl_rdy.write(false);
       wait();
 
-      std::cout << "ACCELERATOR Idle." << std::endl;
+      //std::cout << "ACCELERATOR Idle." << std::endl;
 
       continue;
     }
@@ -79,14 +79,14 @@ void cl_acc::execute(void)
     // It is a READ request
     if (!wr)
     {
-      std::cout << "ACCELERATOR: Read " << std::hex << addr - ACCELERATOR_START_ADDR << std::dec << std::endl;
+      //std::cout << "ACCELERATOR: Read " << std::hex << addr - ACCELERATOR_START_ADDR << std::dec << std::endl;
       if (addr == ACCELERATOR_READY_ADDR)
       {
         // Debug
-        std::cout
+        /*std::cout
             << "ACCELERATOR Wait for the end of the processing at "
             << sc_time_stamp()
-            << std::endl;
+            << std::endl;*/
 
         // Wait the end of the processing
         if (status == CL_ACC_INACTIVE || status == CL_ACC_START)
@@ -94,8 +94,8 @@ void cl_acc::execute(void)
         else
           tmp_pinout.data = 0;
 
-        std::cout << "ACCELERATOR: Is active: " << tmp_pinout.data << std::endl;
-        std::cout << "ACCELERATOR: Status: " << status << std::endl;
+        /*std::cout << "ACCELERATOR: Is active: " << tmp_pinout.data << std::endl;
+        std::cout << "ACCELERATOR: Status: " << status << std::endl;*/
 
         // End of processing
         //tmp_pinout.data = 1;
@@ -115,13 +115,13 @@ void cl_acc::execute(void)
         status = CL_ACC_READ;
 
         // Debug
-        std::cout
+        /*std::cout
             << "ACCELERATOR Read at the address "
             << std::hex
             << addr
             << " at "
             << sc_time_stamp()
-            << std::endl;
+            << std::endl;*/
 
         // Return the requested data
         for (int i = 0; i < burst; i ++)
@@ -158,7 +158,7 @@ void cl_acc::execute(void)
       // Control part
       if (addr == ACCELERATOR_START_ADDR)
       {
-        std::cout << "ACCELERATOR: Start status: " << data << std::endl;
+        //std::cout << "ACCELERATOR: Start status: " << data << std::endl;
         if (data == 1)
         {
           status = CL_ACC_START;
@@ -167,18 +167,18 @@ void cl_acc::execute(void)
           start_processing.notify();
 
           // Debug
-          std::cout
+          /*std::cout
               << "ACCELERATOR: Start processing"
-              << std::endl;
+              << std::endl;*/
         }
         else
         {
           status = CL_ACC_INACTIVE;
 
           // Debug
-          std::cout
+          /*std::cout
               << "ACCELERATOR: Stop processing"
-              << std::endl;
+              << std::endl;*/
         }
 
         // Handshaking
@@ -193,14 +193,14 @@ void cl_acc::execute(void)
         status = CL_ACC_WRITE;
 
         // Debug
-        std::cout
+        /*std::cout
             << "ACCELERATOR Write at the address "
             << hex << addr
             << " the value "
             << data
             << " at "
             << sc_time_stamp()
-            << std::endl;
+            << std::endl;*/
 
         uint32_t cur_addr = addr;
 
@@ -223,7 +223,7 @@ void cl_acc::execute(void)
         {
           case INPUT1_ADDR:
             start_processing_fir1.notify();
-            std::cout << "ACCELERATOR: FIR1 pushed." << std::endl;
+            //std::cout << "ACCELERATOR: FIR1 pushed." << std::endl;
             break;
           case INPUT2_ADDR:
             start_processing_fir2.notify();
@@ -247,26 +247,26 @@ void cl_acc::execute(void)
 void cl_acc::acc_processing_fir1(void)
 {
   //Debug
-  std::cout
+  /*std::cout
       << "ACCELERATOR: FIR1 START!"
-      << std::endl;
+      << std::endl;*/
 
   while (true)
   {
     // Wait for an input.
     wait(start_processing_fir1);
 
-    std::cout
+    /*std::cout
         << "ACCELERATOR: Processing FIR1 request."
-        << std::endl;
+        << std::endl;*/
 
     uint32_t const& input = Read(INPUT1_ADDR, MEM_WORD);
 
     // Send value to FIR.
-    std::cout
+    /*std::cout
         << "ACCELERATOR: FIR1 input: "
         << reinterpret_cast<int const&>(input)
-        << std::endl;
+        << std::endl;*/
 
     fir_module_1.io.x.write(reinterpret_cast<int const&>(input));
 
@@ -282,38 +282,38 @@ void cl_acc::acc_processing_fir1(void)
     // Return in inactive mode.
     status = CL_ACC_INACTIVE;
 
-    std::cout
+    /*std::cout
         << "ACCELERATOR: Finish to write input in FIR1."
-        << std::endl;
+        << std::endl;*/
   }
 
   // Debug
-  cout << "ACCELERATOR: FIR1 DONE!"<<endl;
+  //cout << "ACCELERATOR: FIR1 DONE!"<<endl;
 }
 
 void cl_acc::acc_processing_fir2(void)
 {
   // Debug
-  std::cout
+  /*std::cout
       << "ACCELERATOR: FIR2 START!"
-      << std::endl;
+      << std::endl;*/
 
   while (true)
   {
     // Wait for an input.
     wait(start_processing_fir2);
 
-    std::cout
+    /*std::cout
         << "ACCELERATOR: Processing FIR2 request."
-        << std::endl;
+        << std::endl;*/
 
     uint32_t const& input = Read(INPUT2_ADDR, MEM_WORD);
 
     // Send value to FIR.
-    std::cout
+    /*std::cout
         << "ACCELERATOR: FIR2 input: "
         << reinterpret_cast<int const&>(input)
-        << std::endl;
+        << std::endl;*/
 
     fir_module_2.io.x.write(reinterpret_cast<int const&>(input));
 
@@ -329,12 +329,12 @@ void cl_acc::acc_processing_fir2(void)
     // Return in inactive mode.
     status = CL_ACC_INACTIVE;
 
-    std::cout
+    /*std::cout
         << "ACCELERATOR: Finish to write input in FIR2."
-        << std::endl;
+        << std::endl;*/
   }
 
   //Debug
-  cout << "ACCELERATOR: FIR2 DONE!"<<endl;
+  //cout << "ACCELERATOR: FIR2 DONE!"<<endl;
 }
 
