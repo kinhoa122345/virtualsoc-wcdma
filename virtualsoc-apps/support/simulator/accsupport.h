@@ -9,7 +9,7 @@
 #define false 0
 #define bool int
 
-uint32_t acc_read_word (uint32_t addr);
+int acc_read_word (uint32_t addr);
 void acc_write_word (uint32_t addr, uint32_t data);
 
 void acc_start ();

@@ -15,20 +15,14 @@ int main(int argc, char** arcg)
   int num_proc = get_proc_id();
   start_metric();
 
-
   register int a, iSymbol, iBuffer, iPosCode ;
-  const int bufferSize = SF/2*SAMPLING_FACTOR;
+  const    int bufferSize = SF/2*SAMPLING_FACTOR;
   register int bit;
-  int Signal_I_filtered[bufferSize];
-  int Signal_Q_filtered[bufferSize];
-  int Signal [ 16 ];
-
-
-  for ( a = 0 ; a < bufferSize ; a++ )
-  {
-    Signal_I_filtered[a] = 0 ;
-    Signal_Q_filtered[a] = 0 ;
-  }
+  int          Signal[16];
+  register int sizeof1int = 1 * sizeof(int);
+  register int sizeof2int = 2 * sizeof(int);
+  register int sizeof3int = 3 * sizeof(int);
+  register int tmp_value ;
 
   for ( a = 0 ; a < 16 ; a++ )
   {
@@ -37,70 +31,47 @@ int main(int argc, char** arcg)
 
   if (num_proc == 1)
   {
+    //Start processing on hw module
+    acc_start();
+    //Wait for the end of processing on hw module
+    acc_wait();
+
     //For each symbol
     for(iSymbol=0;iSymbol<NB_SYMBOL;iSymbol++)
     {
       //-------------------------------------- FIRST STAGE -----------------------------------------------
       //FIR for I and Q
-      pr("Time before FIR = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);
-      //Start processing on hw module
-      acc_start();
-      //Wait for the end of processing on hw module
-      acc_wait();
+      pr("Time before FIR-QPSK = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);
 
-      for(iBuffer=0;iBuffer<bufferSize;iBuffer++)
+      for (iBuffer = 0; iBuffer < bufferSize/2 ;iBuffer+=2)
+      {
+        Signal[iBuffer] = Signal[iBuffer + bufferSize/2] ;
+      }
+
+      for(iBuffer=0; iBuffer < bufferSize; iBuffer++)
       {            
         // Write on the hw FIR I
         acc_write_word(0x0, Signal_I[iBuffer+iSymbol*SF/2*SAMPLING_FACTOR] );
 
         // Write on the hw FIR Q
-        acc_write_word(0x0 + 2*sizeof(int), Signal_Q[iBuffer+iSymbol*SF/2*SAMPLING_FACTOR]);
+        acc_write_word(0x0 + sizeof2int, Signal_Q[iBuffer+iSymbol*SF/2*SAMPLING_FACTOR]);
 
-        // Wait for the end of processing on hw module
-        acc_wait();
-
-        // Read on the hw FIR I
-        uint32_t tmp_value = acc_read_word(0x0 + sizeof(int));
-        if (iBuffer>6)
-          Signal_I_filtered[iBuffer-7] = *((int*)(&tmp_value)) >> 26;
-
-        // Read on the hw FIR Q
-        tmp_value = acc_read_word(0x0 + 3*sizeof(int));
-        if (iBuffer>6)
-          Signal_Q_filtered[iBuffer-7] = *((int*)(&tmp_value)) >> 26;
+        // If "" > 6 
+        if(iBuffer > 6 && ((iBuffer -7) % 4) == 0)
+        {
+          register int add = (iBuffer-7)/2;
+          Signal[add]     = acc_read_word(sizeof1int) >> 26;
+          Signal[add + 1] = acc_read_word(sizeof3int) >> 26;
+        }        
       }
-
-      /*fir ( FIR_COEFF, FILTER_NB_CELL, Signal_I_symb, Signal_Q_symb, bufferSize, Signal_I_filtered, Signal_Q_filtered ) ;
-      // fir ( FIR_COEFF, FILTER_NB_CELL, Signal_Q_symb, bufferSize, Signal_Q_filtered ) ;*/
-      pr("Time after FIR = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);
 
       //------------------------------------- SECOND STAGE -----------------------------------------------
-      //---- QPSK-1 (parallel to serial)
-      pr("Time before QPSK = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);
-      for ( iBuffer = 0 ; iBuffer < bufferSize/2 ; iBuffer+=2 )
-      {
-        Signal[iBuffer] = Signal[iBuffer+bufferSize/2] ;
-      }
-      QPSKinv ( Signal_I_filtered, Signal_Q_filtered, bufferSize/2, &Signal[8] ) ;
-      pr("Time after QPSK = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);
 
-      //-------------------------------------- THIRD STAGE -----------------------------------------------
-      if ( iSymbol != 0 )
-      {
-        //---- Rake receiver
-        pr("Time before RakeReceiver = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL) ;
-
-        bit = 0 ;
-
-        for ( iPosCode = 0 ; iPosCode < SF ; iPosCode++ )
-        {
-          bit += Signal[iPosCode]*ovsf_code_user1[iPosCode] + Signal[iPosCode+1]*ovsf_code_user1[iPosCode] + Signal[iPosCode+2]*ovsf_code_user1[iPosCode] + Signal[iPosCode+3]*ovsf_code_user1[iPosCode] + Signal[iPosCode+4]*ovsf_code_user1[iPosCode] + Signal[iPosCode+5]*ovsf_code_user1[iPosCode] ;
-        }
+        bit = -Signal[0] - 2*Signal[1] - Signal[2] + 2*Signal[7] + Signal[8] - Signal[4] - 2*Signal[5] + Signal[10] + 2*Signal[11] + Signal[12] ;
+          
         pr("Time after RakeReceiver = ", 0x10, PR_STRING | PR_TSTAMP | PR_NEWL);
         _printdecn("Bit ", (int) ( (bit > 0) ? 1 : 0) ) ;
         pr("", 0x10, PR_NEWL);
-      }
-
     }
 
   }

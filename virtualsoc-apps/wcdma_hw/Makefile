@@ -34,7 +34,7 @@ INCDIR = \
 			-I${LIBGOMP_PATH} \
 			-I${LIBGOMP_PATH}/config/vsoc
 COMMON_CFLAGS  = $(INCDIR) -msoft-float -mcpu=arm7 -Winline
-CFLAGS         = -O2 -g $(COMMON_CFLAGS) $(LIBGOMP_FLAGS)
+CFLAGS         = -O3 -g $(COMMON_CFLAGS) $(LIBGOMP_FLAGS)
 ASFLAGS        = -mfpu=softfpa
 #OMP_CFLAGS     = -O2 -Wall ${COMMON_CFLAGS} -fopenmp -DSIZE320
 LDFLAGS       += -L${VSOC_APP_DIR}/support/lib -lgcc

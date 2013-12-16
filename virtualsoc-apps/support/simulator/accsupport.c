@@ -4,12 +4,12 @@
 #include "nop_defines.h"
 
 
-uint32_t acc_read_word (uint32_t addr)
+int acc_read_word (uint32_t addr)
 {
 	//Test if aligned
 	if(addr%4!=0) {_printhexp("unaligned address!",addr); exit(1);}
 
-	return *((uint32_t*)(ACCELERATOR_MEM_ADDR+addr));
+	return *((int*)(ACCELERATOR_MEM_ADDR+addr));
 }
 
 void acc_write_word (uint32_t addr, uint32_t data)
