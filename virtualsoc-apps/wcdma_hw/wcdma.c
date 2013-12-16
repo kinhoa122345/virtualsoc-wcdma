@@ -3,11 +3,9 @@
 #include "hws_support.h"
 #include "countersupport.h"
 #include "nop_defines.h"
-#include "hal.h"
 #include "wcdma_signal_fixed.h"
 #include "math.h"
 #include "qpsk.h"
-// #include "fir.h"
 
 
 int main(int argc, char** arcg)
