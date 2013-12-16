@@ -71,12 +71,15 @@ void cl_acc::execute(void)
       sl_rdy.write(false);
       wait();
 
+      std::cout << "ACCELERATOR Idle." << std::endl;
+
       continue;
     }
 
     // It is a READ request
     if (!wr)
     {
+      std::cout << "ACCELERATOR: Read " << std::hex << addr - ACCELERATOR_START_ADDR << std::dec << std::endl;
       if (addr == ACCELERATOR_READY_ADDR)
       {
         // Debug
@@ -86,10 +89,13 @@ void cl_acc::execute(void)
             << std::endl;
 
         // Wait the end of the processing
-        if (status == CL_ACC_INACTIVE || status == CL_ACC_STOP)
+        if (status == CL_ACC_INACTIVE || status == CL_ACC_START)
           tmp_pinout.data = 1;
         else
           tmp_pinout.data = 0;
+
+        std::cout << "ACCELERATOR: Is active: " << tmp_pinout.data << std::endl;
+        std::cout << "ACCELERATOR: Status: " << status << std::endl;
 
         // End of processing
         //tmp_pinout.data = 1;
@@ -152,6 +158,7 @@ void cl_acc::execute(void)
       // Control part
       if (addr == ACCELERATOR_START_ADDR)
       {
+        std::cout << "ACCELERATOR: Start status: " << data << std::endl;
         if (data == 1)
         {
           status = CL_ACC_START;
@@ -166,7 +173,7 @@ void cl_acc::execute(void)
         }
         else
         {
-          status = CL_ACC_STOP;
+          status = CL_ACC_INACTIVE;
 
           // Debug
           std::cout
@@ -195,6 +202,8 @@ void cl_acc::execute(void)
             << sc_time_stamp()
             << std::endl;
 
+        uint32_t cur_addr = addr;
+
         // Write the data in the request
         for (int i = 0; i < burst; i ++)
         {
@@ -210,15 +219,17 @@ void cl_acc::execute(void)
           sl_rdy.write(true);
         }
 
-        switch (addr)
+        switch (cur_addr)
         {
           case INPUT1_ADDR:
             start_processing_fir1.notify();
+            std::cout << "ACCELERATOR: FIR1 pushed." << std::endl;
             break;
           case INPUT2_ADDR:
             start_processing_fir2.notify();
             break;
           default:
+            std::cout << "ACCELERATOR: Bad address pushed: " << std::hex << addr << std::dec << std::endl;
             break;
         }
 
