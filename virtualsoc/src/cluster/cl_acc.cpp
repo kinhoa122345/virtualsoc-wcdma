@@ -61,7 +61,9 @@ void cl_acc::execute(void)
         << std::endl;
 
     // If not started and not queried to start, then continue.
-    if (status == CL_ACC_STOP && addr != ACCELERATOR_START_ADDR)
+    if (status == CL_ACC_STOP &&
+        addr != ACCELERATOR_START_ADDR &&
+        addr != ACCELERATOR_READY_ADDR)
       continue;
 
     // It is a READ request
