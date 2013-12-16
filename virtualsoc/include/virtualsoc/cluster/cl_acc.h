@@ -12,56 +12,60 @@
 
 SC_MODULE(cl_acc)
 {
-  protected:
+protected:
+
   unsigned char ID;
-  unsigned int START_ADDRESS;
-  unsigned int TARGET_MEM_SIZE;
+  unsigned int  START_ADDRESS;
+  unsigned int  TARGET_MEM_SIZE;
+
   sc_event start_processing;
+  sc_event start_processing_fir1;
+  sc_event start_processing_fir2;
 
-  char * acc_memory;
+  char* acc_memory;
 
-  public:
+public:
 
-  //Ports
-  sc_in<bool> clock;
-  sc_inout<PINOUT> slave_port;
-  sc_in<bool> sl_req;
-  sc_out<bool> sl_rdy;
-  sc_signal<int> fir_input;
-  sc_signal<int> fir_output;
+  // Ports
+  sc_in<bool>       clock;
+  sc_inout<PINOUT>  slave_port;
+  sc_in<bool>       sl_req;
+  sc_out<bool>      sl_rdy;
 
-  //Fir
-  fir::fir<64, fir::STATIC> fir_module;
+  // Fir
+  fir::fir<64, fir::STATIC_COEFFICIENT | fir::EMBEDDED> fir_module_1;
+  fir::fir<64, fir::STATIC_COEFFICIENT | fir::EMBEDDED> fir_module_2;
 
-  //Status
+  // Status
   enum cl_status
   {
     CL_ACC_INACTIVE = 0,
-    CL_ACC_READ = 1,
-    CL_ACC_WRITE = 2,
-    CL_ACC_START = 3
+    CL_ACC_READ     = 1,
+    CL_ACC_WRITE    = 2,
+    CL_ACC_START    = 3,
+    CL_ACC_STOP     = 4,
   };
   cl_status status;
 
-  //Members
-  void execute ( );
-  void acc_processing();
-  uint32_t get_word_size( uint32_t bw );
+  // Members
+  void execute(void);
+  void acc_processing_fir1(void);
+  void acc_processing_fir2(void);
+  uint32_t get_word_size(uint32_t bw);
 
   //addressing
   inline virtual uint32_t addressing(uint32_t addr)
-  {
-    return addr - START_ADDRESS;
-  }
+  { return addr - START_ADDRESS; }
 
   //Read
-  inline virtual uint32_t Read ( uint32_t addr, uint8_t bw )
+  inline virtual uint32_t Read(uint32_t addr, uint8_t bw)
   {
     uint32_t tempdata;
 
     addr = addressing(addr);
 
-    if (addr >= TARGET_MEM_SIZE) {
+    if (addr >= TARGET_MEM_SIZE)
+    {
       printf("Bad memory access in Accelerator IP: address is 0x%08x\n", addr);
       exit(1);
     }
@@ -96,11 +100,12 @@ SC_MODULE(cl_acc)
   }
 
   //Write
-  inline virtual void Write  ( uint32_t addr, uint32_t data, uint8_t bw )
+  inline virtual void Write(uint32_t addr, uint32_t data, uint8_t bw)
   {
     addr = addressing(addr);
 
-    if (addr >= TARGET_MEM_SIZE) {
+    if (addr >= TARGET_MEM_SIZE)
+    {
       printf("Bad memory access in Accelerator IP: address is 0x%08x\n", addr);
       exit(1);
     }
@@ -131,9 +136,9 @@ SC_MODULE(cl_acc)
       }
     }
   }
-  SC_HAS_PROCESS(cl_acc);
 
   //Constructor
+  SC_HAS_PROCESS(cl_acc);
   cl_acc(sc_module_name nm,
          unsigned char id,
          unsigned int START_ADDRESS,
@@ -142,16 +147,17 @@ SC_MODULE(cl_acc)
     ID(id),
     START_ADDRESS(START_ADDRESS),
     TARGET_MEM_SIZE(TARGET_MEM_SIZE),
-    fir_module("fir")
+    fir_module_1("fir_1"),
+    fir_module_2("fir_2")
   {
     printf("Build accelerator...");
 
     //Initializations
-    status = CL_ACC_INACTIVE;
+    status = CL_ACC_STOP;
     acc_memory = new char [TARGET_MEM_SIZE];
 
     //Init SystemC threads
-    SC_THREAD(acc_processing);
+    SC_THREAD(acc_processing_fir1);
     sensitive << clock.pos();
     SC_THREAD(execute);
     sensitive << clock.pos();
@@ -168,17 +174,13 @@ SC_MODULE(cl_acc)
       0       ,1  ,0   ,0  ,0   ,0  ,1  ,0,
       0       ,0  ,0   ,0  ,-1  ,0  ,0  ,0
     };
-    fir_module.init_coefficient(coeff);
-    fir_module.x(fir_input);
-    fir_module.y(fir_output);
+    fir_module_1.init_coefficient(coeff);
+    fir_module_2.init_coefficient(coeff);
     printf("Done!\n");
   }
 
   //Destructor
-  ~cl_acc()
-  {
-    delete [] acc_memory;
-  }
+  ~cl_acc() { delete [] acc_memory; }
 };
 
 #endif //_ACC_H__

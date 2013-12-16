@@ -2,7 +2,7 @@ bin
 build
 lib
 wave
-CMakeLists.txt.user
+CMakeLists.txt.user*
 *.vcd
 *.o
 *~

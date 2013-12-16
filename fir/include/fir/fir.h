@@ -12,13 +12,19 @@ namespace fir {
 
 enum fir_mode_t
 {
-  STATIC,
-  DYNAMIC
+  DEFAULT              = 0x0,
+
+  STATIC_COEFFICIENT   = DEFAULT,
+  DYNAMIC_COEFFICIENT  = 0x1,
+
+  STAND_ALONE          = DEFAULT,
+  EMBEDDED             = 0x2
 };
 
+// fir_coefficient.
 namespace detail {
 
-template <unsigned _Size, fir_mode_t mode = STATIC>
+template <unsigned _Size, unsigned _Mode = DEFAULT>
 class fir_coefficient
 {
 public:
@@ -35,7 +41,7 @@ public:
 };
 
 template <unsigned _Size>
-class fir_coefficient<_Size, DYNAMIC>
+class fir_coefficient<_Size, DYNAMIC_COEFFICIENT>
 {
 public:
 
@@ -53,25 +59,73 @@ public:
   }
 };
 
+template <unsigned _Size>
+class fir_coefficient<_Size, DYNAMIC_COEFFICIENT | EMBEDDED>
+{
+public:
+
+  sc_signal<int> val[_Size];
+
+  inline int read(unsigned pos)
+  {
+    return val[pos].read();
+  }
+
+  void set_values(int values[_Size])
+  {
+    for (unsigned i = 0; i < _Size; ++i)
+      val[i].write(values[i]);
+  }
+};
+
 } // detail
+
+namespace detail {
+
+template <unsigned _Mode = DEFAULT>
+struct io_type
+{
+public:
+
+  /// Input.
+  sc_in<int> x;
+
+  /// Output.
+  sc_out<int> y;
+};
+
+template <>
+struct io_type<EMBEDDED>
+{
+public:
+
+  /// Input
+  sc_signal<int> x;
+
+  // Output
+  sc_signal<int> y;
+};
+
+} // detail
+
 } // fir
 
 namespace fir {
 
-template <unsigned _Size, fir_mode_t _Mode = STATIC>
+template <unsigned _Size, unsigned _Mode = DEFAULT>
 SC_MODULE(fir)
 {
   static constexpr unsigned size = _Size;
 
   /// Filter coefficients.
   detail::fir_coefficient<size, _Mode> coeff;
-  /// Input.
-  sc_in<int> x;
-  /// Output.
-  sc_out<int> y;
+
+  /// Input/Output.
+  detail::io_type<_Mode & EMBEDDED> io;
 
   /// Input shift register. More recent is 0.
   sc_signal<int> shift_register[size];
+
   /// Products between shift_register and coeff elements.
   sc_signal<int> prod[size];
 
@@ -80,7 +134,7 @@ SC_MODULE(fir)
   SC_CTOR(fir)
   {
     SC_METHOD(compute_fir);
-    sensitive << x;
+    sensitive << io.x;
   }
 
   void compute_fir(void);

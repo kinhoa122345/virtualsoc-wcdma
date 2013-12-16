@@ -7,7 +7,7 @@ file(GLOB HEADER
   "./*.hpp")
 file(GLOB SOURCE "./*.cpp")
 
-set(SIZES_TO_BUILD 8 10 14 64)
+set(SIZES_TO_BUILD 8) # 10 14 64)
 
 foreach(SIZE ${SIZES_TO_BUILD})
 

@@ -35,7 +35,7 @@ int sc_main(int argc, char** argv)
 
   // Binding.
   stimulus<FIR_SIZE> stim("stimulus");
-  fir::fir<FIR_SIZE, fir::DYNAMIC> fir_module("fir_module");
+  fir::fir<FIR_SIZE, fir::DYNAMIC_COEFFICIENT> fir_module("fir_module");
   display <FIR_SIZE> displ("display", output_debug, fir_module.adder);
   {
     // stimulus.
@@ -47,8 +47,8 @@ int sc_main(int argc, char** argv)
     // fir.
     for (unsigned i = 0; i < FIR_SIZE; ++i)
       fir_module.coeff.val[i](coeff[i]);
-    fir_module.x(x);
-    fir_module.y(y);
+    fir_module.io.x(x);
+    fir_module.io.y(y);
 
     // display.
     displ.x(x);

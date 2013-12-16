@@ -12,7 +12,7 @@
 namespace fir {
 
 
-template <unsigned _Size, fir_mode_t _Mode>
+template <unsigned _Size, unsigned _Mode>
 void fir<_Size, _Mode>::compute_fir(void)
 {
   // Shifting.
@@ -20,7 +20,7 @@ void fir<_Size, _Mode>::compute_fir(void)
     for (unsigned i = 0; i < size-1; ++i)
       shift_register[i+1].write(shift_register[i].read());
 
-    shift_register[0].write(x.read());
+    shift_register[0].write(io.x.read());
   }
 
   // Product.
@@ -33,7 +33,7 @@ void fir<_Size, _Mode>::compute_fir(void)
   adder.compute(prod);
 
   // Write result in y.
-  y.write(adder.get_level(
+  io.y.write(adder.get_level(
             pipeline_adder<size>::get_level_number()-1)
           ->read());
 }
