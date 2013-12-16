@@ -17,49 +17,52 @@
 
 int main()
 {
-	//Get num proc
-	int num_proc = get_proc_id();
-	_printdecn("num proc=",num_proc);
+  //Get num proc
+  int num_proc = get_proc_id();
+  _printdecn("num proc=",num_proc);
 
-	if (num_proc==1)
-	{
-		//################ HW MODULE TEST #################
-		_printstrp("Test hw acceleration!");
+  if (num_proc==1)
+  {
+    //################ HW MODULE TEST #################
+    _printstrp("Test hw acceleration!");
 
-		start_metric();
+    start_metric();
 
-		int i;
-		for(i = 0; i < 10; i++)
-		{
-			//Write on the hw module
-			acc_write_word(0x0, i);
+    //Start processing on hw module
+    acc_start();
 
-			//Start processing on hw module
-		  	acc_start();
+    //Wait for the end of processing on hw module
+    acc_wait();
 
-			//Wait for the end of processing on hw module
-			acc_wait();
+    int i;
+    for(i = 0; i < 10; i++)
+    {
+      //Write on the hw module
+      acc_write_word(0x0, i);
 
-			//Read on the hw module
-			uint32_t tmp_value = acc_read_word(0x0 + sizeof(int));
-			int value = *((int*)(&tmp_value));
-			_printdecp("FIR value is: ", value);
-		}
+      //Wait for the end of processing on hw module
+      acc_wait();
 
-		stop_metric();
+      //Read on the hw module
+      uint32_t tmp_value = acc_read_word(0x0 + sizeof(int));
+      int value = *((int*)(&tmp_value));
+      _printdecp("FIR1 value is: ", value);
+    }
 
-		//################ COUNTER TEST #################
-		_printstrp("Test counter!");
+    stop_metric();
 
-		counter_init();
-		_1000_nop_block;
-		counter_get();
-	}
-	else
-	{
-		_printstrn("Only 1 processor is supported!");
-	}
+    //################ COUNTER TEST #################
+    _printstrp("Test counter!");
 
-	return 0;
+    counter_init();
+    _1000_nop_block;
+    counter_get();
+  }
+  else
+  {
+    _printstrn("Only 1 processor is supported!");
+  }
+
+  return 0;
 }
 
