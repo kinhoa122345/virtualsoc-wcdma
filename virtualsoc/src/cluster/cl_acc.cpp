@@ -43,7 +43,7 @@ void cl_acc::execute(void)
   sl_rdy.write(false);
 
   // Main thread
-  while(1)
+  while(true)
   {
     // Wait for request
     if (!sl_req.read()) wait(sl_req.posedge_event());
@@ -64,7 +64,15 @@ void cl_acc::execute(void)
     if (status == CL_ACC_STOP &&
         addr != ACCELERATOR_START_ADDR &&
         addr != ACCELERATOR_READY_ADDR)
+    {
+      // Handshaking
+      sl_rdy.write(true);
+      wait();
+      sl_rdy.write(false);
+      wait();
+
       continue;
+    }
 
     // It is a READ request
     if (!wr)

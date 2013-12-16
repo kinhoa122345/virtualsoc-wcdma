@@ -158,6 +158,7 @@ public:
 
     //Init SystemC threads
     SC_THREAD(acc_processing_fir1);
+    SC_THREAD(acc_processing_fir2);
     sensitive << clock.pos();
     SC_THREAD(execute);
     sensitive << clock.pos();
