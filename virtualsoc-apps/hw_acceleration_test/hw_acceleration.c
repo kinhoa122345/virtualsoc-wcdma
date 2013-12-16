@@ -37,16 +37,24 @@ int main()
     int i;
     for(i = 0; i < 10; i++)
     {
-      //Write on the hw module
+      // Write on the hw FIR1
       acc_write_word(0x0, i);
 
-      //Wait for the end of processing on hw module
+      // Write on the hw FIR2
+      acc_write_word(0x0 + 2*sizeof(int), i+3);
+
+      // Wait for the end of processing on hw module
       acc_wait();
 
-      //Read on the hw module
+      // Read on the hw FIR1.
       uint32_t tmp_value = acc_read_word(0x0 + sizeof(int));
       int value = *((int*)(&tmp_value));
       _printdecp("FIR1 value is: ", value);
+
+      // Read on the hw FIR2.
+      tmp_value = acc_read_word(0x0 + 3*sizeof(int));
+      value = *((int*)(&tmp_value));
+      _printdecp("FIR2 value is: ", value);
     }
 
     stop_metric();
