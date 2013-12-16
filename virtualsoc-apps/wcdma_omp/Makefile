@@ -8,9 +8,9 @@ endif
 
 LIBGOMP_PATH=${VSOC_APP_DIR}/libgomp
 #VSOC_APP_DIR=${VSOC_DIR}/apps
-VSOC_SRC_DIR=${VSOC_APP_DIR}/../virtualsoc/src
+VSOC_SRC_DIR=${VSOC_APP_DIR}/../virtualsoc/include
 
-PAR1 = 
+PAR1 =
 ############## Default compiler and possible option sets
 OMP_CC    = arm-elf-gcc
 CC        = arm-elf-gcc
@@ -20,10 +20,16 @@ OBJCOPY   = arm-elf-objcopy
 OBJDUMP   = arm-elf-objdump
 
 VSOC_CONFIG_PATH	= ${LIBGOMP_PATH}/config/vsoc
-SUPPORT_PATH		= ${VSOC_APP_DIR}/support/simulator
+SUPPORT_PATH		= ${VSOC_APP_DIR}/support
 
 ############## Initialization of global includes and libs
-INCDIR       = -I. -I.. -I${SUPPORT_PATH} -I${LIBGOMP_PATH} -I${VSOC_CONFIG_PATH} -I${VSOC_SRC_DIR}/core
+INCDIR = \
+		-I. -I.. \
+		-I${SUPPORT_PATH} \
+		-I${SUPPORT_PATH}/simulator \
+		-I${LIBGOMP_PATH} \
+		-I${VSOC_CONFIG_PATH} \
+		-I${VSOC_SRC_DIR} \
 
 ####################### Library FLAGS #############################
 ## Enables safe memory allocation check
@@ -68,11 +74,11 @@ OMP_CFLAGS   	= -O1 ${COMMON_CFLAGS} -fopenmp $(LIBGOMP_FLAGS)
 
 ################### LIBGOMP/APPSUPPORT Sources ########################
 CSRCS  += ${LIBGOMP_PATH}/root.c
-CSRCS  += ${SUPPORT_PATH}/appsupport.c
+CSRCS  += ${SUPPORT_PATH}/simulator/appsupport.c
 CSRCS  += fir.c
-CSRCS  += qpsk.c 
+CSRCS  += qpsk.c
 ## Boot
-ASSRCS = ${SUPPORT_PATH}/boot.s
+ASSRCS = ${SUPPORT_PATH}/simulator/boot.s
 
 ############################ OpenMP Sources ############################
 
@@ -85,7 +91,7 @@ OMP_CSRCS  += wcdma.c
 COBJS  = $(CSRCS:.c=.o)
 ASOBJS = $(ASSRCS:.s=.o)
 OMP_COBJS  = $(OMP_CSRCS:.c=.o)
-	
+
 OBJS   = $(COBJS) $(ASOBJS) $(OMP_COBJS)
 
 ############## Actual build process
@@ -95,7 +101,7 @@ all: $(EXE)
 $(EXE): $(OBJS)
 	test -d o-optimize || mkdir o-optimize
 	$(OMP_CC) $(OMP_CFLAGS) -c -o $(OMP_COBJS) $(OMP_CSRCS)
-	$(LD) -T ${SUPPORT_PATH}/vsoc.ld -o linked.o $(OBJS) $(LDFLAGS)
+	$(LD) -T ${SUPPORT_PATH}/simulator/vsoc.ld -o linked.o $(OBJS) $(LDFLAGS)
 	$(OBJCOPY) -O binary linked.o $@
 	ln -sf o-optimize/app.exe TargetMem_1.mem
 
@@ -113,7 +119,9 @@ clean:
 	rm -r -f ${LIBGOMP_PATH}/*.o
 	rm -r -f ${SUPPORT_PATH}/*.o
 	rm -f TargetMem*
-        
+
 disassemble: $(EXE)
 	$(OBJDUMP) -D linked.o > linked.dis
 
+echo:
+	@echo $(VSOC_APP_DIR)
